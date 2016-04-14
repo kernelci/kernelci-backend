@@ -41,7 +41,7 @@ class TestJobHandler(TestHandlerBase):
         expected_body = {
             "count": 0,
             "code": 200,
-            "limit": 0,
+            "limit": 1024,
             "skip": 0,
             "result": []
         }
@@ -52,7 +52,7 @@ class TestJobHandler(TestHandlerBase):
         self.assertEqual(response.code, 200)
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
-        self.assertDictEqual(json.loads(response.body), expected_body)
+        self.assertDictEqual(expected_body, json.loads(response.body))
 
     @mock.patch("utils.db.find")
     @mock.patch("utils.db.count")
@@ -74,7 +74,7 @@ class TestJobHandler(TestHandlerBase):
         self.assertEqual(response.code, 200)
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
-        self.assertDictEqual(json.loads(response.body), expected_body)
+        self.assertDictEqual(expected_body, json.loads(response.body))
 
     @mock.patch("utils.db.find")
     @mock.patch("utils.db.count")

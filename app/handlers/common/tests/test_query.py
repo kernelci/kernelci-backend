@@ -398,7 +398,7 @@ class TestCommonQuery(unittest.TestCase):
         def query_args_func(key):
             return []
 
-        self.assertEqual((0, 0), get_skip_and_limit(query_args_func))
+        self.assertTupleEqual((0, 1024), get_skip_and_limit(query_args_func))
 
     def test_get_skip_and_limit_only_skip(self):
         def query_args_func(key):
@@ -407,7 +407,7 @@ class TestCommonQuery(unittest.TestCase):
             }
             return args.get(key, [])
 
-        self.assertEqual((1, 0), get_skip_and_limit(query_args_func))
+        self.assertTupleEqual((1, 1024), get_skip_and_limit(query_args_func))
 
     def test_get_skip_and_limit_only_limit(self):
         def query_args_func(key):
@@ -416,13 +416,13 @@ class TestCommonQuery(unittest.TestCase):
             }
             return args.get(key, [])
 
-        self.assertEqual((0, 1), get_skip_and_limit(query_args_func))
+        self.assertTupleEqual((0, 1), get_skip_and_limit(query_args_func))
 
     def test_get_skip_and_limit_not_list(self):
         def query_args_func(key):
             return 1
 
-        self.assertEqual((0, 0), get_skip_and_limit(query_args_func))
+        self.assertTupleEqual((0, 1024), get_skip_and_limit(query_args_func))
 
     def test_get_skip_and_limit_valid(self):
         def query_args_func(key):
@@ -432,7 +432,17 @@ class TestCommonQuery(unittest.TestCase):
             }
             return args.get(key, [])
 
-            self.assertEqual((2, 30), get_skip_and_limit(query_args_func))
+            self.assertTupleEqual((2, 30), get_skip_and_limit(query_args_func))
+
+    def test_get_skip_and_limit_negative(self):
+        def query_args_func(key):
+            args = {
+                "limit": [0, -1, -2],
+                "skip": [10, 20, -30]
+            }
+            return args.get(key, [])
+
+            self.assertTupleEqual((2, 30), get_skip_and_limit(query_args_func))
 
     def test_get_all_query_values(self):
         def query_args_func(key):

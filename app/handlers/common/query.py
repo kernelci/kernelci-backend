@@ -582,14 +582,10 @@ def get_query_sort(query_args_func):
                 sort_order != pymongo.DESCENDING]):
             utils.LOG.warn(
                 "Wrong sort order used (%d), default to %d",
-                sort_order, pymongo.DESCENDING
-            )
+                sort_order, pymongo.DESCENDING)
             sort_order = pymongo.DESCENDING
 
-        sort = [
-            (field, sort_order)
-            for field in sort_fields
-        ]
+        sort = [(field, sort_order) for field in sort_fields]
 
     return sort
 
@@ -597,21 +593,25 @@ def get_query_sort(query_args_func):
 def get_skip_and_limit(query_args_func):
     """Retrieve the `skip` and `limit` query arguments.
 
+    If `limit` is omitted, it will default to 1204.
+
     :param query_args_func: A function used to return a list of query
     arguments.
     :type query_args_func: function
-    :return A tuple with the `skip` and `limit` arguments.
+    :return A 2-tuple: the `skip` and `limit` arguments.
     """
     skip, limit = map(query_args_func, [models.SKIP_KEY, models.LIMIT_KEY])
 
     if all([skip, isinstance(skip, types.ListType)]):
-        skip = int(skip[-1])
+        skip = abs(int(skip[-1]))
     else:
         skip = 0
 
     if all([limit, isinstance(limit, types.ListType)]):
-        limit = int(limit[-1])
+        limit = abs(int(limit[-1]))
+        if limit == 0:
+            limit = 1024
     else:
-        limit = 0
+        limit = 1024
 
     return skip, limit

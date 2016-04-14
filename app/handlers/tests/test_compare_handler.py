@@ -38,8 +38,13 @@ class TestCompareHandler(TestHandlerBase):
         mock_count.return_value = 0
         mock_find.return_value = []
 
-        expected_body = (
-            '{"count":0,"skip":0,"code":200,"limit":0,"result":[]}')
+        expected = {
+            "count": 0,
+            "skip": 0,
+            "code": 200,
+            "limit": 1024,
+            "result": []
+        }
 
         headers = {"Authorization": "foo"}
         response = self.fetch("/job?date_range=5&job=job", headers=headers)
@@ -47,7 +52,7 @@ class TestCompareHandler(TestHandlerBase):
         self.assertEqual(response.code, 200)
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
-        self.assertEqual(response.body, expected_body)
+        self.assertDictEqual(expected, json.loads(response.body))
 
     @mock.patch("utils.db.find")
     @mock.patch("utils.db.count")

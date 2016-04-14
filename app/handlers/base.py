@@ -388,6 +388,11 @@ class BaseHandler(tornado.web.RequestHandler):
         response = hresponse.HandlerResponse()
         spec, sort, fields, skip, limit, unique = self._get_query_args()
 
+        if limit > 1024:
+            response.messages = \
+                "Wrong value specified for 'limit': must be between 1 and 1024"
+            limit = 1024
+
         if unique:
             response.result = utils.db.aggregate(
                 self.collection,
