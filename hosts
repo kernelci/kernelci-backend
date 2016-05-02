@@ -1,0 +1,7 @@
+[local]
+kernel-ci-backend
+
+[all]
+api.kernelci.org
+api.armcloud.us
+staging.api.armcloud.us
