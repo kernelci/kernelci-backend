@@ -1,6 +1,9 @@
 [Unit]
 Description=Kernel CI Backend Celery
+Requires=redis-server.service
+Wants=kernelci-celery-beat.service
 After=kernelci-backend.service
+Before=kernelci-celery-beat.service
 
 [Service]
 Type=simple
