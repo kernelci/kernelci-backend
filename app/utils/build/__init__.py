@@ -746,6 +746,7 @@ def import_single_build(json_obj, db_options, base_path=utils.BASE_PATH):
     defconfig = j_get(models.DEFCONFIG_KEY)
     defconfig_full = j_get(models.DEFCONFIG_FULL_KEY, None)
 
+    # TODO: move validation at import time.
     if all([utils.valid_name(job), utils.valid_name(kernel)]):
         job_dir = os.path.join(base_path, job)
         kernel_dir = os.path.join(job_dir, kernel)

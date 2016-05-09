@@ -13,9 +13,16 @@
 
 """All build/job related celery tasks."""
 
+import os
+
+from celery import chord
+
+import models
 import taskqueue.celery as taskc
+import utils
 import utils.build
 import utils.log_parser
+import utils.storage
 
 
 @taskc.app.task(name="import-job")
@@ -40,7 +47,7 @@ def import_job(json_obj, db_options, mail_options=None):
 
 
 @taskc.app.task(name="import-build")
-def import_build(json_obj, db_options, mail_options=None):
+def import_build(json_obj):
     """Import a single build document.
 
     This is used to provide a Celery-task access to the import function.
@@ -48,44 +55,18 @@ def import_build(json_obj, db_options, mail_options=None):
     :param json_obj: The JSON object with the values necessary to import the
     build data.
     :type json_obj: dictionary
-    :param db_options: The database connection options.
-    :type db_options: dictionary
     :return The build ID and the job ID.
     """
     # build_id and job_id are necessary since they are injected by Celery into
     # another function.
     build_id, job_id, errors = utils.build.import_single_build(
-        json_obj, db_options)
+        json_obj, taskc.app.conf["DB_OPTIONS"])
     # TODO: handle errors.
     return build_id, job_id
 
 
 @taskc.app.task(name="parse-build-log")
-def parse_build_log(job_id, json_obj, db_options, mail_options=None):
-    """Wrapper around the real build log parsing function.
-
-    Used to provided a task to the import function.
-
-    :param job_id: The ID of the job saved in the database. This value is
-    injected by Celery when linking the task to the previous one.
-    :type job_id: string
-    :param json_obj: The JSON object with the necessary values.
-    :type json_obj: dictionary
-    :param db_options: The database connection parameters.
-    :type db_options: dictionary
-    :param mail_options: The options necessary to connect to the SMTP server.
-    :type mail_options: dictionary
-    :return A 2-tuple: The status code, and the errors data structure.
-    """
-    status, errors = utils.log_parser.parse_build_log(
-        job_id, json_obj, db_options)
-    # TODO: handle errors.
-    return status
-
-
-@taskc.app.task(name="parse-single-build-log")
-def parse_single_build_log(
-        prev_res, db_options, mail_options=None):
+def parse_build_log(prev_res):
     """Wrapper around the real build log parsing function.
 
     Used to provided a task to the import function.
@@ -93,13 +74,66 @@ def parse_single_build_log(
     :param prev_res: The results of the previous task, that should be a list
     with two elements: the build ID and the job ID.
     :type prev_res: list
-    :param db_options: The database connection parameters.
-    :type db_options: dictionary
-    :param mail_options: The options necessary to connect to the SMTP server.
-    :type mail_options: dictionary
     :return A 2-tuple: The status code, and the errors data structure.
     """
     status, errors = utils.log_parser.parse_single_build_log(
-        prev_res[0], prev_res[1], db_options)
+        prev_res[0], prev_res[1], taskc.app.conf["DB_OPTIONS"])
     # TODO: handle errors.
-    return status
+    return status, prev_res[0]
+
+
+@taskc.app.task(name="upload-artifacts")
+def upload_artifacts(prev_res, json_obj):
+    """Upload build artifacts to the file storage.
+
+    :param prev_res: The results from the previous task.
+    :type prev_res: list
+    :param json_obj: The JSON data as sent by the client.
+    :type json_obj: dict
+    :return The status code.
+    """
+    j_get = json_obj.get
+    job_dir = os.path.join(utils.BASE_PATH, j_get(models.JOB_KEY))
+    kernel_dir = os.path.join(job_dir, j_get(models.KERNEL_KEY))
+
+    build_rel_dir = "{:s}-{:s}".format(
+        j_get(models.ARCHITECTURE_KEY),
+        j_get(models.DEFCONFIG_FULL_KEY, None) or j_get(models.DEFCONFIG_KEY)
+    )
+    build_dir = os.path.join(kernel_dir, build_rel_dir)
+
+    ret_val, errors = utils.storage.upload_build_artifacts(
+        build_dir, taskc.app.conf["AWS_OPTIONS"])
+
+    # TODO: handle errors
+    return ret_val
+
+
+@taskc.app.task(name="remove-local-artifacts")
+def remove_local_artifacts(prev, json_obj):
+    """Remove the local artifacts from the filesystem.
+
+    :param prev_res: The results from the previous task.
+    :type prev_res: list
+    :param json_obj: The JSON data as sent by the client.
+    :type json_obj: dict
+    """
+    # TODO
+    return 200
+
+
+def complete_build_import(json_obj):
+    """Complete the build import.
+
+    Wrapper around the real tasks execution.
+
+    Parse the JSON file, parse the build logs, upload data to the storage
+    server, and then delete the local data.
+
+    :param json_obj: The JSON data as sent by the client.
+    :type json_obj: dict
+    """
+    chord(
+        header=(import_build.s(json_obj) | parse_build_log.s() |
+                upload_artifacts.s(json_obj))
+    )(remove_local_artifacts.s(json_obj))

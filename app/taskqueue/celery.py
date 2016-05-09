@@ -65,9 +65,11 @@ CELERYBEAT_SCHEDULE = {
     }
 }
 
-# The database connection parameters.
+# The database connection parameters and AWS creadentials.
 # Read from a config file from disk.
 DB_OPTIONS = {}
+AWS_OPTIONS = {}
+
 if os.path.exists(CELERY_CONFIG_FILE):
     parser = ConfigParser.ConfigParser()
     try:
@@ -99,11 +101,27 @@ if os.path.exists(CELERY_CONFIG_FILE):
             if parser.has_option(CELERY_CONFIG_SECTION, "dbpassword"):
                 DB_OPTIONS["dbpassword"] = parser.getint(
                     CELERY_CONFIG_SECTION, "dbpassword")
+
+            # AWS credentials.
+            if parser.has_option(CELERY_CONFIG_SECTION, "aws_s3_bucket"):
+                AWS_OPTIONS["aws_s3_bucket"] = parser.get(
+                    CELERY_CONFIG_SECTION, "aws_s3_bucket")
+
+            if parser.has_option(CELERY_CONFIG_SECTION, "aws_access_key_id"):
+                AWS_OPTIONS["aws_access_key_id"] = parser.get(
+                    CELERY_CONFIG_SECTION, "aws_access_key_id")
+
+            if parser.has_option(
+                    CELERY_CONFIG_SECTION, "aws_secret_access_key"):
+                AWS_OPTIONS["aws_secret_access_key"] = parser.get(
+                    CELERY_CONFIG_SECTION, "aws_secret_access_key")
+
     except ConfigParser.ParsingError:
         utils.LOG.error("Error reading config file from disk")
 
 app.conf.update(
     DB_OPTIONS=DB_OPTIONS,
+    AWS_OPTIONS=AWS_OPTIONS,
     CELERYBEAT_SCHEDULE=CELERYBEAT_SCHEDULE
 )
 
