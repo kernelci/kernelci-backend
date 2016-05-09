@@ -47,15 +47,7 @@ class UploadHandler(hbase.BaseHandler):
 
         Checks that everything is OK to perform a GET.
         """
-        response = None
-        valid_token, _ = self.validate_req_token("GET")
-
-        if valid_token:
-            response = hresponse.HandlerResponse(501)
-        else:
-            response = hresponse.HandlerResponse(403)
-
-        return response
+        return hresponse.HandlerResponse(501)
 
     def execute_delete(self, *args, **kwargs):
         """Perform DELETE pre-operations.
@@ -63,15 +55,7 @@ class UploadHandler(hbase.BaseHandler):
         Check that the DELETE request is OK.
         """
         # TODO: in the future we need to enable delete as well.
-        response = None
-        valid_token, _ = self.validate_req_token("DELETE")
-
-        if valid_token:
-            response = hresponse.HandlerResponse(501)
-        else:
-            response = hresponse.HandlerResponse(403)
-
-        return response
+        return hresponse.HandlerResponse(501)
 
     def execute_post(self, *args, **kwargs):
         """Execute the POST pre-operations.
