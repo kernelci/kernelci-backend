@@ -159,3 +159,24 @@ def upload_build_artifacts(path, aws_options):
         ret_val = 500
 
     return ret_val, errors
+
+
+def upload_artifact(path, aws_options):
+    """Upload a single file to the file storage.
+
+    :param path: The path to the artifact to upload.
+    :type path: str
+    :param aws_options: The AWS connection parameters.
+    :type aws_options: dict
+    :return A 2-tuple: status code, error string.
+    """
+    ret_val = 200
+    error = ""
+
+    if os.path.isfile(path):
+        ret_val, error = upload_to_s3(path, aws_options)
+    else:
+        ret_val = 400
+        error = "Provided path is not a file"
+
+    return ret_val, error

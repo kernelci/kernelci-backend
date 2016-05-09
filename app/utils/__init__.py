@@ -17,6 +17,7 @@
 
 import bson
 import re
+import os
 
 import models
 import utils.log
@@ -241,3 +242,25 @@ def get_defconfig_full(build_dir,
             defconfig_full = defconfig_full_k
 
     return defconfig_full
+
+
+def create_build_dir(json_obj):
+    """Create the correct build directory.
+
+    The JSON object passed has to be already validated.
+
+    :param json_obj: The JSON data as sent.
+    :type json_obj: dict
+    :return The build directory path on the filesystem.
+    """
+    j_get = json_obj.get
+    job_dir = os.path.join(BASE_PATH, j_get(models.JOB_KEY))
+    kernel_dir = os.path.join(job_dir, j_get(models.KERNEL_KEY))
+
+    build_rel_dir = "{:s}-{:s}".format(
+        j_get(models.ARCHITECTURE_KEY),
+        j_get(models.DEFCONFIG_FULL_KEY, None) or j_get(models.DEFCONFIG_KEY)
+    )
+    build_dir = os.path.join(kernel_dir, build_rel_dir)
+
+    return build_dir

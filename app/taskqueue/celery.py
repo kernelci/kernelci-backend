@@ -37,7 +37,8 @@ TASKS_LIST = [
     "taskqueue.tasks.compare",
     "taskqueue.tasks.report",
     "taskqueue.tasks.stats",
-    "taskqueue.tasks.test"
+    "taskqueue.tasks.test",
+    "taskqueue.tasks.upload"
 ]
 
 # Register the custom decoder/encoder for celery with the name "kjson".

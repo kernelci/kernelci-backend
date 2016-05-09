@@ -13,12 +13,10 @@
 
 """All build/job related celery tasks."""
 
-import os
-
 from celery import chord
 
-import models
 import taskqueue.celery as taskc
+import taskqueue.tasks.upload as upload_tasks
 import utils
 import utils.build
 import utils.log_parser
@@ -82,46 +80,6 @@ def parse_build_log(prev_res):
     return status, prev_res[0]
 
 
-@taskc.app.task(name="upload-artifacts")
-def upload_artifacts(prev_res, json_obj):
-    """Upload build artifacts to the file storage.
-
-    :param prev_res: The results from the previous task.
-    :type prev_res: list
-    :param json_obj: The JSON data as sent by the client.
-    :type json_obj: dict
-    :return The status code.
-    """
-    j_get = json_obj.get
-    job_dir = os.path.join(utils.BASE_PATH, j_get(models.JOB_KEY))
-    kernel_dir = os.path.join(job_dir, j_get(models.KERNEL_KEY))
-
-    build_rel_dir = "{:s}-{:s}".format(
-        j_get(models.ARCHITECTURE_KEY),
-        j_get(models.DEFCONFIG_FULL_KEY, None) or j_get(models.DEFCONFIG_KEY)
-    )
-    build_dir = os.path.join(kernel_dir, build_rel_dir)
-
-    ret_val, errors = utils.storage.upload_build_artifacts(
-        build_dir, taskc.app.conf["AWS_OPTIONS"])
-
-    # TODO: handle errors
-    return ret_val
-
-
-@taskc.app.task(name="remove-local-artifacts")
-def remove_local_artifacts(prev, json_obj):
-    """Remove the local artifacts from the filesystem.
-
-    :param prev_res: The results from the previous task.
-    :type prev_res: list
-    :param json_obj: The JSON data as sent by the client.
-    :type json_obj: dict
-    """
-    # TODO
-    return 200
-
-
 def complete_build_import(json_obj):
     """Complete the build import.
 
@@ -135,5 +93,5 @@ def complete_build_import(json_obj):
     """
     chord(
         header=(import_build.s(json_obj) | parse_build_log.s() |
-                upload_artifacts.s(json_obj))
-    )(remove_local_artifacts.s(json_obj))
+                upload_tasks.upload_build_artifacts.s(json_obj))
+    )(upload_tasks.remove_build_artifacts.s(json_obj))
