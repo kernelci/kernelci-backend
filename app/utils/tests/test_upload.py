@@ -227,3 +227,9 @@ class TestUpload(unittest.TestCase):
         self.assertEqual(ret_dict["status"], 200)
         self.assertEqual(ret_dict["filename"], filename)
         self.assertIsNone(ret_dict["error"])
+
+    def test_check_upload_path(self):
+        path = "next/next-20160510/build.json"
+        expected = "/var/www/images/kernel-ci/next/next-20160510/build.json"
+
+        self.assertEqual(expected, upload.check_upload_path(path))

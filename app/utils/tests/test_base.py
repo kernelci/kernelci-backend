@@ -190,3 +190,41 @@ class TestBaseUtils(unittest.TestCase):
         }
 
         self.assertDictEqual(expected, spec)
+
+    def test_create_build_dir(self):
+        json_obj = {
+            "job": "job",
+            "kernel": "kernel",
+            "arch": "arm",
+            "defconfig": "defconfig"
+        }
+        expected = "/var/www/images/kernel-ci/job/kernel/arm-defconfig"
+
+        self.assertEqual(expected, utils.create_build_dir(json_obj))
+
+    def test_create_build_dir_with_defconfig_full(self):
+        json_obj = {
+            "job": "job",
+            "kernel": "kernel",
+            "arch": "arm",
+            "defconfig": "defconfig",
+            "defconfig_full": "defconfig_full"
+        }
+        expected = "/var/www/images/kernel-ci/job/kernel/arm-defconfig_full"
+
+        self.assertEqual(expected, utils.create_build_dir(json_obj))
+
+    def test_create_boot_dir(self):
+        json_obj = {
+            "job": "job",
+            "kernel": "kernel",
+            "arch": "arm",
+            "defconfig": "defconfig",
+            "defconfig_full": "defconfig_full",
+            "board": "board",
+            "lab_name": "lab-name"
+        }
+        expected = (
+            "/var/www/images/kernel-ci/job/kernel/arm-defconfig_full/lab-name")
+
+        self.assertEqual(expected, utils.create_boot_dir(json_obj))

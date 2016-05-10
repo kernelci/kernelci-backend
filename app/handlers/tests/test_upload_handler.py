@@ -36,7 +36,7 @@ class TestUploadHandler(TestHandlerBase):
 
     def test_get_no_token(self):
         response = self.fetch("/upload", method="GET")
-        self.assertEqual(response.code, 403)
+        self.assertEqual(response.code, 501)
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
 
@@ -51,7 +51,7 @@ class TestUploadHandler(TestHandlerBase):
 
     def test_delete_no_token(self):
         response = self.fetch("/upload", method="DELETE")
-        self.assertEqual(response.code, 403)
+        self.assertEqual(response.code, 501)
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
 
