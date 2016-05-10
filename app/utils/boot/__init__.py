@@ -133,7 +133,7 @@ def save_to_disk(boot_doc, json_obj, base_path, errors):
     r_defconfig = "-".join([arch, defconfig_full])
 
     dir_path = os.path.join(base_path, job, kernel, r_defconfig, lab_name)
-    file_path = os.path.join(dir_path, "boot-%s.json" % board)
+    file_path = os.path.join(dir_path, utils.BOOT_REPORT_FORMAT.format(board))
 
     try:
         if not os.path.isdir(dir_path):

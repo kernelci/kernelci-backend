@@ -113,7 +113,7 @@ def upload_build_artifacts(path, aws_options):
     def upload_callback(res):
         """Callback for the upload operation.
 
-        :param res: The return value from the callee.
+        :param res: The return value from the called function.
         :type res: tuple
         """
         upload_status.append(res[0])
@@ -150,7 +150,7 @@ def upload_build_artifacts(path, aws_options):
             ret_val = reduce(lambda x, y: x | y, upload_status)
         else:
             ret_val = 500
-            errors.append("Provided directory to upload does not exists")
+            errors.append("Provided directory to upload does not exist")
     else:
         ret_val = 500
         errors.append("Missing AWS credentials")

@@ -27,6 +27,7 @@ LOG = utils.log.get_log()
 
 # Pattern used for glob matching files on the filesystem.
 BOOT_REPORT_PATTERN = "boot-*.json"
+BOOT_REPORT_FORMAT = "boot-{:s}.json"
 
 # Build log file names.
 BUILD_LOG_FILE = "build.log"
@@ -264,3 +265,16 @@ def create_build_dir(json_obj):
     build_dir = os.path.join(kernel_dir, build_rel_dir)
 
     return build_dir
+
+
+def create_boot_dir(json_obj):
+    """Craete the boot directory where reporsts and logs are stored.
+
+    :param json_obj: The JSON data as sent.
+    :type json_obj: dict
+    :return The boot directory path on the filesystem.
+    """
+    build_dir = create_build_dir(json_obj)
+    boot_dir = os.path.join(build_dir, json_obj.get(models.LAB_NAME_KEY))
+
+    return boot_dir

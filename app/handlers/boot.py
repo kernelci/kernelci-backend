@@ -23,6 +23,7 @@ import models
 import models.lab as mlab
 import models.token as mtoken
 import taskqueue.tasks.boot as taskq
+import taskqueue.tasks.upload as upload_task
 import utils.db
 
 
@@ -54,7 +55,8 @@ class BootHandler(hbase.BaseHandler):
             response.reason = "Request accepted and being imported"
 
             taskq.import_boot.apply_async(
-                [kwargs["json_obj"], self.settings["dboptions"]])
+                [kwargs["json_obj"], self.settings["dboptions"]],
+                link=upload_task.complete_boot_import.s(kwargs["json_obj"]))
         else:
             response = hresponse.HandlerResponse(403)
             response.reason = (

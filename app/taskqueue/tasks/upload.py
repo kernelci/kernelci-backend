@@ -22,9 +22,11 @@ except ImportError:
 
 from celery import chord
 
+import models
 import taskqueue.celery as taskc
 import utils
 import utils.storage
+import utils.upload
 
 
 @taskc.app.task(name="remove-build-artifacts")
@@ -65,9 +67,9 @@ def remove_single_artifact(prev_res, path):
     :param path: The path to the artifact to remove.
     :type path: str
     """
-    if prev_res[0] == 200:
+    if prev_res[0][0] == 200:
         try:
-            os.remove(path)
+            os.remove(utils.upload.check_upload_path(path))
         except OSError as ex:
             # OSError is 2 when the file is not found.
             if ex.errno != 2:
@@ -82,7 +84,8 @@ def upload_single_artifact(path):
     :param path: The path to the artifact to upload.
     :type path: str
     """
-    return utils.storage.upload_artifact(path, taskc.app.conf["AWS_OPTIONS"])
+    return utils.storage.upload_artifact(
+        utils.upload.check_upload_path(path), taskc.app.conf["AWS_OPTIONS"])
 
 
 @taskc.app.task(name="build-upload-artifacts")
@@ -103,10 +106,34 @@ def upload_build_artifacts(prev_res, json_obj):
     return ret_val
 
 
+@taskc.app.task(name="complete-boot-import")
+def complete_boot_import(prev_res, json_obj):
+    """Complete the boot import uploading, and deleting, the boot JSON report.
+
+    :param prev_res: The results from the previous task.
+    :type prev_res: list
+    :param json_obj: The JSON data as sent by the client.
+    :type json_obj: dict
+    """
+    boot_dir = utils.create_boot_dir(json_obj)
+    path = os.path.join(
+        boot_dir,
+        utils.BOOT_REPORT_FORMAT.format(json_obj.get(models.BOARD_KEY)))
+
+    utils.LOG.info("BOOT PATH: %s", path)
+
+    chord(
+        header=upload_single_artifact.s(path)
+    )(remove_single_artifact.s(path))
+
+
 def complete_single_import(path):
     """Wrapper around the single artifact import task.
 
-    :param path: The path to the artifact to upload.
+    Upload the artifact to the file storage system, and then delete it
+    from the local filesystem.
+
+    :param path: The path to the artifact to upload and remove.
     :type path: str
     """
     chord(

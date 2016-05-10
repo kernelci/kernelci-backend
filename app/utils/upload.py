@@ -20,6 +20,21 @@ import os
 import utils
 
 
+def check_upload_path(path):
+    """Check that the path to the artifact matches the filesystem.
+
+    :param path: The path to the artifact to upload.
+    :type path: str
+    :return The correct path.
+    """
+    new_path = path
+    if utils.BASE_PATH not in new_path:
+        if new_path[0] == "/":
+            new_path = new_path[1:]
+        new_path = os.path.join(utils.BASE_PATH, new_path)
+    return new_path
+
+
 def is_valid_dir_path(path, base_path=utils.BASE_PATH):
     """Verify if the provided path is a valid directory.
 

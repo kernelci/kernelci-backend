@@ -22,6 +22,7 @@ import handlers.common.token
 import handlers.response as hresponse
 import models
 import utils.upload
+import taskqueue.tasks.upload as upload_task
 
 
 class UploadHandler(hbase.BaseHandler):
@@ -161,6 +162,10 @@ class UploadHandler(hbase.BaseHandler):
                             location = self._create_storage_url(path)
                             if location is not None:
                                 response.headers = {"Location": location}
+
+                        # Move the artifact to the file storage and then remove
+                        # it from the filesystem.
+                        upload_task.complete_single_import(path)
                     else:
                         response.status_code = ret_dict["status"]
                         response.reason = "Unable to save file"
