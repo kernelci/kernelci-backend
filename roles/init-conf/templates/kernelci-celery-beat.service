@@ -1,5 +1,6 @@
 [Unit]
 Description=Kernel CI Backend Celery Beat
+Requires=kernelci-celery.service
 After=kernelci-celery.service
 
 [Service]

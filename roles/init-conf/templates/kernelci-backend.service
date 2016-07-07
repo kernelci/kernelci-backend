@@ -1,7 +1,6 @@
 [Unit]
 Description=Kernel CI Backend Service
-Requires=mongod.service kernelci-celery.service
-Before=kernelci-celery.service kernelci-celery-beat.service
+Requires=mongod.service
 After=mongod.service
 
 [Service]
