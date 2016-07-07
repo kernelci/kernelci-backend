@@ -22,7 +22,7 @@ WorkingDirectory={{ install_base }}/{{ hostname }}/app
 ExecStart={{ install_base }}/.venv/{{ hostname }}/bin/python -OO -R \
     {{ install_base }}/.venv/{{ hostname }}/bin/celery beat \
     --loglevel=INFO --schedule=/var/run/celery/kernelci-beat.db \
-    --app=taskqueue
+    --app=taskqueue --pidfile=/tmp/kernelci-celery-beat.pid
 
 [Install]
 WantedBy=multi-user.target
