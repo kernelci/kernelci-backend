@@ -1,2 +1,3 @@
 hostname: api.kernelci.org
 role: production
+certname: api.kernelci.org

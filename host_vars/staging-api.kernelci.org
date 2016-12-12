@@ -1,2 +1,3 @@
 hostname: staging-api.kernelci.org
 role: production
+certname: staging-api.kernelci.org
