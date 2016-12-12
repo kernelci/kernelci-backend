@@ -1,7 +1,12 @@
 [local]
 kernel-ci-backend
 
-[all]
+[dev]
+staging-api.kernelci.org
+
+[prod]
 api.kernelci.org
-api.armcloud.us
-staging.api.armcloud.us
+
+[all:children]
+prod
+dev

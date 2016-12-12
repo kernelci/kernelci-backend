@@ -49,7 +49,6 @@
     - firewall
 
 - name: Accept web secure connections
-  when: role == "production"
   ufw:  rule=allow
         port=443
         proto=tcp
@@ -71,6 +70,7 @@
   when: role == "production"
   tags:
     - firewall
+    - monitoring
 
 - name: Enable ufw
   ufw: state=enabled

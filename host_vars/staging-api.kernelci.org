@@ -1,0 +1,2 @@
+hostname: staging-api.kernelci.org
+role: production
