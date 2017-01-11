@@ -13,6 +13,10 @@
     - python-virtualenv
     - python2.7-dev
     - sysfsutils
+    - python3
+    - python3-yaml
+    - python3-setproctitle
+    - python3-zmq
   tags:
     - install
     - deps
