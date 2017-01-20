@@ -187,6 +187,13 @@ def _get_boot_seconds(boot_dict):
     return boot_time
 
 
+def _seconds_as_datetime(seconds):
+    """
+    Returns seconds encoded as a point in time `seconds` seconds after since 1970-01-01T00:00:00Z.
+    """
+    return datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=seconds)
+
+
 def _update_boot_doc_from_json(boot_doc, boot_dict, errors):
     """Update a BootDocument from the provided boot dictionary.
 
@@ -203,33 +210,24 @@ def _update_boot_doc_from_json(boot_doc, boot_dict, errors):
     
     try:
         seconds = _get_boot_seconds(boot_dict)
-    except BootValidationError, ex:
+    except BootValidationError as ex:
         seconds = 0.0
-        err_msg = ("Error reading boot time data; defaulting to 0")
+        err_msg = "Error reading boot time data; defaulting to 0"
+        utils.LOG.exception(ex)
+        utils.LOG.error(err_msg)
+        ERR_ADD(errors, 400, err_msg)
+
+    try:
+        boot_doc.time = _seconds_as_datetime(seconds)
+    except OverflowError as ex:
+        seconds = 0.0
+        err_msg = "Boot time value is too large for a time value, default to 0"
         utils.LOG.exception(ex)
         utils.LOG.error(err_msg)
         ERR_ADD(errors, 400, err_msg)
 
     if seconds == 0.0:
-        boot_doc.time = datetime.datetime(
-            1970, 1, 1, hour=0, minute=0, second=0)
-    else:
-        try:
-            time_d = datetime.timedelta(seconds=seconds)
-            boot_doc.time = datetime.datetime(
-                1970, 1, 1,
-                minute=time_d.seconds / 60,
-                second=time_d.seconds % 60,
-                microsecond=time_d.microseconds
-            )
-        except OverflowError, ex:
-            # Default to 0 time.
-            boot_doc.time = datetime.datetime(
-                1970, 1, 1, hour=0, minute=0, second=0)
-            err_msg = "Boot time value is too large for a time value, default to 0"
-            utils.LOG.exception(ex)
-            utils.LOG.error(err_msg)
-            ERR_ADD(errors, 400, err_msg)
+        boot_doc.time = _seconds_as_datetime(seconds)
 
     boot_doc.status = boot_dict.get(
         models.BOOT_RESULT_KEY, models.UNKNOWN_STATUS)
