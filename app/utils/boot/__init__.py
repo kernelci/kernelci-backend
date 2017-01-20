@@ -172,42 +172,49 @@ def save_to_disk(boot_doc, json_obj, base_path, errors):
         ERR_ADD(errors, 500, err_msg)
 
 
-def _update_boot_doc_from_json(boot_doc, json_pop_f, errors):
-    """Update a BootDocument from the provided JSON boot object.
+def _get_boot_seconds(boot_dict):
+    """Returns boot time in seconds"""
+    try:
+        boot_time_raw = boot_dict[models.BOOT_TIME_KEY]
+    except KeyError:
+        raise BootValidationError("Boot time missing")
+    try:
+        boot_time = float(boot_time_raw)
+    except ValueError:
+        raise BootValidationError("Boot time is not a number: {!r}".format(boot_time_raw))
+    if boot_time < 0.0:
+        raise BootValidationError("Found negative boot time")
+    return boot_time
+
+
+def _update_boot_doc_from_json(boot_doc, boot_dict, errors):
+    """Update a BootDocument from the provided boot dictionary.
 
     This function does not return anything, and the BootDocument passed is
     updated from the values found in the provided JSON object.
 
     :param boot_doc: The BootDocument to update.
     :type boot_doc: `models.boot.BootDocument`.
-    :param json_pop_f: The function used to pop elements out of the JSON
-    object.
-    :type json_pop_f: function
+    :param boot_dict: Boot dictionary.
+    :type boot_dict: dict
     :param errors: Where errors should be stored.
     :type errors: dict
     """
-    boot_time = json_pop_f(models.BOOT_TIME_KEY, 0.0)
+    
     try:
-        seconds = float(boot_time)
-    except ValueError, ex:
-        # Default to 0.
+        seconds = _get_boot_seconds(boot_dict)
+    except BootValidationError, ex:
         seconds = 0.0
-        err_msg = (
-            "Error reading boot time data, got: %s; defaulting to 0" %
-            str(boot_time))
+        err_msg = ("Error reading boot time data; defaulting to 0")
         utils.LOG.exception(ex)
         utils.LOG.error(err_msg)
         ERR_ADD(errors, 400, err_msg)
 
-    try:
-        if seconds < 0.0:
-            seconds = 0.0
-            ERR_ADD(errors, 400, "Boot time is negative, defaulting to 0")
-
-        if seconds == 0.0:
-            boot_doc.time = datetime.datetime(
-                1970, 1, 1, hour=0, minute=0, second=0)
-        else:
+    if seconds == 0.0:
+        boot_doc.time = datetime.datetime(
+            1970, 1, 1, hour=0, minute=0, second=0)
+    else:
+        try:
             time_d = datetime.timedelta(seconds=seconds)
             boot_doc.time = datetime.datetime(
                 1970, 1, 1,
@@ -215,15 +222,16 @@ def _update_boot_doc_from_json(boot_doc, json_pop_f, errors):
                 second=time_d.seconds % 60,
                 microsecond=time_d.microseconds
             )
-    except OverflowError, ex:
-        # Default to 0 time.
-        boot_doc.time = datetime.datetime(
-            1970, 1, 1, hour=0, minute=0, second=0)
-        err_msg = "Boot time value is too large for a time value, default to 0"
-        utils.LOG.exception(ex)
-        utils.LOG.error(err_msg)
-        ERR_ADD(errors, 400, err_msg)
+        except OverflowError, ex:
+            # Default to 0 time.
+            boot_doc.time = datetime.datetime(
+                1970, 1, 1, hour=0, minute=0, second=0)
+            err_msg = "Boot time value is too large for a time value, default to 0"
+            utils.LOG.exception(ex)
+            utils.LOG.error(err_msg)
+            ERR_ADD(errors, 400, err_msg)
 
+    json_pop_f = boot_dict.get
     boot_doc.status = json_pop_f(
         models.BOOT_RESULT_KEY, models.UNKNOWN_STATUS)
     boot_doc.board_instance = json_pop_f(models.BOARD_INSTANCE_KEY, None)
@@ -417,7 +425,7 @@ def _parse_boot_from_json(boot_json, database, errors):
         job, kernel, defconfig, lab_name, defconfig_full, arch)
     boot_doc.created_on = datetime.datetime.now(
         tz=bson.tz_util.utc)
-    _update_boot_doc_from_json(boot_doc, json_pop_f, errors)
+    _update_boot_doc_from_json(boot_doc, boot_json, errors)
     _update_boot_doc_ids(boot_doc, database)
     return boot_doc
 
