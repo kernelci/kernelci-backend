@@ -373,47 +373,45 @@ def _parse_boot_from_json(boot_json, database, errors):
     :return A `models.boot.BootDocument` instance, or None if the JSON cannot
     be parsed correctly.
     """
-    boot_doc = None
+    if not boot_json:
+        return None
 
-    if boot_json:
-        try:
-            json_pop_f = boot_json.pop
-            json_get_f = boot_json.get
+    try:
+        _check_for_null(boot_json.get)
+    except BootImportError, ex:
+        utils.LOG.exception(ex)
+        ERR_ADD(errors, 400, str(ex))
+        return None
 
-            _check_for_null(json_get_f)
+    try:
+        board = boot_json[models.BOARD_KEY]
+        job = boot_json[models.JOB_KEY]
+        kernel = boot_json[models.KERNEL_KEY]
+        defconfig = boot_json[models.DEFCONFIG_KEY]
+        lab_name = boot_json[models.LAB_NAME_KEY]
+    except KeyError, ex:
+        err_msg = "Missing mandatory key in boot data"
+        utils.LOG.exception(ex)
+        utils.LOG.error(err_msg)
+        ERR_ADD(errors, 400, err_msg)
+        return None
 
-            board = json_pop_f(models.BOARD_KEY)
-            job = json_pop_f(models.JOB_KEY)
-            kernel = json_pop_f(models.KERNEL_KEY)
-            defconfig = json_pop_f(models.DEFCONFIG_KEY)
-            defconfig_full = json_pop_f(models.DEFCONFIG_FULL_KEY, defconfig)
-            lab_name = json_pop_f(models.LAB_NAME_KEY)
-            arch = json_pop_f(
-                models.ARCHITECTURE_KEY, models.ARM_ARCHITECTURE_KEY)
+    defconfig_full = boot_json.get(models.DEFCONFIG_FULL_KEY, defconfig)
+    arch = boot_json.get(models.ARCHITECTURE_KEY, models.ARM_ARCHITECTURE_KEY)
 
-            if not arch:
-                arch = models.ARM_ARCHITECTURE_KEY
+    if arch not in models.VALID_ARCHITECTURES:
+        err_msg = "Invalid architecture found: %s".format(arch)
+        utils.LOG.error(err_msg)
+        ERR_ADD(errors, 400, err_msg)
+        return None
 
-            if arch in models.VALID_ARCHITECTURES:
-                boot_doc = mboot.BootDocument(
-                    board,
-                    job, kernel, defconfig, lab_name, defconfig_full, arch)
-                boot_doc.created_on = datetime.datetime.now(
-                    tz=bson.tz_util.utc)
-                _update_boot_doc_from_json(boot_doc, json_pop_f, errors)
-                _update_boot_doc_ids(boot_doc, database)
-            else:
-                raise BootImportError(
-                    "Invalid architecture found: %s".format(arch))
-        except KeyError, ex:
-            err_msg = "Missing mandatory key in boot data"
-            utils.LOG.exception(ex)
-            utils.LOG.error(err_msg)
-            ERR_ADD(errors, 400, err_msg)
-        except BootImportError, ex:
-            utils.LOG.exception(ex)
-            ERR_ADD(errors, 400, str(ex))
-
+    boot_doc = mboot.BootDocument(
+        board,
+        job, kernel, defconfig, lab_name, defconfig_full, arch)
+    boot_doc.created_on = datetime.datetime.now(
+        tz=bson.tz_util.utc)
+    _update_boot_doc_from_json(boot_doc, json_pop_f, errors)
+    _update_boot_doc_ids(boot_doc, database)
     return boot_doc
 
 
