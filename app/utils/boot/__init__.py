@@ -231,54 +231,49 @@ def _update_boot_doc_from_json(boot_doc, boot_dict, errors):
             utils.LOG.error(err_msg)
             ERR_ADD(errors, 400, err_msg)
 
-    json_pop_f = boot_dict.get
-    boot_doc.status = json_pop_f(
+    boot_doc.status = boot_dict.get(
         models.BOOT_RESULT_KEY, models.UNKNOWN_STATUS)
-    boot_doc.board_instance = json_pop_f(models.BOARD_INSTANCE_KEY, None)
-    boot_doc.boot_log = json_pop_f(models.BOOT_LOG_KEY, None)
-    boot_doc.boot_log_html = json_pop_f(models.BOOT_LOG_HTML_KEY, None)
-    boot_doc.boot_result_description = json_pop_f(
+    boot_doc.board_instance = boot_dict.get(models.BOARD_INSTANCE_KEY, None)
+    boot_doc.boot_log = boot_dict.get(models.BOOT_LOG_KEY, None)
+    boot_doc.boot_log_html = boot_dict.get(models.BOOT_LOG_HTML_KEY, None)
+    boot_doc.boot_result_description = boot_dict.get(
         models.BOOT_RESULT_DESC_KEY, None)
-    boot_doc.dtb = json_pop_f(models.DTB_KEY, None)
-    boot_doc.dtb_addr = json_pop_f(models.DTB_ADDR_KEY, None)
-    boot_doc.dtb_append = json_pop_f(models.DTB_APPEND_KEY, None)
-    boot_doc.endian = json_pop_f(models.ENDIANNESS_KEY, None)
-    boot_doc.fastboot = json_pop_f(models.FASTBOOT_KEY, None)
-    boot_doc.fastboot_cmd = json_pop_f(models.FASTBOOT_CMD_KEY, None)
-    boot_doc.file_server_resource = json_pop_f(
+    boot_doc.dtb = boot_dict.get(models.DTB_KEY, None)
+    boot_doc.dtb_addr = boot_dict.get(models.DTB_ADDR_KEY, None)
+    boot_doc.dtb_append = boot_dict.get(models.DTB_APPEND_KEY, None)
+    boot_doc.endian = boot_dict.get(models.ENDIANNESS_KEY, None)
+    boot_doc.fastboot = boot_dict.get(models.FASTBOOT_KEY, None)
+    boot_doc.fastboot_cmd = boot_dict.get(models.FASTBOOT_CMD_KEY, None)
+    boot_doc.file_server_resource = boot_dict.get(
         models.FILE_SERVER_RESOURCE_KEY, None)
-    boot_doc.file_server_url = json_pop_f(models.FILE_SERVER_URL_KEY, None)
-    boot_doc.git_branch = json_pop_f(models.GIT_BRANCH_KEY, None)
-    boot_doc.git_commit = json_pop_f(models.GIT_COMMIT_KEY, None)
-    boot_doc.git_describe = json_pop_f(models.GIT_DESCRIBE_KEY, None)
-    boot_doc.git_url = json_pop_f(models.GIT_URL_KEY, None)
-    boot_doc.initrd_addr = json_pop_f(models.INITRD_ADDR_KEY, None)
-    boot_doc.kernel_image = json_pop_f(models.KERNEL_IMAGE_KEY, None)
-    boot_doc.load_addr = json_pop_f(models.BOOT_LOAD_ADDR_KEY, None)
-    boot_doc.metadata = json_pop_f(models.METADATA_KEY, {})
-    boot_doc.qemu = json_pop_f(models.QEMU_KEY, None)
-    boot_doc.qemu_command = json_pop_f(models.QEMU_COMMAND_KEY, None)
-    boot_doc.retries = json_pop_f(models.BOOT_RETRIES_KEY, 0)
-    boot_doc.uimage = json_pop_f(models.UIMAGE_KEY, None)
-    boot_doc.uimage_addr = json_pop_f(models.UIMAGE_ADDR_KEY, None)
-    boot_doc.version = json_pop_f(models.VERSION_KEY, "1.0")
-    boot_doc.warnings = json_pop_f(models.BOOT_WARNINGS_KEY, 0)
-    boot_doc.bootloader = json_pop_f(models.BOOTLOADER_TYPE_KEY, None)
-    boot_doc.bootloader_version = json_pop_f(
+    boot_doc.file_server_url = boot_dict.get(models.FILE_SERVER_URL_KEY, None)
+    boot_doc.git_branch = boot_dict.get(models.GIT_BRANCH_KEY, None)
+    boot_doc.git_commit = boot_dict.get(models.GIT_COMMIT_KEY, None)
+    boot_doc.git_describe = boot_dict.get(models.GIT_DESCRIBE_KEY, None)
+    boot_doc.git_url = boot_dict.get(models.GIT_URL_KEY, None)
+    boot_doc.initrd_addr = boot_dict.get(models.INITRD_ADDR_KEY, None)
+    boot_doc.kernel_image = boot_dict.get(models.KERNEL_IMAGE_KEY, None)
+    boot_doc.load_addr = boot_dict.get(models.BOOT_LOAD_ADDR_KEY, None)
+    boot_doc.metadata = boot_dict.get(models.METADATA_KEY, {})
+    boot_doc.qemu = boot_dict.get(models.QEMU_KEY, None)
+    boot_doc.qemu_command = boot_dict.get(models.QEMU_COMMAND_KEY, None)
+    boot_doc.retries = boot_dict.get(models.BOOT_RETRIES_KEY, 0)
+    boot_doc.uimage = boot_dict.get(models.UIMAGE_KEY, None)
+    boot_doc.uimage_addr = boot_dict.get(models.UIMAGE_ADDR_KEY, None)
+    boot_doc.version = boot_dict.get(models.VERSION_KEY, "1.0")
+    boot_doc.warnings = boot_dict.get(models.BOOT_WARNINGS_KEY, 0)
+    boot_doc.bootloader = boot_dict.get(models.BOOTLOADER_TYPE_KEY, None)
+    boot_doc.bootloader_version = boot_dict.get(
         models.BOOTLOADER_VERSION_KEY, None)
-    boot_doc.chainloader = json_pop_f(models.CHAINLOADER_TYPE_KEY, None)
-    boot_doc.filesystem = json_pop_f(models.FILESYSTEM_TYPE_KEY, None)
-    boot_doc.boot_job_id = json_pop_f(models.BOOT_JOB_ID_KEY, None)
-    boot_doc.boot_job_path = json_pop_f(models.BOOT_JOB_PATH_KEY, None)
-    boot_doc.boot_job_url = json_pop_f(models.BOOT_JOB_URL_KEY, None)
+    boot_doc.chainloader = boot_dict.get(models.CHAINLOADER_TYPE_KEY, None)
+    boot_doc.filesystem = boot_dict.get(models.FILESYSTEM_TYPE_KEY, None)
+    boot_doc.boot_job_id = boot_dict.get(models.BOOT_JOB_ID_KEY, None)
+    boot_doc.boot_job_path = boot_dict.get(models.BOOT_JOB_PATH_KEY, None)
+    boot_doc.boot_job_url = boot_dict.get(models.BOOT_JOB_URL_KEY, None)
 
-    boot_doc.mach = json_pop_f(models.MACH_KEY, None)
-    # If the mach_alias key is defined in the JSON data, its value will be the
-    # value of the mack key.
-    mach_alias = json_pop_f(models.MACH_ALIAS_KEY, None)
-    if mach_alias:
-        boot_doc.mach = mach_alias
-
+    # mach_alias_key takes precedence if defined
+    boot_doc.mach = boot_dict.get(models.MACH_ALIAS_KEY,
+        boot_dict.get(models.MACH_KEY, None))
 
 def _check_for_null(board_dict):
     """Check if the board dictionary has values resembling None in its mandatory keys.
