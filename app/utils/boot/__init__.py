@@ -33,6 +33,11 @@ import utils
 import utils.db
 import utils.errors
 
+try: # Py3K compat
+    basestring
+except NameError:
+    basestring = str
+
 # Some dtb appears to be in a temp directory like 'tmp', and will results in
 # some weird names.
 TMP_RE = re.compile(r"tmp")
@@ -52,6 +57,8 @@ ERR_ADD = utils.errors.add_error
 class BootImportError(Exception):
     """General boot import exceptions class."""
 
+class BootValidationError(ValueError, BootImportError):
+    """General error for values of boot data."""
 
 def save_or_update(boot_doc, database, errors):
     """Save or update the document in the database.
@@ -265,24 +272,24 @@ def _update_boot_doc_from_json(boot_doc, json_pop_f, errors):
         boot_doc.mach = mach_alias
 
 
-def _check_for_null(get_func):
-    """Check if the json object has invalid values in its mandatory keys.
+def _check_for_null(board_dict):
+    """Check if the board dictionary has values resembling None in its mandatory keys.
 
-    An invalid value is either None or the "null" string.
+    Values must be different than:
+    - None
+    - ""
+    - "null"
 
-    :param get_func: The get() function to retrieve the data.
-    :type get_func: function
+    :param board_dict: The board dictoinary.
+    :type board_dict: dict
 
-    :raise BootImportError in case of errors.
+    :raise BootValidationError if any of the keys matches the condition.
     """
-    err_msg = "Invalid value found for mandatory key '%s': %s"
-
     for key in NON_NULL_KEYS:
-        t_val = str(get_func(key, ""))
-
-        val = t_val.lower()
-        if any([not val, val == "null", val == "none"]):
-            raise BootImportError(err_msg.format(key, t_val))
+        val = board_dict.get(key, None)
+        if val is None or (isinstance(val, basestring) \
+                and val.lower() in ('', 'null', 'none')):
+            raise BootValidationError("Invalid value found for mandatory key {!r}: {!r}".format(key, val))
 
 
 def _update_boot_doc_ids(boot_doc, database):
@@ -377,8 +384,8 @@ def _parse_boot_from_json(boot_json, database, errors):
         return None
 
     try:
-        _check_for_null(boot_json.get)
-    except BootImportError, ex:
+        _check_for_null(boot_json)
+    except BootValidationError, ex:
         utils.LOG.exception(ex)
         ERR_ADD(errors, 400, str(ex))
         return None
