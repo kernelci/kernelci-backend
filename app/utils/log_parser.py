@@ -25,7 +25,6 @@ except ImportError:
 
 import bson
 import datetime
-import io
 import itertools
 import os
 import re
@@ -480,7 +479,7 @@ def _read_build_data(build_dir, job, kernel, errors):
         build_data = None
 
         try:
-            with io.open(build_file, "r") as read_file:
+            with open(build_file, "r") as read_file:
                 build_data = json.load(read_file)
 
             build_doc, _ = utils.build.parse_build_data(
@@ -549,7 +548,7 @@ def _parse_log(job, kernel, defconfig, log_file, build_dir, errors):
     mismatch_append = mismatch_lines.append
 
     try:
-        with io.open(log_file) as read_file:
+        with open(log_file) as read_file:
             for line in read_file:
                 if any(re.search(err_pattrn, line)
                        for err_pattrn in ERROR_PATTERNS):
