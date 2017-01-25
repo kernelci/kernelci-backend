@@ -81,7 +81,7 @@ class TestParseBoot(unittest.TestCase):
         self.assertListEqual([500], errors.keys())
 
     def test_parse_from_json_simple(self):
-        errors = {}it's
+        errors = {}
         doc = bimport._parse_boot_from_json(self.boot_report, self.db, errors)
 
         self.assertIsInstance(doc, mboot.BootDocument)
