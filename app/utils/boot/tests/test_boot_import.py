@@ -81,7 +81,7 @@ class TestParseBoot(unittest.TestCase):
         self.assertListEqual([500], errors.keys())
 
     def test_parse_from_json_simple(self):
-        errors = {}
+        errors = {}it's
         doc = bimport._parse_boot_from_json(self.boot_report, self.db, errors)
 
         self.assertIsInstance(doc, mboot.BootDocument)
@@ -159,7 +159,7 @@ class TestParseBoot(unittest.TestCase):
             '"kernel": "none", "defconfig": "none", "lab_name": "none"}'
         )
 
-        self.assertRaises(bimport.BootValidationError
+        self.assertRaises(bimport.BootValidationError,
             bimport._check_for_null, json.loads(boot_report))
 
     def test_check_for_null_with_empty_string_from_string(self):

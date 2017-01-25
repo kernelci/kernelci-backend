@@ -33,7 +33,7 @@ import utils
 import utils.db
 import utils.errors
 
-try: # Py3K compat
+try:  # Py3K compat
     basestring
 except NameError:
     basestring = str
@@ -57,8 +57,10 @@ ERR_ADD = utils.errors.add_error
 class BootImportError(Exception):
     """General boot import exceptions class."""
 
+
 class BootValidationError(ValueError, BootImportError):
     """General error for values of boot data."""
+
 
 def save_or_update(boot_doc, database, errors):
     """Save or update the document in the database.
@@ -207,7 +209,7 @@ def _update_boot_doc_from_json(boot_doc, boot_dict, errors):
     :param errors: Where errors should be stored.
     :type errors: dict
     """
-    
+
     try:
         seconds = _get_boot_seconds(boot_dict)
     except BootValidationError as ex:
@@ -273,6 +275,7 @@ def _update_boot_doc_from_json(boot_doc, boot_dict, errors):
     boot_doc.mach = boot_dict.get(models.MACH_ALIAS_KEY,
         boot_dict.get(models.MACH_KEY, None))
 
+
 def _check_for_null(board_dict):
     """Check if the board dictionary has values resembling None in its mandatory keys.
 
@@ -290,7 +293,9 @@ def _check_for_null(board_dict):
         val = board_dict.get(key, None)
         if val is None or (isinstance(val, basestring) \
                 and val.lower() in ('', 'null', 'none')):
-            raise BootValidationError("Invalid value found for mandatory key {!r}: {!r}".format(key, val))
+            raise BootValidationError(
+                "Invalid value found for mandatory key {!r}: {!r}" \
+                .format(key, val))
 
 
 def _update_boot_doc_ids(boot_doc, database):
