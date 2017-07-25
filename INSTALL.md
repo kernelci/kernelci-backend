@@ -66,11 +66,6 @@ by Flask.
 
 Other non-secrets variable might need to be defined, please look at the `templates` directories.
 
-
-```
-A template secrets.yml should be provided
-```
-
 ### Run Ansible
 ```
 $ cd <kernelci-backend-diretory>
