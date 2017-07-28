@@ -56,7 +56,6 @@ def _get_document_and_update(oid, collection, fields, up_doc, validate_func):
             }
         )
 
-
 def parse_test_suite(suite_json, db_options):
     """Parse the test suite JSON and retrieve the values to update.
 
@@ -573,3 +572,46 @@ def import_test_cases_from_test_set(
         ADD_ERR(errors, ret_val, error_msg)
 
     return ret_val, errors
+
+
+def update_test_suite_add_test_set_id(
+        set_id, suite_id, suite_name, db_options, mail_options):
+    """Add the test set ID provided in a test suite.
+
+    This task is linked from the test set post one: It add the
+    test set ID as a child of the test suite.
+
+    :param set_id: The ID of the test set.
+    :type set_id: bson.objectid.ObjectId
+    :param suite_id: The ID of the suite.
+    :type suite_id: bson.objectid.ObjectId
+    :param suite_name: The name of the test suite.
+    :type suite_name: str
+    :param db_options: The database connection parameters.
+    :type db_options: dict
+    :param mail_options: The email system parameters.
+    :type mail_options: dict
+    :return 200 if OK, 500 in case of errors; a dictionary with errors or an
+    empty one.
+    """
+
+    ret_val = 200
+    errors = {}
+
+    utils.LOG.info(
+        "Updating test suite '%s' (%s) with test set ID",
+        suite_name, str(suite_id))
+    database = utils.db.get_db_connection(db_options)
+
+    ret_val = utils.db.update(
+        database[models.TEST_SUITE_COLLECTION],
+        {models.ID_KEY: suite_id},
+        {models.TEST_SET_KEY: set_id}, operation='$push')
+    if ret_val != 200:
+        ADD_ERR(
+            errors,
+            ret_val,
+            "Error updating test suite '%s' with test set references" %
+            (str(suite_id))
+        )
+    return ret_val,errors
