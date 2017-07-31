@@ -56,6 +56,7 @@ def _get_document_and_update(oid, collection, fields, up_doc, validate_func):
             }
         )
 
+
 def parse_test_suite(suite_json, db_options):
     """Parse the test suite JSON and retrieve the values to update.
 
@@ -468,9 +469,11 @@ def import_test_case(
             test_name = j_get(models.NAME_KEY, None)
             set_id = j_get(models.TEST_SET_ID_KEY, None)
             if set_id:
-                json_obj[models.TEST_SET_ID_KEY] = bson.objectid.ObjectId(set_id)
+                set_id = bson.objectid.ObjectId(set_id)
+                json_obj[models.TEST_SET_ID_KEY] = set_id
             else:
                 json_obj[models.TEST_SET_ID_KEY] = None
+
             test_case = mtcase.TestCaseDocument.from_json(json_obj)
 
             if test_case:
@@ -483,15 +486,16 @@ def import_test_case(
                     err_msg = "Error saving test case '%s'" % test_name
                     utils.LOG.error(err_msg)
                     ADD_ERR(errors, 500, err_msg)
-                # If test case imported correctly reference it in the test suite
+                # If test case imported correctly
+                # reference it in the test suite
                 else:
                     update_test_suite_add_test_case_id(
                         doc_id, suite_oid, suite_name,
                         db_options)
-                    #and in the test set if it exists
+                    # and in the test set if it exists
                     if set_id:
                         update_test_set_add_test_case_id(
-                            doc_id, bson.objectid.ObjectId(set_id), db_options)
+                            doc_id, set_id, db_options)
             else:
                 ADD_ERR(errors, 400, "Missing mandatory key in JSON data")
         except ValueError, ex:
@@ -586,6 +590,7 @@ def import_test_cases_from_test_set(
 
 # TODO: create a separate test_update.py document
 
+
 def update_test_suite_add_test_set_id(
         set_id, suite_id, suite_name, db_options, mail_options):
     """Add the test set ID provided in a test suite.
@@ -626,7 +631,8 @@ def update_test_suite_add_test_set_id(
             "Error updating test suite '%s' with test set references" %
             (str(suite_id))
         )
-    return ret_val,errors
+    return ret_val, errors
+
 
 def update_test_suite_add_test_case_id(
         case_id, suite_id, suite_name, db_options):
@@ -666,7 +672,8 @@ def update_test_suite_add_test_case_id(
             "Error updating test suite '%s' with test case references" %
             (str(suite_id))
         )
-    return ret_val,errors
+    return ret_val, errors
+
 
 def update_test_set_add_test_case_id(
         case_id, set_id, db_options):
@@ -704,4 +711,4 @@ def update_test_set_add_test_case_id(
             "Error updating test set '%s' with test case references" %
             (str(set_id))
         )
-    return ret_val,errors
+    return ret_val, errors

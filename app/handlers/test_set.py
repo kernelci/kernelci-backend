@@ -109,7 +109,8 @@ class TestSetHandler(htbase.TestBaseHandler):
 
         return response
 
-    def _update_test_suite_add_test_set_id(self, set_oid, suite_oid, suite_name):
+    def _update_test_suite_add_test_set_id(
+            self, set_oid, suite_oid, suite_name):
         """Execute the async task to add the test set ID onto the test suite.
 
         :param set_oid: The ID of the test set.
@@ -124,7 +125,6 @@ class TestSetHandler(htbase.TestBaseHandler):
                 set_oid,
                 suite_oid,
                 suite_name,
-                self.settings["dboptions"], self.settings["mailoptions"]
             ]
         )
 
