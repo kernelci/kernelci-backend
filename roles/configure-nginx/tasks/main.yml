@@ -1,7 +1,7 @@
 ---
 - name: Add nginx stable PPA repository
   apt_repository: repo='ppa:nginx/stable'
-  when: ansible_lsb.id == "Ubuntu"
+  when: ansible_distribution == "Ubuntu"
   tags:
     - install
     - deps
