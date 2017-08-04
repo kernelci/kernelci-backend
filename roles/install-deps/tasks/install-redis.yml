@@ -2,21 +2,40 @@
 - name: Add redis PPA (Ubuntu)
   apt_repository: repo='ppa:rwky/redis'
                   update_cache=yes
-  when: ansible_lsb.id == "Ubuntu"
+  when: ansible_distribution == "Ubuntu"
   tags:
     - install
     - redis
     - deps
 
 - name: Install redis server
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
   apt: pkg=redis-server
   tags:
     - install
     - redis
     - deps
 
+- name: Install redis server
+  when: ansible_distribution == "CentOS"
+  yum: pkg=redis
+  tags:
+    - install
+    - redis
+    - deps
+
+- name: set redis_service fact for CentOS
+  when: ansible_distribution == "CentOS"
+  set_fact:
+    redis_service: "redis"
+
+- name: set redis_service fact for Debian
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+  set_fact:
+    redis_service: "redis-server"
+
 - name: Make sure redis is running
-  service:  name=redis-server
+  service:  name={{ redis_service }}
             state=started
   tags:
     - install

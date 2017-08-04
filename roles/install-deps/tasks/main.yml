@@ -1,5 +1,6 @@
 ---
 - name: Install OS dependencies
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
   apt:  pkg={{ item }}
         state=latest
         update_cache=yes
@@ -19,6 +20,20 @@
     - python3-zmq
     - libyaml-dev
     - libpython2.7-dev
+  tags:
+    - install
+    - deps
+
+- name: Install OS dependencies
+  when: ansible_distribution == "CentOS"
+  yum:
+        pkg={{ item }}
+  with_items:
+    - PyYAML
+    - git
+    - libselinux-python
+    - python-virtualenv
+    - gcc
   tags:
     - install
     - deps
