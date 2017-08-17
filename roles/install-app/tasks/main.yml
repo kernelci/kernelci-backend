@@ -14,6 +14,7 @@
         dest={{ install_base }}/{{ hostname }}
         version={{ git_head }}
         update=yes
+        force=yes
   notify:
     - restart-kernel-ci-backend
     - restart-celery
@@ -30,6 +31,14 @@
   tags:
     - install
     - app
+
+# mock does work on CentOS. Since it is used only for testing, we can remove it
+- name: Disable mock
+  when: ansible_distribution == "CentOS"
+  lineinfile:
+        path: "{{ install_base }}/{{ hostname }}/requirements.txt"
+        regexp: "^mock;*"
+        state: absent
 
 - name: Install pip requirements
   pip:  requirements={{ install_base }}/{{ hostname }}/requirements.txt
@@ -101,3 +110,26 @@
     - install
     - app
     - docs
+
+#TODO use ansible_selinux
+- name: Permit nginx to connect to backend
+  when: ansible_distribution == "CentOS"
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+  tags:
+    - install
+    - app
+
+# the optionnal yaml.Cloader is never installed by pip
+# This hack install it in virtualenv
+- name: Fix libjson
+  when: ansible_distribution == "CentOS"
+  command: cp /usr/lib64/python2.7/site-packages/_yaml.so /srv/.venv/{{ hostname }}/lib/python2.7/site-packages/
+  notify:
+    - restart-kernel-ci-backend
+    - restart-celery
+  tags:
+    - install
+    - app

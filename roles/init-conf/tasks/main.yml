@@ -8,6 +8,18 @@
   tags:
     - init
 
+- name: set redis service name fact
+  when: ansible_distribution == "CentOS"
+  set_fact:
+   redis_service_name: "redis"
+   mongodb_service_name: "mongod"
+
+- name: set redis service name fact
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+  set_fact:
+   redis_service_name: "redis-server"
+   mongodb_service_name: "mongodb"
+
 - name: Install Upstart conf
   template: src=kernel-ci-backend.conf
             dest=/etc/init/{{ init_service }}.conf
@@ -51,13 +63,16 @@
     - init
     - upstart
 
-- name: Install celery systemd service
-  template: src=kernelci-celery.service
-            dest=/etc/systemd/system/kernelci-celery.service
+- name: Install celery systemd services
+  template: src={{ item }}.service
+            dest=/etc/systemd/system/{{ item }}.service
             owner=root
             group=root
             mode=0644
   when: ansible_distribution == "Debian"
+  with_items:
+    - kernelci-celery
+    - kernelci-celery-beat
   notify:
     - reload-systemd
   tags:
@@ -75,13 +90,34 @@
     - init
     - upstart
 
-- name: Install celery beat systemd service
-  template: src=kernelci-celery-beat.service
-            dest=/etc/systemd/system/kernelci-celery-beat.service
+- name: Install celery systemd services
+  template: src={{ item }}.service
+            dest=/usr/lib/systemd/system/{{ item }}.service
             owner=root
             group=root
             mode=0644
-  when: ansible_distribution == "Debian"
+  when: ansible_distribution == "CentOS"
+  with_items:
+   - kernelci-backend
+   - kernelci-celery
+   - kernelci-celery-beat
+  notify:
+    - reload-systemd
+  tags:
+    - init
+    - systemd
+
+- name: Create kernelci backend systemd directories
+  file: path=/etc/systemd/{{ item }}.d
+        state=directory
+            owner=root
+            group=root
+            mode=0750
+  when: ansible_distribution == "CentOS"
+  with_items:
+   - kernelci-backend
+   - kernelci-celery
+   - kernelci-celery-beat
   notify:
     - reload-systemd
   tags:

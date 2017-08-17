@@ -8,6 +8,7 @@
     - web-server
 
 - name: Install nginx
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
   apt:  pkg={{ item }}
         state=latest
         update_cache=yes
@@ -112,7 +113,7 @@
     - web-server
 
 - name: Copy backend maintenance configuration
-  copy: src=backend-maintenance.conf
+  template: src=backend-maintenance.conf
         dest=/etc/nginx/custom/backend-maintenance.conf
         owner=root
         group=root
