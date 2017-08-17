@@ -32,8 +32,10 @@
     - PyYAML
     - git
     - libselinux-python
+    - libsemanage-python
     - python-virtualenv
     - gcc
+    - libyaml-devel
   tags:
     - install
     - deps

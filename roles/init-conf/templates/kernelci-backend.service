@@ -1,7 +1,7 @@
 [Unit]
 Description=Kernel CI Backend Service
-Requires=mongod.service
-After=mongod.service
+Requires={{ mongodb_service_name }}.service
+After={{ mongodb_service_name }}.service
 
 [Service]
 Type=simple

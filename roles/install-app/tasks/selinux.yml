@@ -1,0 +1,11 @@
+---
+- name: Enable SElinux httpd_can_network_connect to allow nginx to connect to backend
+  when: ansible_selinux.status != 'disabled'
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+  tags:
+    - install
+    - app
+    - selinux

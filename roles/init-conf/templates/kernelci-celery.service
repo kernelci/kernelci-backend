@@ -1,6 +1,6 @@
 [Unit]
 Description=Kernel CI Backend Celery
-Requires=redis-server.service
+Requires={{ redis_service_name }}.service
 Wants=kernelci-celery-beat.service
 Before=kernelci-celery-beat.service
 
