@@ -32,7 +32,6 @@
     - PyYAML
     - git
     - libselinux-python
-    - libsemanage-python
     - python-virtualenv
     - gcc
   tags:
