@@ -2,6 +2,26 @@
 
 All installation docs are now on the dedicated [kernelci-backend-config](https://github.com/kernelci/kernelci-backend/config/INSTALL.md)
 
+# Configuration/Administration
+
+## Main configurations files
+/etc/linaro/kernelci-frontend.cfg
+/etc/linaro/kernelci-backend.cfg
+/etc/linaro/kernelci-celery.cfg
+
+They are filled with informations from secrets.yml.
+
+## Troubleshooting/Main log file
+Celery and kernelci-backend services logs via syslog.
+Nginx logs in /var/log/nginx
+Uwsgi logs via syslog on Centos (and in /var/log/uwsgi on debian)
+
+## Network access
+Only the nginx service needs to be accessible from the external network. All other components needs to be available only from localhost.
+
+## Data / backups
+Only mongodb stores data and need to be backuped.
+
 # Run the server
 
 From the 'app/' folder, run:
