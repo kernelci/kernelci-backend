@@ -54,14 +54,8 @@ class BootHandler(hbase.BaseHandler):
             response.reason = "Request accepted and being imported"
 
             taskq.import_boot.apply_async(
-                [
-                    kwargs["json_obj"],
-                    self.settings["dboptions"],
-                    self.settings["mailoptions"]
-                ],
-                link=taskq.find_regression.s(
-                    self.settings["dboptions"], self.settings["mailoptions"]
-                )
+                [kwargs["json_obj"]],
+                link=taskq.find_regression.s()
             )
         else:
             response = hresponse.HandlerResponse(403)
