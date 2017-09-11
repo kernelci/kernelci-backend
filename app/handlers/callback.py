@@ -21,7 +21,8 @@ import handlers.common.token
 import handlers.response as hresponse
 import models
 import models.token as mtoken
-import taskqueue.tasks.callback as taskq
+import taskqueue.tasks.boot
+import taskqueue.tasks.callback
 import utils.callback.lava
 import utils.db
 
@@ -151,6 +152,9 @@ class LavaCallbackHandler(CallbackHandler):
         else:
             response.status_code = 202
             response.reason = "Request accepted and being processed"
-            task.apply_async([kwargs["json_obj"], lab_name])
+            task.apply_async(
+                [kwargs["json_obj"], lab_name],
+                link_error=taskqueue.tasks.error_handler.s()
+            )
 
         return response

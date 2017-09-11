@@ -20,7 +20,7 @@ import utils.callback
 
 @taskc.app.task(name="lava-boot")
 def lava_boot(json_obj, lab_name):
-    """Add boot data from a LAVA v2 job callback
+    """Add boot data from a LAVA v2 boot job callback
 
     This is a wrapper around the actual function which runs in a Celery task.
 
@@ -29,18 +29,15 @@ def lava_boot(json_obj, lab_name):
     :type json_obj: dictionary
     :param lab_name: The name of the LAVA lab that posted the callback.
     :type lab_name: string
-    :return tuple The return code and the boot document id.
+    :return ObjectId The boot document object id.
     """
-    ret_code, doc_id, errors = \
-        utils.callback.lava.add_boot(json_obj, lab_name,
-                                     taskc.app.conf.db_options)
-    # TODO: handle errors.
-    return ret_code, doc_id
+    return utils.callback.lava.add_boot(json_obj, lab_name,
+                                        taskc.app.conf.db_options)
 
 
 @taskc.app.task(name="lava-test")
 def lava_test(json_obj, lab_name):
-    """Add test data from a LAVA v2 job callback
+    """Add test data from a LAVA v2 test job callback
 
     This is a wrapper around the actual function which runs in a Celery task.
 
@@ -49,13 +46,10 @@ def lava_test(json_obj, lab_name):
     :type json_obj: dictionary
     :param lab_name: The name of the LAVA lab that posted the callback.
     :type lab_name: string
-    :return tuple The return code and the test document id.
+    :return ObjectId The test document object id.
     """
-    ret_code, boot_doc_id, errors = \
-        utils.callback.lava.add_boot(json_obj, lab_name,
-                                     taskc.app.conf.db_options)
-    ret_code, doc_id, errors = \
-        utils.callback.lava.add_tests(json_obj, lab_name, boot_doc_id,
-                                      taskc.app.conf.db_options)
-    # TODO: handle errors.
-    return ret_code, doc_id
+    boot_doc_id = utils.callback.lava.add_boot(
+        json_obj, lab_name, taskc.app.conf.db_options)
+
+    return utils.callback.lava.add_tests(json_obj, lab_name, boot_doc_id,
+                                         taskc.app.conf.db_options)

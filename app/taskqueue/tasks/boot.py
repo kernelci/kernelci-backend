@@ -27,31 +27,21 @@ def import_boot(json_obj):
     :param json_obj: The JSON object with the values necessary to import the
     boot report.
     :type json_obj: dictionary
-    :return tuple The return code; and the document id.
+    :return ObjectId The boot document object id.
     """
-    ret_code, doc_id, errors = \
-        utils.boot.import_and_save_boot(json_obj, taskc.app.conf.db_options)
-    # TODO: handle errors.
-    return ret_code, doc_id
+    return utils.boot.import_and_save_boot(json_obj, taskc.app.conf.db_options)
 
 
 @taskc.app.task(name="boot-regressions")
-def find_regression(prev_res):
+def find_regression(boot_doc_id):
     """Trigger the find regression function.
 
     This is a wrapper around the real function to provide a Celery task.
     This function is concataned to the `import_boot` one, and the results of
     the previous execution are injected here.
 
-    :param prev_res: A list with the results of the previous task.
-    :type prev_res: list
-    :return tuple The return code; and the document id.
+    :param boot_doc_id: The boot document object id.
+    :return ObjectId The boot object id.
     """
-    ret_code = None
-    doc_id = None
-
-    if any([prev_res[0] == 201, prev_res[0] == 200]):
-        ret_code, doc_id = utils.boot.regressions.find(
-            prev_res[1], taskc.app.conf.db_options)
-
-    return ret_code, doc_id
+    utils.boot.regressions.find(boot_doc_id, taskc.app.conf.db_options)
+    return boot_doc_id
