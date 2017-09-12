@@ -1,0 +1,39 @@
+---
+# app_user need to go throught /var/www
+- name: Fix /var/www/ permissions
+  file: path=/var/www/
+        state=directory
+        mode=0755
+  tags:
+  - kernelci
+  - storage
+
+- name: Create /var/www/images
+  file: path=/var/www/images
+        state=directory
+        owner={{ app_user }}
+        group={{ web_user }}
+        mode=0750
+  tags:
+  - kernelci
+  - storage
+
+- name: configure storage vhost
+  template: src=kci-storage.conf
+        dest=/etc/nginx/sites-available/{{ kci_storage_fqdn }}.conf
+  notify:
+    - reload-nginx
+  tags:
+  - kernelci
+  - storage
+
+- name: Enable storage vhost
+  file:
+    src: /etc/nginx/sites-available/{{ kci_storage_fqdn }}.conf
+    dest: /etc/nginx/sites-enabled/{{ kci_storage_fqdn }}.conf
+    state: link
+  notify:
+    - reload-nginx
+  tags:
+  - kernelci
+  - storage

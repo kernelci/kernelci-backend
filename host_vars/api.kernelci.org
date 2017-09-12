@@ -1,3 +1,5 @@
 hostname: api.kernelci.org
 role: production
 certname: api.kernelci.org
+storage_certname: storage.kernelci.org
+kci_storage_fqdn: storage.kernelci.org

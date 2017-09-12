@@ -12,3 +12,4 @@
     - configure-nginx
     - db-backup
     - firewall
+    - kernelci-storage
