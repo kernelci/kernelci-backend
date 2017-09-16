@@ -1,4 +1,4 @@
-FROM nginx:1.13
+FROM python:2.7
 
 ### Install dependencies
 
@@ -25,35 +25,21 @@ RUN apt-get update \
 COPY requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 
+# Setup working directory
+WORKDIR /app
+
 # Copy source code
 COPY app /app
 
 # App configuration file
-COPY etc/kernelci-backend.cfg /etc/linaro/kernelci-backend.cfg
+COPY etc/backend.cfg /etc/linaro/kernelci-backend.cfg
 
 # Celery configuration
 RUN mkdir /var/log/celery /var/run/celery
-COPY etc/kernelci-celery.cfg /etc/linaro/kernelci-celery.cfg
+COPY etc/celery.cfg /etc/linaro/kernelci-celery.cfg
 
-#TODO
-# start celery process when container starts
+# Copy file starting tornado + celery (worker + beat)
+COPY bin/start.sh /bin/start.sh
 
-### Nginx configuration
-
-# Create root directory
-RUN mkdir -p /usr/share/nginx/html/kernelci \
-    && chown www-data:www-data /usr/share/nginx/html/kernelci
-
-# Backend configuration
-COPY etc/backend-nginx.conf /etc/nginx/conf.d/kernelci.conf
-
-# Upstream definitions
-COPY etc/backend-upstreams.conf /etc/nginx/conf.d/backend-upstreams.conf
-
-# Proxy / Proxy-cache
-COPY etc/backend-proxy*.conf /etc/nginx/custom/
-
-#TODO
-# - maintenance configuration + page
-# - backup (in another service)
-# - firewall (in another service => proxy)
+# Start the application (might move this to supervisord in the future)
+CMD ["/bin/start.sh"]
