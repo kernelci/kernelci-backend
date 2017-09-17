@@ -17,7 +17,8 @@ RUN apt-get update \
     python3-setproctitle \
     python3-zmq \
     libyaml-dev \
-    libpython2.7-dev
+    libpython2.7-dev \
+    supervisor
 
 ### Install application
 
@@ -38,8 +39,9 @@ COPY etc/backend.cfg /etc/linaro/kernelci-backend.cfg
 RUN mkdir /var/log/celery /var/run/celery
 COPY etc/celery.cfg /etc/linaro/kernelci-celery.cfg
 
-# Copy file starting tornado + celery (worker + beat)
-COPY bin/start.sh /bin/start.sh
+# Setup supervisor to start both Celery and Tornado processes
+RUN mkdir -p /var/log/supervisor
+COPY etc/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Start the application (might move this to supervisord in the future)
-CMD ["/bin/start.sh"]
+# Start supervisord
+CMD ["/usr/bin/supervisord"]
