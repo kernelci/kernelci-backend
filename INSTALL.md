@@ -107,18 +107,63 @@ For production, requirements.txt is sufficient. For development purpose, require
 will add extra package for testing.
 For the moment ansible does not handle this requirements-dev.txt.
 
-### Manual tasks
- * You need to generate an admin token, this token will be used to generate others token (referenced as ADMINTOKEN below)
-```
-	curl -XPOST -H "Content-Type: application/json" -H "Authorization: SECRET_KEY" "localhost:8888/token" -d '{"email": "xxx@xxx", "username": "admin", "admin": 1}'
-```
- * You need to generate a GET+POST token for the frontend. Set it in secrets.yml (it is used for /etc/linaro/kernelci-frontend.cfg:BACKEND_TOKEN=xxxx)
-```
-	 curl -XPOST -H "Content-Type: application/json" -H "Authorization: ADMINTOKEN" "localhost:8888/token" -d '{"email": "xxx@xxx", "username": "admin", "get": 1, "post": 1}'
-```
+### Token Management
+- - - - 
+Once the kernelCI backend is up and running, you need to create several tokens for inter process communication.
 
- * If you plan to have a LAVA lab interacting with your kernelci, you need to generate a LAB token for your LAVA lab. This token will be used along with the backend FQDN for CALLBACK Jobs.
-```
- 	curl -XPOST -H "Content-Type: application/json" -H "Authorization: ADMINTOKEN" "localhost:8888/lab" -d '{"namel": "lab-xxx", "contact":  { {"name": "xxx", "surname": "xxx", "email": "xxx@xxx"} }'
-```
+#### Admin token
+The first token to create is the admin token. This token will be used for managing the whole KernelCI backend database.\
+Make sure to write it down somewhere and not forget it.
 
+The following example shows how to send a request to create an admin token.
+```
+$ curl -XPOST -H "Content-Type: application/json" -H "Authorization: MASTER_KEY" "BACKEND_URL/token" -d '{"email": "ADMIN_EMAIL", "username": "ADMIN_USERNAME", "admin": 1}'
+
+```
+Response:
+```{"code":201,"result":[{"token":"ADMIN_TOKEN"}]}```\
+Note that:
+* MASTER_KEY and BACKEND_URL must replaced by the values specified in the secrets.yml file used by ansible.
+* ADMIN_EMAIL and ADMIN_USERNAME must be replaced by the email and username for whom this token is created.
+* ADMIN_TOKEN in the response will be the actual token created for the administrator.
+
+#### KernelCI Frontend token
+Second token to create is the KernelCI Frontend token. This token will allow the KernelCI Frontend to fetch data through the backend API.
+
+The following example shows how to send a request to create a KernelCI Frontend token.
+```
+$ curl -XPOST -H "Content-Type: application/json" -H "Authorization: ADMIN_TOKEN" "BACKEND_URL/token" -d '{"email": "FRONTEND_MAINTAINER_EMAIL", "username": "BASE_URL", "get": 1, "post": 1}'
+
+```
+Response:
+```{"code":201,"result":[{"token":"FRONTEND_TOKEN_VALUE"}]}```\
+Note that:
+* ADMIN_TOKEN must be replaced by the value of the admin token returned in the previous step (Admin token).
+* BACKEND_URL must replaced by the values specified in the secrets.yml file used by ansible. It corresponds to the URL where KernelCI backend API is available
+* ADMIN_EMAIL and ADMIN_USERNAME must be replaced by the email and username for whom this token is created.
+* FRONTEND_TOKEN_VALUE in the response will be the actual token created for the KernelCI Frontend instance.
+
+*Important steps once the token is created:*
+* Note the FRONTEND_TOKEN_VALUE
+* On the machine running the KernelCI Frontend services:
+    * Edit the file /etc/linaro/kernelci-frontend.cfg
+    * Add (or replace) the line ```BACKEND_TOKEN = ''``` and write FRONTEND_TOKEN_VALUE between the quotes
+        * Example: ```BACKEND_TOKEN = 'de41df12-4s35-a547-b597-cebef80ae5ef'```
+        * Where ```de41df12-4s35-a547-b597-cebef80ae5ef``` is the FRONTEND_TOKEN_VALUE returned by the curl command.
+
+#### LAVA Lab callback token
+To allow LAVA labs to submit results to your KernelCI instance, you need to genereate one token per LAVA lab.
+
+The following example shows how to send a request to create a LAVA Lab token.
+
+```
+$ curl -XPOST -H "Content-Type: application/json" -H "Authorization: ADMIN_TOKEN" "BACKEND_URL/lab" -d '{"name": "LAB_NAME", "contact": {"name": "CONTACT_NAME", "surname": "CONTACT_SURNAME", "email": "CONTACT_MAIL"}}'
+```
+Response:
+```{"code":201,"result":[{"_id":{"$oid":"59de2100708a590152c2a5c7"},"token":"LAB_TOKEN_VALUE","name":"LAB_NAME"}]}```\
+Note that:
+* ADMIN_TOKEN must be replaced by the value of the admin token returned in the previous step (Admin token).
+* BACKEND_URL must replaced by the values specified in the secrets.yml file used by ansible. It corresponds to the URL where KernelCI backend API is available.
+* LAB_NAME  must be replaced by the lab name for which the token is created
+* CONTACT_NAME, CONTACT_SURNAME and CONTACT_MAIL must be replaced by the email and username for whom this token is created.
+* LAB_TOKEN_VALUE in the response will be the actual token created for the KernelCI Frontend instance.
