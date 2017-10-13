@@ -45,22 +45,33 @@ git clone https://github.com/kernelci/kernelci-backend-config.git
 ```
 
 ### Configure Host
-* You need to choose the FQDN used for calling both the frontend and backend.
-  These FQDN must be set in the hostname variable. (default from group_vars/all is kernelci-frontend/kernelci-backend)
-  Thoses name could be different from the hostname of the host.
+* The server running the instance is named TARGET_NAME in the rest of the document
+* You need to choose the FQDN used for calling both the frontend and backend; one FQDN for each, named FQDN_BACKEND and FQDN_FRONTEND in the rest of the document.
+  These FQDN must be set in the hostname variable. Ddefault from group_vars/all is kernelci-frontend/kernelci-backend
+  This name could be different from TARGET_NAME.
+* Name example:
+    * TARGET_NAME: server.mydomain.local
+    * FQDN_FRONTEND: frontend.mydomain.local
+    * FQDN_BACKEND: api.mydomain.local
 
-* then add the choosen hostname in the hosts file
+	* Example:
+	In host_vars/TARGET_NAME
+	```
+	hostname: FQDN_BACKEND
+	```
+
+* then add the choosen TARGET_NAME in the hosts file
 	* Example:
 ```
 [dev]
 #this machine will be managed directly via root
-kernelci.mydns.com ansible_ssh_user=root
+TARGET_NAME ansible_ssh_user=root
 [rec]
 #this machine will be managed via the user admin becoming root via "su"
-kernelci.mydns.com ansible_ssh_user=admin become_method=su
+TARGET_NAME ansible_ssh_user=admin become_method=su
 [prod]
 #this machine will be managed via the user admin using sudo
-kernelci.mydns.com ansible_ssh_user=admin become_method=sudo
+TARGET_NAME ansible_ssh_user=admin become_method=sudo
 ```
 
 ### Create secrets.yml file
