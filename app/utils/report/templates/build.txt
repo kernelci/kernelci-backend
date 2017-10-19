@@ -10,63 +10,14 @@
 {%- if built_unique_string %}
 {{ built_unique_string }}
 {% endif %}
-{%- if platforms %}
-{%- if platforms.failed_data %}
-{%- for summary in platforms.failed_data.summary.txt %}
-{{ summary }}
-{%- endfor %}
-{% for arch, arch_data in platforms.failed_data.data|dictsort %}
-{%- if compiler_data %}
-{{ arch }}    {{ compiler_data[arch.replace(":", "")][0] }}
-{%- else %}
-{{ arch }}
-{%- endif %}{# end compiler data #}
-{% for defconfig in arch_data %}
-    {{ defconfig[0] }}
-{%- endfor %}{# defconfig #}
-{% endfor %}{# arch #}
-{%- endif %}{# end failed_data #}
-{%- if platforms.error_data %}
-{%- for summary in platforms.error_data.summary.txt %}
-{{ summary }}
-{%- endfor %}
-{% for arch, arch_data in platforms.error_data.data|dictsort %}
-{%- if compiler_data %}
-{{ arch }}    {{ compiler_data[arch.replace(":", "")][0] }}
-{%- else %}
-{{ arch }}
-{%- endif %}{# end compiler data #}
-{% for defconfig in arch_data %}
-    {{ defconfig[0] }}
-{%- endfor %}{# defconfig #}
-{% endfor %}{# arch #}
-{%- endif %}{# end error_data #}
-{%- endif %}{# end platforms #}
-{%- if errors_summary %}
-{%- if errors_summary.errors %}
-Errors summary:
-{% for err in errors_summary.errors %}
-    {{ "{:>3d}  {:s}".format(err[0], err[1]) -}}
-{% endfor %}
-{%- endif %}{# end errors #}
-{% if errors_summary.warnings %}
-Warnings summary:
-{% for warn in errors_summary.warnings %}
-    {{ "{:>3d}  {:s}".format(warn[0], warn[1]) -}}
-{% endfor %}
-{%- endif %}{# end warnings #}
-{% if errors_summary.mismatches %}
-Section mismatches summary:
-{% for mism in errors_summary.mismatches %}
-    {{ "{:>3d}  {:s}".format(mism[0], mism[1]) -}}
-{% endfor %}
-{% endif %}{# end mismatches #}
-{%- endif %}{# and errors summary #}
+
+
 {%- if error_details %}
 {{ "{:=^80}".format("") }}
 
-Detailed per-defconfig build reports:
+Detailed per-defconfig reports:
 {% for d in error_details %}
+{%- if d.errors or d.warnings %}
 {% set errs = P_("{:d} error", "{:d} errors", d.errors_count).format(d.errors_count) -%}
 {%- set warns = P_("{:d} warning", "{:d} warnings", d.warnings_count).format(d.warnings_count) -%}
 {%- set mism = P_("{:d} section mismatch", "{:d} section mismatches", d.mismatches_count).format(d.mismatches_count) -%}
@@ -95,7 +46,31 @@ Section mismatches:
 {%- endfor %}
 {%- endif %}{# end mismatch lines #}
 {% endfor %}
+{%- endif %}{# end if errors or warnings #}
 {%- endif %}{# end error_details #}
+
+
+{%- if errors_summary %}
+{%- if errors_summary.errors %}
+Errors summary:
+{% for err in errors_summary.errors %}
+    {{ "{:>3d}  {:s}".format(err[0], err[1]) -}}
+{% endfor %}
+{%- endif %}{# end errors #}
+{% if errors_summary.warnings %}
+Warnings summary:
+{% for warn in errors_summary.warnings %}
+    {{ "{:>3d}  {:s}".format(warn[0], warn[1]) -}}
+{% endfor %}
+{%- endif %}{# end warnings #}
+{% if errors_summary.mismatches %}
+Section mismatches summary:
+{% for mism in errors_summary.mismatches %}
+    {{ "{:>3d}  {:s}".format(mism[0], mism[1]) -}}
+{% endfor %}
+{% endif %}{# end mismatches #}
+{%- endif %}{# and errors summary #}
+
 {%- if info_email %}
 ---
 For more info write to <{{ info_email }}>
