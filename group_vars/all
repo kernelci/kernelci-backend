@@ -14,3 +14,7 @@ dbpool: 100
 redis_host: localhost
 redis_port: 6379
 kci_storage_fqdn: storage.kernelci.org
+jenkins_url: ""
+jenkins_usr: ""
+jenkins_job: ""
+jenkins_token: ""
