@@ -37,7 +37,10 @@ class BootDocument(modb.BaseDocument):
             kernel,
             defconfig,
             lab_name,
-            git_branch, defconfig_full=None, arch=models.ARM_ARCHITECTURE_KEY):
+            git_branch,
+            defconfig_full=None,
+            arch=models.ARM_ARCHITECTURE_KEY,
+            plan=None):
         """A new BootDocument.
 
         :param board: The name of the board.
@@ -55,6 +58,8 @@ class BootDocument(modb.BaseDocument):
         :type defconfig_full: string
         :param arch: The architecture type, default to 'arm'.
         :type arch: string
+        :param plan: The name of the test plan.
+        :type plan: string
         """
         self._created_on = None
         self._id = None
@@ -64,6 +69,7 @@ class BootDocument(modb.BaseDocument):
         self.board = board
         self.defconfig = defconfig
         self.defconfig_full = defconfig_full or defconfig
+        self.plan = plan
         self.git_branch = git_branch
         self.job = job
         self.kernel = kernel
@@ -179,6 +185,7 @@ class BootDocument(modb.BaseDocument):
             models.CREATED_KEY: self.created_on,
             models.DEFCONFIG_FULL_KEY: self.defconfig_full,
             models.DEFCONFIG_KEY: self.defconfig,
+            models.PLAN_KEY: self.plan,
             models.DTB_ADDR_KEY: self.dtb_addr,
             models.DTB_APPEND_KEY: self.dtb_append,
             models.DTB_KEY: self.dtb,
@@ -233,6 +240,7 @@ class BootDocument(modb.BaseDocument):
                 job = doc_pop(models.JOB_KEY)
                 kernel = doc_pop(models.KERNEL_KEY)
                 defconfig = doc_pop(models.DEFCONFIG_KEY)
+                plan = doc_pop(models.PLAN_KEY)
                 lab_name = doc_pop(models.LAB_NAME_KEY)
                 git_branch = doc_pop(models.GIT_BRANCH_KEY)
                 defconfig_full = doc_pop(models.DEFCONFIG_FULL_KEY, None)
@@ -246,7 +254,9 @@ class BootDocument(modb.BaseDocument):
                     defconfig,
                     lab_name,
                     git_branch,
-                    defconfig_full=defconfig_full, arch=arch
+                    defconfig_full=defconfig_full,
+                    arch=arch,
+                    plan=plan
                 )
 
                 boot_doc.id = boot_id

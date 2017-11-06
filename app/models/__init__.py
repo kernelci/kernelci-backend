@@ -138,6 +138,7 @@ MODULES_KEY = "modules"
 MODULES_SIZE_KEY = "modules_size"
 NAME_KEY = "name"
 NOT_FIELD_KEY = "nfield"
+PLAN_KEY = "plan"
 PARAMETERS_KEY = "parameters"
 PRIVATE_KEY = "private"
 PROPERTIES_KEY = "properties"
@@ -414,6 +415,7 @@ COUNT_VALID_KEYS = {
         MODULES_DIR_KEY,
         MODULES_KEY,
         NAME_KEY,
+        PLAN_KEY,
         PRIVATE_KEY,
         STATUS_KEY,
         SYSTEM_MAP_KEY,

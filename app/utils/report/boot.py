@@ -497,8 +497,9 @@ def _start_bisection(bisection, jopts):
         "LAB": "lab_name",
         "TREE": "job",
         "GOOD_COMMIT": "git_commit",
+        "PLAN": "plan",
     }
-    params = {k: good[v] for k, v in params_map.iteritems()}
+    params = {k: good[v] for k, v in params_map.iteritems() if v in good}
     params["BAD_COMMIT"] = bad["git_commit"]
     utils.LOG.info("Triggering bisection for {}, board: {}, lab: {}".format(
         bad["kernel"], bad["board"], bad["lab_name"]))
