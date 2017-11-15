@@ -84,7 +84,8 @@ def save_or_update(boot_doc, database, errors):
         models.JOB_KEY: boot_doc.job,
         models.KERNEL_KEY: boot_doc.kernel,
         models.LAB_NAME_KEY: boot_doc.lab_name,
-        models.GIT_BRANCH_KEY: boot_doc.git_branch
+        models.GIT_BRANCH_KEY: boot_doc.git_branch,
+        models.PLAN_KEY: boot_doc.plan,
     }
 
     fields = [
@@ -409,6 +410,7 @@ def _parse_boot_from_json(boot_json, database, errors):
         return None
 
     defconfig_full = boot_json.get(models.DEFCONFIG_FULL_KEY, defconfig)
+    plan = boot_json.get(models.PLAN_KEY)
     arch = boot_json.get(models.ARCHITECTURE_KEY, models.ARM_ARCHITECTURE_KEY)
 
     if arch not in models.VALID_ARCHITECTURES:
@@ -419,9 +421,15 @@ def _parse_boot_from_json(boot_json, database, errors):
 
     boot_doc = mboot.BootDocument(
         board,
-        job, kernel, defconfig, lab_name, git_branch, defconfig_full, arch)
-    boot_doc.created_on = datetime.datetime.now(
-        tz=bson.tz_util.utc)
+        job,
+        kernel,
+        defconfig,
+        lab_name,
+        git_branch,
+        defconfig_full,
+        arch,
+        plan)
+    boot_doc.created_on = datetime.datetime.now(tz=bson.tz_util.utc)
     _update_boot_doc_from_json(boot_doc, boot_json, errors)
     _update_boot_doc_ids(boot_doc, database)
     return boot_doc
