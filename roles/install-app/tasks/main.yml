@@ -55,8 +55,9 @@
 - name: Does /etc/linaro exists?
   file: path=/etc/linaro
         state=directory
-        owner={{ web_user }}
-        group={{ app_user }}
+        owner=root
+        group=root
+        mode=0755
   tags:
     - install
     - app
