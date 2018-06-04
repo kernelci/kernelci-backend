@@ -1,9 +1,7 @@
-KernelCi Backend Config
+KernelCI Backend Config
 =======================
 
 This is the Ansible configuration to deploy/setup the kernelci-backend
-system at:
+system at: https://github.com/kernelci/kernelci-backend
 
-    https://github.com/kernelci/kernel-ci-backend
-
-Please refer to INSTALL.md for the install process documentation
+Please refer to [INSTALL.md](https://github.com/kernelci/kernelci-backend-config/blob/master/INSTALL.md) for the install process documentation.
