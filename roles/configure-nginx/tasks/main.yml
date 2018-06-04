@@ -12,7 +12,6 @@
   apt:  pkg={{ item }}
         state=latest
         update_cache=yes
-        default_release=jessie-backports
   with_items:
     - nginx
     - nginx-extras
