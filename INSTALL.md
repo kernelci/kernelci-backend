@@ -57,14 +57,16 @@ git clone https://github.com/kernelci/kernelci-backend-config.git
     * TARGET_NAME: server.mydomain.local
     * FQDN_FRONTEND: frontend.mydomain.local
     * FQDN_BACKEND: api.mydomain.local
+    * FQDN_STORAGE: storage.mydomain.local
 
+The storage service is installed alongside the backend so you don't need to run a different playbook for this. This service is only a directory browseable where the backend will host the logs and build results.  However you should add a cname to the server hosting the backend using the FQDN given to the storage.
 
 You need to modify or add the following files:
 
 * `group_vars/all` :
 Replace hostname and nickname for something else if you don't want to use kernelci-backend.
 Change the role to "staging" instead of "production" if you're installing locally for testing or development.
-
+Replace kci_storage_fqdn with the name you'll be using for the storage.
 
 * `hosts`:
 Add the TARGET_MACHINE and configure how to ansible should connect, for example if your machine
