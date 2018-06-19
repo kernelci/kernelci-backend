@@ -14,6 +14,7 @@
 import errno
 import models
 import os
+import re
 import yaml
 import json
 
@@ -91,6 +92,15 @@ META_DATA_MAP_BOOT = {
     models.DEVICE_TYPE_KEY: "device.type",
 }
 
+# This is used to detect that an early job step timed out and set the status to
+# UNKNOWN.  It should eventually be reported as an infrastructure error by
+# LAVA, at which point this code could be removed.
+TIMEOUT_RE = re.compile(r"^(.*) timed out after [\d]* seconds$")
+EARLY_TIMEOUT_STEPS = [
+    "http-download",
+    "bootloader-commands",
+]
+
 BL_META_MAP = {
     "ramdisk_addr": "initrd_addr",
     "kernel_addr": "loadaddr",
@@ -147,6 +157,15 @@ def _get_lava_job_meta(meta, boot_meta):
     """
     if boot_meta.get("error_type") == "Infrastructure":
         meta[models.BOOT_RESULT_KEY] = "UNKNOWN"
+        return
+
+    error_msg = boot_meta.get("error_msg")
+    if error_msg:
+        m = TIMEOUT_RE.match(error_msg)
+        if m and m.groups()[0] in EARLY_TIMEOUT_STEPS:
+            utils.LOG.warn("early error detected: {}".format(error_msg))
+            meta[models.BOOT_RESULT_KEY] = "UNKNOWN"
+            return
 
 
 def _get_lava_boot_meta(meta, boot_meta):
