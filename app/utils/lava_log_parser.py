@@ -87,11 +87,11 @@ def run(log, boot, txt, html):
         fmt = formats.get(level, None)
         if fmt:
             log_buffer.write(timestamp)
-            log_buffer.write(fmt.format(cgi.escape(msg)))
+            log_buffer.write(fmt.format(cgi.escape(msg.decode('utf-8'))))
             numbers[level] += 1
         elif level == "target":
             log_buffer.write(timestamp)
-            log_buffer.write(cgi.escape(msg))
+            log_buffer.write(cgi.escape(msg.decode('utf-8')))
             log_buffer.write("\n")
             txt.write(msg)
             txt.write("\n")
