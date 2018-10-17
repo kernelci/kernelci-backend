@@ -48,6 +48,15 @@ DEFAULT_BOOT_URL = u"https://kernelci.org/boot/all/job"
 BOOT_ID_URL = u"https://kernelci.org/boot/id/{_id:s}/"
 DEFAULT_BUILD_URL = u"https://kernelci.org/build"
 DEFAULT_STORAGE_URL = u"https://storage.kernelci.org"
+BOARD_URL = (
+    u"{base_url:s}/boot/{board:s}/job/{job:s}/branch/{git_branch:s}"
+    u"/kernel/{kernel:s}/defconfig/{defconfig:s}/"
+)
+BOOT_SUMMARY_URL = \
+    u"{boot_url:s}/{job:s}/branch/{git_branch:s}/kernel/{kernel:s}/"
+BOOT_REGRESSIONS_URL = BOOT_SUMMARY_URL + u"#regressions"
+BUILD_SUMMARY_URL = \
+    u"{build_url:s}/{job:s}/branch/{git_branch:s}/kernel/{kernel:s}/"
 
 # Default colors for error and warning links.
 HTML_RED = u"#d9534f"
