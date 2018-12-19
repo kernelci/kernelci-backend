@@ -149,9 +149,16 @@ class LavaCallbackHandler(CallbackHandler):
         response.status_code = 202
         response.reason = "Request accepted and being processed"
 
-        if action in ["boot", "test"]:
+        if action == "boot":
             tasks = [
                 taskqueue.tasks.callback.lava_test.s(json_obj, lab_name),
+            ]
+            chain(tasks).apply_async(
+                link_error=taskqueue.tasks.error_handler.s())
+        elif action == "test":
+            tasks = [
+                taskqueue.tasks.callback.lava_test.s(json_obj, lab_name),
+                taskqueue.tasks.test.find_regression.s(),
             ]
             chain(tasks).apply_async(
                 link_error=taskqueue.tasks.error_handler.s())

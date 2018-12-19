@@ -169,6 +169,7 @@ TEST_JOB_PATH_KEY = "test_job_path"
 TEST_JOB_URL_KEY = "test_job_url"
 TEST_GROUP_ID_KEY = "test_group_id"
 TEST_GROUP_NAME_KEY = "test_group_name"
+TEST_GROUP_REGRESSIONS_ID_KEY = "test_group_regressions_id"
 TEXT_OFFSET_KEY = "text_offset"
 TIME_KEY = "time"
 TIME_RANGE_KEY = "time_range"
@@ -260,6 +261,9 @@ LAB_COLLECTION = "lab"
 REPORT_COLLECTION = "report"
 UPLOAD_COLLECTION = "upload"
 TEST_GROUP_COLLECTION = "test_group"
+TEST_GROUP_REGRESSIONS_BY_TEST_GROUP_COLLECTION = \
+                                  "test_group_regressions_by_test_group_id"
+TEST_GROUP_REGRESSIONS_COLLECTION = "test_group_regressions"
 TEST_CASE_COLLECTION = "test_case"
 ERROR_LOGS_COLLECTION = "error_logs"
 ERRORS_SUMMARY_COLLECTION = "errors_summary"
@@ -965,6 +969,7 @@ BOOT_REGRESSIONS_VALID_KEYS = {
         KERNEL_KEY
     ]
 }
+
 
 # Used by the DistinctHandler to handle query arguments on the various
 # supported resources.

@@ -19,6 +19,7 @@ import utils
 import utils.db
 import utils.errors
 import utils.tests_import as tests_import
+import utils.kci_test.regressions
 
 ADD_ERR = utils.errors.add_error
 
@@ -113,3 +114,21 @@ def import_test_cases_from_test_group(
 
     # TODO: handle errors
     return ret_val
+
+
+@taskc.app.task(name="test-group-regressions")
+def find_regression(test_group_doc_ids):
+    """Trigger the find regression function.
+
+    This is a wrapper around the real function to provide a Celery task.
+    This function is concatenated to the
+    `taskqueue.tasks.callback.lava_test` one, and the results of the
+    previous execution are injected here.
+
+    :param test_group_doc_ids: List of test group document object id.
+    :return ObjectId The test group object id.
+    """
+
+    for test_group_doc_id in test_group_doc_ids:
+        utils.kci_test.regressions.find(test_group_doc_id,
+                                        taskc.app.conf.db_options)
