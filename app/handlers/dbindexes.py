@@ -38,6 +38,7 @@ def ensure_indexes(database):
     _ensure_stats_indexes(database)
     _ensure_reports_indexes(database)
     _ensure_test_group_indexes(database)
+    _ensure_test_group_regressions_indexes(database)
     _ensure_test_case_indexes(database)
 
 
@@ -319,6 +320,34 @@ def _ensure_test_group_indexes(database):
         ],
         background=True
     )
+
+
+def _ensure_test_group_regressions_indexes(database):
+    """Ensure indexes exist on the test_group_regression collection.
+
+    :param database: The database connection.
+    """
+    collection = database[models.TEST_GROUP_REGRESSIONS_COLLECTION]
+    collection.ensure_index(
+        [
+            (models.CREATED_KEY, pymongo.DESCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.DESCENDING),
+            (models.NAME_KEY, pymongo.ASCENDING),
+        ],
+        background=True
+    )
+    collection.ensure_index(
+        [(models.JOB_ID_KEY, pymongo.DESCENDING)], background=True)
+
+    # The index collection.
+    collection = database[models.TEST_GROUP_REGRESSIONS_BY_TEST_GROUP_COLLECTION]
+    collection.ensure_index(
+        [(models.TEST_GROUP_REGRESSIONS_ID_KEY, pymongo.DESCENDING)],
+        background=True)
+    collection.ensure_index(
+        [(models.CREATED_KEY, pymongo.DESCENDING)], background=True)
 
 
 def _ensure_test_case_indexes(database):
