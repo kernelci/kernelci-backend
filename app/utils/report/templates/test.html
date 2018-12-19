@@ -89,25 +89,41 @@ pre {
     </table>
 
     <table>
+      {% if t.regressions %}
+      {%- for elem in t.regressions|dictsort %}
+      {%- for key, value in t.regressions.data.iteritems()|sort %}
+      <tr><td width="30"></td><td width="100">{{ key }}</td><td width="400"> {{ value }}</td></tr>
+      {%- endfor %}
+      {%- endfor %}
+      {%- else %}
       {% for tc in t.test_cases -%}
       {%- if 'FAIL' == tc.status %}
-      <tr><td width="30"></td><td width="100">{{ tc.name }}</td><td width="20">{{ tc.status }}</td></tr>
+      <tr><td width="30"></td><td width="100">{{ tc.name }}</td><td width="100">never passed</td></tr>
       {%- endif %}
       {%- endfor %}
+      {%- endif %}
     </table>
     <br/>
 
     {% if t.sub_groups -%}
     {% for sg in t.sub_groups -%}
     <table>
-    <tr><td width="30"></td><td width="100"><strong>{{ sg.name }}</strong></td><td width="100">{{ sg.total_tests }} tests</td><td width="100">{{ sg.total["PASS"] }} PASS</td><td width="100">{{ sg.total["FAIL"] }} FAIL</td><td width="100">{{ sg.total["SKIP"] }} SKIP</td></tr>
+    <tr><td width="30"></td><td width="200"><strong>{{ sg.name }}</strong></td><td width="100">{{ sg.total_tests }} tests</td><td width="100">{{ sg.total["PASS"] }} PASS</td><td width="100">{{ sg.total["FAIL"] }} FAIL</td><td width="100">{{ sg.total["SKIP"] }} SKIP</td></tr>
     </table>
     <table>
+      {% if sg.regressions %}
+      {%- for elem in sg.regressions|dictsort %}
+      {%- for key, value in sg.regressions.data.iteritems()|sort %}
+      <tr><td width="30"></td><td width="100">{{ key }}</td><td width="400"> {{ value }}</td></tr>
+      {%- endfor %}
+      {%- endfor %}
+      {%- else %}
       {% for tc in sg.test_cases -%}
       {%- if 'FAIL' == tc.status %}
-      <tr><td width="30"></td><td width="100">{{ tc.name }}</td><td width="20">{{ tc.status }}</td></tr>
+      <tr><td width="30"></td><td width="100">{{ tc.name }}</td><td width="100">never passed</td></tr>
       {%- endif %}
       {%- endfor %}
+      {%- endif %}
     </table>
     <br/>
     {%- endfor %}

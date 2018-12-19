@@ -30,19 +30,35 @@ Summary
   Test Git:    {{ e.git_url }}
   Test Commit: {{ e.git_commit }}
 {%- endfor %}
-{% for tc in t.test_cases %}
-  {%- if 'FAIL' == tc.status %}
-    * {{ tc.name }}: {{ tc.status }}
-  {%- endif %}
-{%- endfor %}
+{% if t.regressions %}
+  {%- for elem in t.regressions|dictsort %}
+    {%- for key, value in t.regressions.data.iteritems()|sort %}
+    * {{ key }}: {{ value }}
+    {%- endfor %}
+  {%- endfor %}
+{% else %}
+  {% for tc in t.test_cases %}
+    {%- if 'FAIL' == tc.status %}
+    * {{ tc.name }}: never passed
+    {%- endif %}
+  {%- endfor %}
+{%- endif %}
 {% if t.sub_groups %}
   {%- for sg in t.sub_groups %}
     {{ sg.name }} - {{ sg.total_tests }} tests: {{ sg.total["PASS"] }}  PASS, {{ sg.total["FAIL"] }} FAIL, {{ sg.total["SKIP"] }} SKIP
-    {%- for tc in sg.test_cases %}
+    {% if sg.regressions %}
+      {%- for elem in sg.regressions|dictsort %}
+      {%- for key, value in sg.regressions.data.iteritems()|sort %}
+      * {{ key }}: {{ value }}
+      {%- endfor %}
+      {%- endfor %}
+    {%- else %}
+      {%- for tc in sg.test_cases %}
       {%- if 'FAIL' == tc.status %}
-      * {{ tc.name }}: {{ tc.status }}
+      * {{ tc.name }}: never passed
       {%- endif %}
-    {%- endfor %}
+      {%- endfor %}
+    {%- endif %}
   {% endfor %}
 {%- endif %}
 {%- endif %}
