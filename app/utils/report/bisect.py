@@ -59,7 +59,9 @@ def create_bisect_report(data, email_options, db_options,
         models.TYPE_KEY,
         models.ARCHITECTURE_KEY,
         models.DEFCONFIG_FULL_KEY,
+        models.BUILD_ENVIRONMENT_KEY,
         models.JOB_KEY,
+        models.KERNEL_KEY,
         models.GIT_BRANCH_KEY,
         models.LAB_NAME_KEY,
         models.DEVICE_TYPE_KEY,
@@ -98,6 +100,7 @@ def create_bisect_report(data, email_options, db_options,
         data[k] for k in [
             models.ARCHITECTURE_KEY,
             models.DEFCONFIG_FULL_KEY,
+            models.BUILD_ENVIRONMENT_KEY,
             models.LAB_NAME_KEY,
         ]
     ))
@@ -120,6 +123,10 @@ def create_bisect_report(data, email_options, db_options,
         rcommon.DEFAULT_STORAGE_URL, rel_path, boot_data["FAIL"][k]])
         for k in [models.BOOT_LOG_KEY, models.BOOT_LOG_HTML_KEY])
 
+    cc = doc[models.COMPILER_KEY]
+    cc_ver = doc[models.COMPILER_VERSION_KEY]
+    compiler_str = "-".join([cc, cc_ver]) if cc_ver else cc
+
     template_data = {
         "subject_str": email_subject,
         "bad": doc[models.BISECT_BAD_SUMMARY_KEY],
@@ -136,6 +143,7 @@ def create_bisect_report(data, email_options, db_options,
         "arch": doc[models.ARCHITECTURE_KEY],
         "lab_name": lab,
         "defconfig": doc[models.DEFCONFIG_FULL_KEY],
+        "compiler": compiler_str,
         "test_suite": test_suite,
         "show": log_data["show"],
         "log": log_data["log"],
