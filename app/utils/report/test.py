@@ -41,6 +41,7 @@ TEST_REPORT_FIELDS = [
     models.GIT_DESCRIBE_KEY,
     models.GIT_URL_KEY,
     models.ID_KEY,
+    models.IMAGE_TYPE_KEY,
     models.INITRD_KEY,
     models.INITRD_INFO_KEY,
     models.JOB_ID_KEY,
@@ -201,8 +202,8 @@ def create_test_report(data, email_format, db_options,
     subject_str = "{}/{} {}: {} tests, {} regressions ({})".format(
         job, branch, plan_subject, tests_total, regr_total, kernel)
 
-    git_url, git_commit = (groups[0][k] for k in [
-        models.GIT_URL_KEY, models.GIT_COMMIT_KEY])
+    git_url, git_commit, image_type = (groups[0][k] for k in [
+        models.GIT_URL_KEY, models.GIT_COMMIT_KEY, models.IMAGE_TYPE_KEY])
 
     headers = {
         rcommon.X_REPORT: rcommon.TEST_REPORT_TYPE,
@@ -218,6 +219,7 @@ def create_test_report(data, email_format, db_options,
         "git_url": git_url,
         "kernel": kernel,
         "git_commit": git_commit,
+        "image_type": image_type,
         "plan": plan,
         "boot_log": models.BOOT_LOG_KEY,
         "boot_log_html": models.BOOT_LOG_HTML_KEY,
