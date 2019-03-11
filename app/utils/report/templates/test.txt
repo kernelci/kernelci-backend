@@ -47,6 +47,12 @@ Test failures
       * {{ tc.name }}: {{ tc.failure_message }}
           {%- endif %}
         {%- endfor %}
+        {%- for tc in sg.test_cases %}
+          {%- if tc.measurements %}
+      * {{ tc.name }}:
+        Measurements: {{ tc.measurements[0]['value'] }} {{ tc.measurements[0]['unit'] }}
+          {%- endif %}
+        {%- endfor %}
       {%- endif %} {# sg fail or regressions #}
     {%- endfor %} {# sub_groups #}
   {%- endif %} {# fail or regressions #}
