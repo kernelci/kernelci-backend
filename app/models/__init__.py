@@ -171,6 +171,7 @@ TEST_JOB_PATH_KEY = "test_job_path"
 TEST_JOB_URL_KEY = "test_job_url"
 TEST_GROUP_ID_KEY = "test_group_id"
 TEST_GROUP_NAME_KEY = "test_group_name"
+TEST_TEMPLATE = "test_template"
 TEXT_OFFSET_KEY = "text_offset"
 TIME_KEY = "time"
 TIME_RANGE_KEY = "time_range"
@@ -771,6 +772,7 @@ SEND_VALID_KEYS = {
             SEND_BOOT_REPORT_KEY,
             SEND_BUILD_REPORT_KEY,
             SUBJECT_KEY,
+            TEST_TEMPLATE,
             # Bisection keys
             TYPE_KEY,
             ARCHITECTURE_KEY,

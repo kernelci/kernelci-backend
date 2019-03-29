@@ -112,6 +112,7 @@ class SendHandler(hbase.BaseHandler):
             return response
         report_data = {k: j_get(k) for k in report_keys}
 
+        test_template = j_get(models.TEST_TEMPLATE, None)
         email_format = j_get(models.EMAIL_FORMAT_KEY, None)
         email_format, email_errors = _check_email_format(email_format)
         response.errors = email_errors
@@ -154,6 +155,7 @@ class SendHandler(hbase.BaseHandler):
                 "in_reply_to": j_get(models.IN_REPLY_TO_KEY),
                 "subject": j_get(models.SUBJECT_KEY),
                 "format": email_format,
+                "test_template": test_template,
             }
 
             report_type_or_plan = j_get(models.PLAN_KEY, report_type)
