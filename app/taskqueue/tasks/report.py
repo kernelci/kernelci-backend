@@ -201,7 +201,7 @@ def send_test_report(job, git_branch, kernel, plan, report_data, email_opts):
     db_options = taskc.app.conf.get("db_options", {})
 
     test_report = utils.report.test.create_test_report(
-        report_data, email_opts["format"], db_options)
+        db_options, report_data, email_opts["format"], email_opts["template"])
 
     if test_report is None:
         return 500

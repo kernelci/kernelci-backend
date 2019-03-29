@@ -144,16 +144,18 @@ def _add_test_group_data(group, db, spec, hierarchy=[]):
     })
 
 
-def create_test_report(data, email_format, db_options,
+def create_test_report(db_options, data, email_format, email_template=None,
                        base_path=utils.BASE_PATH):
     """Create the tests report email to be sent.
 
+    :param db_options: The mongodb database connection parameters.
+    :type db_options: dict
     :param data: The meta-data for the test job.
     :type data: dictionary
     :param email_format: The email format to send.
     :type email_format: list
-    :param db_options: The mongodb database connection parameters.
-    :type db_options: dict
+    :param email_template: A specific email template to use.
+    :type email_template: str
     :param base_path: Path to the top-level storage directory.
     :type base_path: string
     :return A tuple with the email body, the email subject and the headers as
@@ -168,7 +170,7 @@ def create_test_report(data, email_format, db_options,
         models.PLAN_KEY,
     ])
 
-    plan_options = TEST_PLAN_OPTIONS.get(plan, {})
+    plan_options = TEST_PLAN_OPTIONS.get(email_template or plan, {})
 
     spec = {x: y for x, y in data.iteritems() if x != models.PLAN_KEY}
     group_spec = dict(spec)
