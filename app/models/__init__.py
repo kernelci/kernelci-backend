@@ -87,6 +87,7 @@ EMAIL_FORMAT_KEY = "format"
 EMAIL_HTML_FORMAT_KEY = "html"
 EMAIL_KEY = "email"
 EMAIL_LIST_KEY = "emails"
+EMAIL_TEMPLATE = "template"
 EMAIL_TXT_FORMAT_KEY = "txt"
 ENDIANNESS_KEY = "endian"
 ERRORS_COUNT_KEY = "errors_count"
@@ -772,6 +773,7 @@ SEND_VALID_KEYS = {
             SEND_BOOT_REPORT_KEY,
             SEND_BUILD_REPORT_KEY,
             SUBJECT_KEY,
+            EMAIL_TEMPLATE,
             # Bisection keys
             TYPE_KEY,
             ARCHITECTURE_KEY,
