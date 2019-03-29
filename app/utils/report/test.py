@@ -139,7 +139,7 @@ def _add_test_group_data(group, db, spec, hierarchy=[]):
     })
 
 
-def create_test_report(data, email_format, db_options,
+def create_test_report(data, email_format, test_template, db_options,
                        base_path=utils.BASE_PATH):
     """Create the tests report email to be sent.
 
@@ -224,7 +224,18 @@ def create_test_report(data, email_format, db_options,
         "test_groups": groups,
     }
 
-    template = plan_options.get("template", "test.txt")
+    if test_template:
+        path = os.getcwd() + "/utils/report/templates"
+        templates = [t for t in os.listdir( path )]
+        test_template = str(test_template) + ".txt"
+        if test_template in templates:
+            template = plan_options.get("template", test_template)
+        else:
+            utils.LOG.warning("%s: this template does not exist" % str(test_template))
+            return None
+    else:
+        template = plan_options.get("template", "test.txt")
+
     template_data.update(plan_options.get("params", {}))
     body = rcommon.create_txt_email(template, **template_data)
 
