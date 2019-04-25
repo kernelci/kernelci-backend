@@ -551,7 +551,7 @@ def _parse_log(build_doc, log_file, build_dir, errors):
     except IOError, ex:
         err_msg = "Error writing errors/warnings file for {}-{}-{}-{}".format(
             build_doc.job,
-            build_doc.branch, build_doc.kernel, build_doc.defconfig_full
+            build_doc.git_branch, build_doc.kernel, build_doc.defconfig_full
         )
         utils.LOG.exception(ex)
         utils.LOG.error(err_msg)
