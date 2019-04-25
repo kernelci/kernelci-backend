@@ -16,7 +16,7 @@ LimitNOFILE=65536
 RestartSec=5
 Restart=always
 WorkingDirectory={{ install_base }}/{{ hostname }}/app
-ExecStart={{ install_base }}/.venv/{{ hostname }}/bin/python -OO -R server.py
+ExecStart={{ install_base }}/.venv/{{ hostname }}/bin/python -OO -R server.py --buffer-size=1073741824
 
 [Install]
 WantedBy=multi-user.target
