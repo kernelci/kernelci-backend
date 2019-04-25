@@ -16,13 +16,9 @@
 {{ summary }}
 {%- endfor %}
 {% for arch, arch_data in platforms.failed_data.data|dictsort %}
-{%- if compiler_data %}
-{{ arch }}    {{ compiler_data[arch.replace(":", "")][0] }}
-{%- else %}
 {{ arch }}
-{%- endif %}{# end compiler data #}
-{% for defconfig in arch_data %}
-    {{ defconfig[0] }}
+{%- for defconfig_data in arch_data %}
+    {{ defconfig_data[0] }}
 {%- endfor %}{# defconfig #}
 {% endfor %}{# arch #}
 {%- endif %}{# end failed_data #}
@@ -31,12 +27,8 @@
 {{ summary }}
 {%- endfor %}
 {% for arch, arch_data in platforms.error_data.data|dictsort %}
-{%- if compiler_data %}
-{{ arch }}    {{ compiler_data[arch.replace(":", "")][0] }}
-{%- else %}
 {{ arch }}
-{%- endif %}{# end compiler data #}
-{% for defconfig in arch_data %}
+{%- for defconfig in arch_data %}
     {{ defconfig[0] }}
 {%- endfor %}{# defconfig #}
 {% endfor %}{# arch #}

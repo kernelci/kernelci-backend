@@ -29,6 +29,7 @@ P_ = rcommon.L10N.ungettext
 BUILD_SEARCH_FIELDS = [
     models.ARCHITECTURE_KEY,
     models.DEFCONFIG_FULL_KEY,
+    models.BUILD_ENVIRONMENT_KEY,
     models.ERRORS_KEY,
     models.ID_KEY,
     models.STATUS_KEY,
@@ -36,6 +37,7 @@ BUILD_SEARCH_FIELDS = [
 ]
 
 BUILD_SEARCH_SORT = [
+    (models.BUILD_ENVIRONMENT_KEY, pymongo.ASCENDING),
     (models.DEFCONFIG_KEY, pymongo.ASCENDING),
     (models.DEFCONFIG_FULL_KEY, pymongo.ASCENDING),
     (models.ARCHITECTURE_KEY, pymongo.ASCENDING)
@@ -48,22 +50,23 @@ DEFCONFIG_URL = (
 DEFCONFIG_ID_URL = (u"{build_url:s}/id/{build_id:s}/")
 LOG_URL = (
     u"{storage_url:s}/{job:s}/{git_branch:}/{kernel:s}/{arch:s}" +
-    u"/{defconfig:s}/" + utils.BUILD_LOG_FILE)
+    u"/{defconfig:s}/{build_environment:s}/" + utils.BUILD_LOG_FILE)
 ERR_LOG_URL = (
     u"{storage_url:s}/{job:s}/{git_branch:s}/{kernel:s}/{arch:s}" +
-    u"/{defconfig:s}/" + utils.BUILD_ERRORS_FILE)
+    u"/{defconfig:s}/{build_environment:s}/" + utils.BUILD_ERRORS_FILE)
 WARN_LOG_URL = (
     u"{storage_url:s}/{job:s}/{git_branch:s}/{kernel:s}/{arch:s}" +
-    u"/{defconfig:s}/" + utils.BUILD_WARNINGS_FILE)
+    u"/{defconfig:s}/{build_environment:s}/" + utils.BUILD_WARNINGS_FILE)
 MISM_LOG_URL = (
     u"{storage_url:s}/{job:s}/{git_branch:s}/{kernel:s}/{arch:s}" +
-    u"/{defconfig:s}/" + utils.BUILD_MISMATCHES_FILE)
+    u"/{defconfig:s}/{build_environment:s}/" + utils.BUILD_MISMATCHES_FILE)
 BUILD_SUMMARY_URL = \
     u"{build_url:s}/{job:s}/branch/{git_branch:}/kernel/{kernel:s}/"
 
 
 # Other template strings.
-DEFCONFIG_URL_HTML = u"<a href=\"{defconfig_url:s}\">{defconfig:s}</a>"
+DEFCONFIG_URL_HTML = \
+    u"<a href=\"{defconfig_url:s}\">{defconfig:s} ({build_environment:s})</a>"
 STATUS_HTML = (
     u"<a style=\"color: {red:s}\" href=\"{log_url:s}\">{status:s}</a>"
 )
@@ -85,10 +88,10 @@ def _get_errors_count(results):
     :return The errors data structure, the errors and warnings count and the
     build id value.
     """
-    err_data = {}
+    parsed_data = {}
     total_errors = total_warnings = 0
 
-    arch_keys = err_data.viewkeys()
+    arch_keys = parsed_data.viewkeys()
 
     for result in results:
         res_get = result.get
@@ -96,8 +99,10 @@ def _get_errors_count(results):
         arch = res_get(models.ARCHITECTURE_KEY)
         defconfig = res_get(models.DEFCONFIG_KEY)
         defconfig_full = res_get(models.DEFCONFIG_FULL_KEY, defconfig)
-        res_errors = res_get(models.ERRORS_KEY, 0)
-        res_warnings = res_get(models.WARNINGS_KEY, 0)
+        environment = res_get(models.BUILD_ENVIRONMENT_KEY)
+        res_errors = res_get(models.ERRORS_COUNT_KEY, 0)
+        res_warnings = res_get(models.WARNINGS_COUNT_KEY, 0)
+        res_id = res_get(models.ID_KEY)
 
         if defconfig_full is None:
             defconfig_full = defconfig
@@ -106,29 +111,29 @@ def _get_errors_count(results):
 
         if res_errors is not None and res_errors != 0:
             total_errors += res_errors
-            err_struct[models.ERRORS_KEY] = res_errors
 
         if res_warnings is not None and res_warnings != 0:
             total_warnings += res_warnings
-            err_struct[models.WARNINGS_KEY] = res_warnings
 
-        if err_struct:
-            err_struct[models.BUILD_ID_KEY] = res_get(models.ID_KEY)
+        warnings = res_get('warnings_count', 0)
+        errors = res_get('errors_count', 0)
 
-            if arch in arch_keys:
-                if defconfig_full in err_data[arch].keys():
-                    # Multiple builds with the same defconfig value?
-                    err_data[arch][defconfig_full][models.WARNINGS_KEY] += \
-                        res_warnings
-                    err_data[arch][defconfig_full][models.ERRORS_KEY] += \
-                        res_errors
-                else:
-                    err_data[arch][defconfig_full] = err_struct
-            else:
-                err_data[arch] = {}
-                err_data[arch][defconfig_full] = err_struct
+        struct = (
+            defconfig,
+            environment,
+            res_get(models.STATUS_KEY),
+            res_id,
+            res_warnings,
+            res_errors
+        )
 
-    return err_data, total_errors, total_warnings
+        if arch in arch_keys:
+            parsed_data[arch].append(struct)
+        else:
+            parsed_data[arch] = []
+            parsed_data[arch].append(struct)
+
+    return parsed_data, total_errors, total_warnings
 
 
 def _parse_build_data(results):
@@ -151,9 +156,11 @@ def _parse_build_data(results):
         arch = res_get(models.ARCHITECTURE_KEY)
         defconfig = res_get(models.DEFCONFIG_FULL_KEY, None) or \
             res_get(models.DEFCONFIG_KEY)
+        environment = res_get(models.BUILD_ENVIRONMENT_KEY)
 
         struct = (
             defconfig,
+            environment,
             res_get(models.STATUS_KEY),
             res_get(models.ID_KEY)
         )
@@ -326,12 +333,15 @@ def _parse_and_structure_results(**kwargs):
 
             for struct in f_get(arch):
                 subs["defconfig"] = struct[0]
-                subs["status"] = struct[1]
-                if struct[2]:
+                subs["build_environment"] = struct[1]
+                subs["status"] = struct[2]
+                if struct[3]:
                     subs["defconfig_url"] = DEFCONFIG_ID_URL
-                    subs["build_id"] = struct[2]
+                    subs["build_id"] = struct[3]
 
-                txt_str = G_(u"{defconfig:s}: {status:s}").format(**subs)
+                txt_str = G_(
+                    u"{defconfig:s}: ({build_environment:s}) {status:s}"
+                ).format(**subs)
                 html_str = (
                     DEFCONFIG_URL_HTML.format(**subs).format(**subs),
                     STATUS_HTML.format(**subs).format(**subs))
@@ -367,34 +377,31 @@ def _parse_and_structure_results(**kwargs):
 
                 error_append = error_struct[arch_string].append
 
-                # Force defconfigs to be sorted.
-                defconfigs = list(err_get(arch).viewkeys())
-                defconfigs.sort()
+                for struct in err_get(arch):
+                    subs["defconfig"] = struct[0]
+                    subs["build_environment"] = struct[1]
+                    subs["status"] = struct[2]
+                    subs["warnings"] = struct[4]
+                    subs["errors"] = struct[5]
+                    err_numb = subs["errors"]
+                    warn_numb = subs["warnings"]
+                    if err_numb == 0 and warn_numb == 0:
+                        continue
+                    txt_desc_str = ""
+                    html_desc_str = ""
 
-                for defconfig in defconfigs:
-                    err_numb = err_get(arch)[defconfig].get(
-                        models.ERRORS_KEY, 0)
-                    warn_numb = err_get(arch)[defconfig].get(
-                        models.WARNINGS_KEY, 0)
-                    build_id = err_get(arch)[defconfig].get(
-                        models.BUILD_ID_KEY)
-
-                    if build_id:
+                    if struct[3]:
                         subs["defconfig_url"] = DEFCONFIG_ID_URL
-                        subs["build_id"] = build_id
+                        subs["build_id"] = struct[3]
 
                     err_string = P_(
                         u"{errors:d} error",
-                        u"{errors:d} errors", err_numb)
+                        u"{errors:d} errors", subs["errors"])
                     warn_string = P_(
                         u"{warnings:d} warning",
-                        u"{warnings:d} warnings", warn_numb)
-
-                    subs["defconfig"] = defconfig
+                        u"{warnings:d} warnings", subs["warnings"])
                     subs["err_string"] = err_string
-                    subs["errors"] = err_numb
                     subs["warn_string"] = warn_string
-                    subs["warnings"] = warn_numb
 
                     if err_numb > 0 and warn_numb > 0:
                         txt_desc_str = G_(
@@ -416,12 +423,12 @@ def _parse_and_structure_results(**kwargs):
                     subs["txt_desc_str"] = txt_desc_str
 
                     txt_defconfig_str = (
-                        G_(u"{defconfig:s}: {txt_desc_str:s}").format(**subs)
+                        G_(u"{defconfig:s} ({build_environment:s}): " +
+                           u"{txt_desc_str:s}").format(**subs)
                     ).format(**subs)
                     html_defconfing_str = (
                         DEFCONFIG_URL_HTML.format(**subs).format(**subs),
                         html_desc_str)
-
                     error_append((txt_defconfig_str, html_defconfing_str))
     else:
         platforms["error_data"] = None
@@ -583,26 +590,6 @@ def create_build_report(
         fields=BUILD_SEARCH_FIELDS
     )
 
-    err_data, errors_count, warnings_count = _get_errors_count(
-        total_results.clone())
-
-    compiler_aggregate = database[models.BUILD_COLLECTION].aggregate([
-        {"$match": spec},
-        {
-            "$group": {
-                "_id": "${:s}".format(models.ARCHITECTURE_KEY),
-                "compiler": {
-                    "$addToSet":
-                        "${:s}".format(models.COMPILER_VERSION_FULL_KEY)
-                }
-            }
-        }
-    ])
-
-    compiler_data = {}
-    for data in compiler_aggregate["result"]:
-        compiler_data[data["_id"]] = data["compiler"]
-
     total_unique_data = rcommon.get_unique_data(
         total_results.clone(), unique_keys=[models.ARCHITECTURE_KEY])
 
@@ -642,10 +629,12 @@ def create_build_report(
     )
     error_details = [d for d in error_details.clone()]
 
+    err_data, errors_count, warnings_count = _get_errors_count(
+        error_details)
+
     kwargs = {
         "base_url": rcommon.DEFAULT_BASE_URL,
         "build_url": rcommon.DEFAULT_BUILD_URL,
-        "compiler_data": compiler_data,
         "email_format": email_format,
         "error_data": err_data,
         "error_details": error_details,

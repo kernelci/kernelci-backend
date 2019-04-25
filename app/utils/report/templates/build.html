@@ -31,20 +31,9 @@
             <table style="border: none; padding-bottom: 15px; padding-top: 5px; padding-left: 15px;">
                 <tbody>
                 {%- for arch, arch_data in platforms.failed_data.data|dictsort %}
-                {%- if compiler_data %}
-                    <tr>
-                        <td align="left" style="padding-bottom: 5px;">
-                            {{ arch }}
-                        </td>
-                        <td align="left" style="padding-bottom: 5px;">
-                            {{ compiler_data[arch.replace(":", "")][0] }}
-                        </td>
-                    </tr>
-                {%- else %}
                     <tr>
                         <td colspan="2" align="left" style="padding-bottom: 5px;">{{ arch }}</td>
                     </tr>
-                {%- endif %}{# end compiler data #}
                 {%- for defconfig in arch_data %}
                     <tr>
                         <td style="padding-left: 25px; padding-right: 5px;">{{ defconfig[1][0] }}</td>
@@ -65,30 +54,18 @@
             <table style="border: none; padding-bottom: 15px; padding-top: 5px; padding-left: 15px;">
                 <tbody>
                 {%- for arch, arch_data in platforms.error_data.data|dictsort %}
-                {%- if compiler_data %}
                     <tr>
-                        <td align="left" style="padding-bottom: 5px;">
-                            {{ arch }}
-                        </td>
-                        <td align="left" colspan="3" style="padding-bottom: 5px;">
-                            {{ compiler_data[arch.replace(":", "")][0] }}
-                        </td>
+                        <td colspan="2" align="left" style="padding-bottom: 5px;">{{ arch }}</td>
                     </tr>
-                {%- else %}
+                {%- for defconfig_data in arch_data %}
                     <tr>
-                        <td colspan="3" align="left" style="padding-bottom: 5px;">
-                            {{ arch }}
-                        </td>
-                    </tr>
-                {%- endif %}{# compiler data #}
-                {%- for defconfig in arch_data %}
-                    <tr>
-                        <td align="left" style="padding-left: 25px; padding-right: 5px;">{{ defconfig[1][0] }}
-                        </td>
-                        <td align="right" style="padding-right: 5px;">
-                            {{ defconfig[1][1][0] }}
-                        </td>
-                        <td align="right">{{ defconfig[1][1][1] }}</td>
+                        <td style="padding-left: 25px; padding-right: 5px;">{{ defconfig_data[1][0] }}</td>
+                        {%- if defconfig_data[1][1][1] %}
+                        <td align="center">{{ defconfig_data[1][1][1] }}</td>
+                        {%- endif %}
+                        {%- if defconfig_data[1][1][0] %}
+                        <td align="center">{{ defconfig_data[1][1][0] }}</td>
+                        {%- endif %}
                     </tr>
                 {%- endfor %}{# defconfig #}
                 <tr><td style="padding-bottom: 5px;"></td></tr>
