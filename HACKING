@@ -1,6 +1,9 @@
 Tests
 =====
 
+Tests run best from a virtualenv using python2.7. Though most tests use
+fakeredis, some do actually require an actual redis running locally.
+
 From the 'app/' folder, run:
 
   python -m unittest discover
@@ -8,6 +11,21 @@ From the 'app/' folder, run:
 or
 
   python -m unittest tests.test_suite
+
+Example Test Setup
+------------------
+
+    $ redis-cli ping # ensure redis is available
+    $ cd app
+    $ virtualenv -p python2.7 venv
+    $ . venv/bin/activate
+    $ pip install -r ../requirements-dev.txt
+    $ python -m unittest discover
+    ...
+    Ran 787 tests in 1.852s
+
+    OK
+
 
 Test Code Coverage
 ==================
