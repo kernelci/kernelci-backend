@@ -18,6 +18,7 @@ import os
 import yaml
 import json
 import urllib2
+from collections import OrderedDict
 
 import utils
 import utils.boot
@@ -429,7 +430,7 @@ def _add_test_results(group, suite_results, suite_name):
     """
     tests = yaml.load(suite_results, Loader=yaml.CLoader)
     test_cases = []
-    test_sets = {}
+    test_sets = OrderedDict()
 
     for test in reversed(tests):
         test_case = {
@@ -455,10 +456,12 @@ def _add_test_results(group, suite_results, suite_name):
         test_case_list.append(test_case)
 
     sub_groups = []
-    for test_set_name, test_set_cases in test_sets.iteritems():
+    for index, test_set in enumerate(test_sets.iteritems(), 1):
+        test_set_name, test_set_cases = test_set
         sub_group = {
             models.NAME_KEY: test_set_name,
             models.TEST_CASES_KEY: test_set_cases,
+            models.INDEX_KEY: index,
         }
         sub_group.update({
             k: group[k] for k in [
