@@ -15,5 +15,5 @@ redis==2.10.6
 scandir
 simplejson
 sphinx-bootstrap-theme
-sphinxcontrib-httpdomain
+sphinxcontrib-httpdomain==1.3.0
 tornado==3.2.2
