@@ -545,7 +545,8 @@ def add_tests(job_data, job_meta, lab_name, db_options,
     :return The top-level test group document id as ObjectId object.
     """
     ret_code = 201
-    group_doc_ids = []
+    plan = None
+    plan_doc_id = None
     errors = {}
     ex = None
     msg = None
@@ -568,7 +569,8 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         _add_test_log(meta, job_data["log"], plan_name)
         _add_rootfs_info(meta, base_path)
         _store_lava_json(job_data, meta)
-        # TODO add a test plan entry in the database to group test suites
+        groups = []
+
         for suite_name, suite_results in job_data["results"].iteritems():
             if suite_name != "lava":
                 # LAVA adds a prefix index to the test suite names "X_" except
@@ -579,10 +581,24 @@ def add_tests(job_data, job_meta, lab_name, db_options,
             group = dict(meta)
             group[models.NAME_KEY] = suite_name
             _add_test_results(group, suite_results, suite_name)
-            ret_code, group_doc_id, err = \
-                utils.kci_test.import_and_save_kci_tests(group, db_options)
+            groups.append(group)
+
+        if (len(groups) == 1) and (groups[0][models.NAME_KEY] == plan_name):
+            # Only one group with same name as test plan
+            plan = groups[0]
+        elif groups:
+            # Create top-level group with the test plan name
+            plan = dict(meta)
+            plan[models.NAME_KEY] = plan_name
+            for index, group in enumerate(groups):
+                group[models.INDEX_KEY] = index
+            plan[models.SUB_GROUPS_KEY] = groups
+            plan[models.TEST_CASES_KEY] = []
+
+        if plan:
+            ret_code, plan_doc_id, err = \
+                utils.kci_test.import_and_save_kci_tests(plan, db_options)
             utils.errors.update_errors(errors, err)
-            group_doc_ids.append(group_doc_id)
     except (yaml.YAMLError, ValueError) as ex:
         ret_code = 400
         msg = "Invalid test data from LAVA callback"
@@ -598,11 +614,8 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         if errors:
             raise utils.errors.BackendError(errors)
 
-    if not group_doc_ids:
-        utils.LOG.warn("No test groups")
+    if not plan_doc_id:
+        utils.LOG.warn("No test results")
         return None
 
-    if len(group_doc_ids) > 1:
-        utils.LOG.warn("Discarding extra test group documents")
-
-    return group_doc_ids[0]
+    return plan_doc_id
