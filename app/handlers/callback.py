@@ -167,10 +167,12 @@ class LavaCallbackHandler(CallbackHandler):
         valid, errors = super(LavaCallbackHandler, self).is_valid_json(
             json_obj, **kwargs)
         if not valid:
+            self.log.error("Invalid JSON {}".format(errors))
             return valid, errors
         definition = yaml.load(json_obj["definition"], Loader=yaml.CLoader)
         job_meta = definition.get("metadata")
         if not job_meta:
+            self.log.error("metadata missing from LAVA job definition")
             return False, "metadata missing from LAVA job definition"
         self._json_obj = json_obj
         self._job_meta = job_meta
@@ -182,9 +184,11 @@ class LavaCallbackHandler(CallbackHandler):
         job_meta_keys = job_meta.keys()
         for k in job_meta_keys:
             if k not in all_keys:
+                self.log.error("invalid LAVA metadata: {}".format(k))
                 return False, "invalid LAVA metadata: {}".format(k)
         for k in mandatory_keys:
             if k not in job_meta_keys:
+                self.log.error("missing mandatory LAVA metadata: {}".format(k))
                 return False, "missing mandatory LAVA metadata: {}".format(k)
         return True, ''
 
