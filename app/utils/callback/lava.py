@@ -438,21 +438,24 @@ def _add_test_results(group, suite_results, suite_name):
             models.TIME_KEY: "0.0",
         }
         test_case.update({k: test[v] for k, v in TEST_CASE_MAP.iteritems()})
-        test_meta = test["metadata"]
-        if suite_name == "lava":
-            _parse_lava_test_data(test_case, test_meta)
-        test_set_name = test_meta.get("set")
-        if test_set_name:
-            test_case_list = test_sets.setdefault(test_set_name, [])
-        else:
-            test_case_list = test_cases
-        test_case[models.INDEX_KEY] = len(test_case_list) + 1
         measurement = test.get("measurement")
         if measurement and measurement != 'None':
             test_case[models.MEASUREMENTS_KEY] = [{
                 "value": float(measurement),
                 "unit": test["unit"],
             }]
+        test_meta = test["metadata"]
+        if suite_name == "lava":
+            _parse_lava_test_data(test_case, test_meta)
+        reference = test_meta.get("reference")
+        if reference:
+            test_case[models.ATTACHMENTS_KEY] = [reference]
+        test_set_name = test_meta.get("set")
+        if test_set_name:
+            test_case_list = test_sets.setdefault(test_set_name, [])
+        else:
+            test_case_list = test_cases
+        test_case[models.INDEX_KEY] = len(test_case_list) + 1
         test_case_list.append(test_case)
 
     sub_groups = []

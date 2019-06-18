@@ -218,6 +218,7 @@ def _update_test_case_doc_from_json(case_doc, test_dict, errors):
     case_doc.index = test_dict.get(models.INDEX_KEY, None)
     case_doc.maximum = test_dict.get(models.MAXIMUM_KEY, None)
     case_doc.measurements = test_dict.get(models.MEASUREMENTS_KEY, [])
+    case_doc.attachments = test_dict.get(models.ATTACHMENTS_KEY, [])
     case_doc.metadata = test_dict.get(models.METADATA_KEY, None)
     case_doc.minimum = test_dict.get(models.MINIMUM_KEY, None)
     case_doc.samples = test_dict.get(models.SAMPLES_KEY, None)
