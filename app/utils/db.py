@@ -143,7 +143,7 @@ def find_one(collection, value, field="_id", operator="$in", fields=None):
     return result
 
 
-def find_one2(collection, spec_or_id, fields=None):
+def find_one2(collection, spec_or_id, fields=None, sort=None):
     """Search for a single document.
 
     This is different from `find_one` in that it accepts a more generic `spec`
@@ -153,9 +153,10 @@ def find_one2(collection, spec_or_id, fields=None):
     :param spec_or_id: A `spec` data structure or the document id.
     :param fields: The fields that should be available or excluded from the
     result.
+    :param sort: The sort data structure.
     :return None or the search result as a dictionary.
     """
-    return collection.find_one(spec_or_id, fields=fields)
+    return collection.find_one(spec_or_id, fields=fields, sort=sort)
 
 
 def find_one3(
