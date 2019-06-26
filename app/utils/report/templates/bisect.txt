@@ -3,6 +3,10 @@
 * that you may be involved with the breaking commit it has      *
 * found.  No manual investigation has been done to verify it,   *
 * and the root cause of the problem may be somewhere else.      *
+*                                                               *
+* If you do send a fix, please include this trailer:            *
+*   Reported-by: "kernelci.org bot" <bot@kernelci.org>          *
+*                                                               *
 * Hope this helps!                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
