@@ -14,8 +14,11 @@
 """Container for all the kci_test import related functions."""
 
 import bson
+import codecs
 import copy
 import datetime
+import errno
+import os
 import pymongo
 
 import models
@@ -127,6 +130,19 @@ def save_or_update(doc, spec_map, collection, database, errors):
         ERR_ADD(errors, ret_val, err_msg)
 
     return ret_val, doc_id
+
+
+def _add_test_log(dir_path, filename, log_data):
+    utils.LOG.info("Generating log files in {}".format(filename))
+    if not os.path.isdir(dir_path):
+        try:
+            os.makedirs(dir_path)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise e
+    logfile_path = os.path.join(dir_path, filename)
+    with codecs.open(logfile_path, "w", "utf-8") as logfile:
+        logfile.write(log_data)
 
 
 def _check_for_null(test_dict, NON_NULL_KEYS):

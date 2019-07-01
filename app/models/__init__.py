@@ -127,6 +127,7 @@ LAB_ID_KEY = "lab_id"
 LAB_NAME_KEY = "lab_name"
 LIMIT_KEY = "limit"
 LOAD_ADDR_KEY = "load_addr"
+LOG_KEY = 'log'
 LT_KEY = "lt"
 MACH_ALIAS_KEY = "mach_alias"
 MACH_KEY = "mach"
@@ -814,10 +815,14 @@ BISECT_VALID_KEYS = {
 TEST_GROUP_VALID_KEYS = {
     "POST": {
         MANDATORY_KEYS: [
-            BUILD_ID_KEY,
+            ARCHITECTURE_KEY,
+            BUILD_ENVIRONMENT_KEY,
+            DEFCONFIG_KEY,
+            GIT_BRANCH_KEY,
+            JOB_KEY,
+            KERNEL_KEY,
             LAB_NAME_KEY,
             NAME_KEY,
-            BUILD_ENVIRONMENT_KEY,
         ],
         ACCEPTED_KEYS: [
             ARCHITECTURE_KEY,
@@ -827,10 +832,15 @@ TEST_GROUP_VALID_KEYS = {
             BUILD_ENVIRONMENT_KEY,
             CREATED_KEY,
             DEFCONFIG_FULL_KEY,
+            DEVICE_TYPE_KEY,
             BUILD_ID_KEY,
             DEFCONFIG_KEY,
             DEFINITION_URI_KEY,
+            ENDIANNESS_KEY,
+            FILE_SERVER_RESOURCE_KEY,
+            GIT_COMMIT_KEY,
             GIT_BRANCH_KEY,
+            IMAGE_TYPE_KEY,
             INDEX_KEY,
             INITRD_KEY,
             INITRD_INFO_KEY,
@@ -838,9 +848,13 @@ TEST_GROUP_VALID_KEYS = {
             JOB_KEY,
             KERNEL_KEY,
             LAB_NAME_KEY,
+            LOG_KEY,
+            MACH_KEY,
             METADATA_KEY,
             NAME_KEY,
+            SUB_GROUPS_KEY,
             TEST_CASES_KEY,
+            TIME_KEY,
             VCS_COMMIT_KEY,
             VERSION_KEY
         ]

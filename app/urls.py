@@ -172,6 +172,11 @@ _TEST_GROUP_URL = tornado.web.url(
     handlers.test_group.TestGroupHandler, name="test-group"
 )
 
+_TEST_RESULT_URL = tornado.web.url(
+    r"/test[s]?",
+    handlers.test_group.TestGroupHandler, name="test-result"
+)
+
 _TEST_GROUP_DISTINCT_URL = tornado.web.url(
     r"/test[s]?/group[s]?/distinct/(?P<field>[A-Za-z0-9_]+)/?$",
     handlers.distinct.DistinctHandler,
@@ -249,6 +254,7 @@ APP_URLS = [
     _TEST_GROUP_COUNT_DISTINCT_URL,
     _TEST_GROUP_DISTINCT_URL,
     _TEST_GROUP_URL,
+    _TEST_RESULT_URL,
     _TOKEN_URL,
     _UPLOAD_URL,
     _VERSION_URL

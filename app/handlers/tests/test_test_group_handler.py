@@ -19,6 +19,7 @@ import bson
 import json
 import mock
 import tornado
+import unittest
 
 import urls
 
@@ -124,20 +125,30 @@ class TestTestGroupHandler(TestHandlerBase):
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
 
-    @mock.patch("taskqueue.tasks.test.complete_test_group_import")
+    @mock.patch("utils.db.get_db_connection")
     @mock.patch("handlers.test_group.TestGroupHandler._check_references")
     @mock.patch("utils.db.save")
-    def test_post_correct(self, mock_save, mock_check, mock_task):
+    def test_post_correct(self, mock_save, mock_check, mock_db):
         mock_save.return_value = (201, "test-suite-id")
         mock_check.return_value = (200, None)
-        mock_task.apply_async = mock.MagicMock()
+        mock_db.return_value = self.database
         headers = {"Authorization": "foo", "Content-Type": "application/json"}
 
         body = json.dumps(
             dict(
                 name="test",
                 lab_name="lab_name", version="1.0", build_id="build",
-                build_environment="build-environment")
+                build_environment="build-environment",
+                board="board",
+                defconfig="defconfig",
+                job="job",
+                kernel="kernel",
+                git_commit="git_commit",
+                time=1.0,
+                test_cases=[],
+                arch="x86",
+                git_branch="branch"
+                )
         )
 
         response = self.fetch(
@@ -162,42 +173,34 @@ class TestTestGroupHandler(TestHandlerBase):
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
 
+    @mock.patch("utils.db.get_db_connection")
     @mock.patch("taskqueue.tasks.test.complete_test_group_import")
     @mock.patch("handlers.test_group.TestGroupHandler._check_references")
-    def test_post_correct_with_test_cases(self, mock_check, mock_task):
+    def test_post_correct_with_test_cases(self,
+                                          mock_check,
+                                          mock_task,
+                                          mock_db):
         mock_check.return_value = (200, None)
         mock_task.apply_async = mock.MagicMock()
+        mock_db.return_value = self.database
         headers = {"Authorization": "foo", "Content-Type": "application/json"}
         body = json.dumps(
             dict(
                 name="suite",
                 version="1.0",
                 lab_name="lab",
-                build_id="build", test_cases=[{"foo": "bar"}],
-                build_environment="build_environment"
-            )
-        )
-
-        response = self.fetch(
-            "/test/group", method="POST", headers=headers, body=body)
-
-        self.assertEqual(response.code, 202)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-
-    @mock.patch("taskqueue.tasks.test.complete_test_group_import")
-    @mock.patch("handlers.test_group.TestGroupHandler._check_references")
-    def test_post_correct_with_wrong_test_case(self, mock_check, mock_task):
-        mock_check.return_value = (200, None)
-        mock_task.apply_async = mock.MagicMock()
-        headers = {"Authorization": "foo", "Content-Type": "application/json"}
-        body = json.dumps(
-            dict(
-                name="suite",
-                version="1.0",
-                lab_name="lab",
-                build_id="build", test_case={"foo": "bar"},
-                build_environment="build-environment"
+                build_id="build", test_cases=[{"name": "foo",
+                                               "status": "pass",
+                                               "time": 1.0}],
+                build_environment="build_environment",
+                board="board",
+                defconfig="defconfig",
+                job="job",
+                kernel="kernel",
+                git_commit="git_commit",
+                time=1.0,
+                arch="x86",
+                git_branch="branch"
             )
         )
 
@@ -208,132 +211,26 @@ class TestTestGroupHandler(TestHandlerBase):
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
 
+    @mock.patch("utils.db.get_db_connection")
     @mock.patch("handlers.test_group.TestGroupHandler._check_references")
     @mock.patch("utils.db.save")
-    def test_post_correct_with_error(self, mock_save, mock_check):
+    def test_post_correct_with_error(self, mock_save, mock_check, mock_db):
         mock_check.return_value = (200, None)
         mock_save.return_value = (500, None)
+        mock_db.return_value = self.database
         headers = {"Authorization": "foo", "Content-Type": "application/json"}
         body = json.dumps(
             dict(
                 name="test", lab_name="lab_name", version="1.0",
-                build_id="build_id", build_environment="build-environment")
+                build_environment="build-environment",
+                arch="x86", defconfig="defconfig", git_branch="git_branch",
+                job="job", kernel="kernel")
         )
 
         response = self.fetch(
             "/test/group", method="POST", headers=headers, body=body)
 
         self.assertEqual(response.code, 500)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-
-    def test_post_correct_wrong_build_id(self):
-        headers = {"Authorization": "foo", "Content-Type": "application/json"}
-        body = json.dumps(
-            dict(
-                name="test", lab_name="lab_name", version="1.0",
-                build_id="build_id")
-        )
-
-        response = self.fetch(
-            "/test/group", method="POST", headers=headers, body=body)
-
-        self.assertEqual(response.code, 400)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-
-    @mock.patch("bson.objectid.ObjectId")
-    def test_post_correct_wrong_job_id(self, mock_oid):
-        mock_oid.side_effect = ["build-id", bson.errors.InvalidId]
-        headers = {"Authorization": "foo", "Content-Type": "application/json"}
-        body = json.dumps(
-            dict(
-                name="test", lab_name="lab_name", version="1.0",
-                build_id="build-id", job_id="job_id")
-        )
-
-        response = self.fetch(
-            "/test/group", method="POST", headers=headers, body=body)
-
-        self.assertEqual(response.code, 400)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-
-    @mock.patch("bson.objectid.ObjectId")
-    def test_post_correct_wrong_boot_id(self, mock_oid):
-        mock_oid.side_effect = ["build-id", bson.errors.InvalidId]
-        headers = {"Authorization": "foo", "Content-Type": "application/json"}
-        body = json.dumps(
-            dict(
-                name="test", lab_name="lab_name", version="1.0",
-                build_id="build-id", boot_id="boot_id")
-        )
-
-        response = self.fetch(
-            "/test/group", method="POST", headers=headers, body=body)
-
-        self.assertEqual(response.code, 400)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-
-    @mock.patch("bson.objectid.ObjectId")
-    @mock.patch("utils.db.find_one2")
-    def test_post_correct_defconfig_not_found(self, mock_find, mock_oid):
-        mock_oid.side_effect = ["build-id", "boot-id"]
-        mock_find.side_effect = [None, {"_id": "fake-boot"}]
-        headers = {"Authorization": "foo", "Content-Type": "application/json"}
-        body = json.dumps(
-            dict(
-                name="test", lab_name="lab_name", version="1.0",
-                build_id="build-id", boot_id="boot_id")
-        )
-
-        response = self.fetch(
-            "/test/group", method="POST", headers=headers, body=body)
-
-        self.assertEqual(response.code, 400)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-
-    @mock.patch("bson.objectid.ObjectId")
-    @mock.patch("utils.db.find_one2")
-    def test_post_correct_job_not_found(self, mock_find, mock_oid):
-        mock_oid.side_effect = ["build-id", "job-id"]
-        mock_find.side_effect = [{"_id": "fake-id"}, None]
-        headers = {"Authorization": "foo", "Content-Type": "application/json"}
-        body = json.dumps(
-            dict(
-                name="test", lab_name="lab_name", version="1.0",
-                build_id="build-id", job_id="job_id")
-        )
-
-        response = self.fetch(
-            "/test/group", method="POST", headers=headers, body=body)
-
-        self.assertEqual(response.code, 400)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-
-    @mock.patch("bson.objectid.ObjectId")
-    @mock.patch("utils.db.find_one2")
-    def test_post_correct_job_not_found2(self, mock_find, mock_oid):
-        mock_oid.side_effect = ["build-id", "job-id", "boot-id"]
-        mock_find.side_effect = [
-            {"_id": "fake-id"}, None, {"_id": "fake-boot"}]
-        headers = {"Authorization": "foo", "Content-Type": "application/json"}
-        body = json.dumps(
-            dict(
-                name="test",
-                lab_name="lab_name",
-                version="1.0",
-                build_id="build-id",
-                job_id="job_id", boot_id="boot_id")
-        )
-
-        response = self.fetch(
-            "/test/group", method="POST", headers=headers, body=body)
-
-        self.assertEqual(response.code, 400)
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
 
