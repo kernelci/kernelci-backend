@@ -575,7 +575,7 @@ def add_tests(job_data, job_meta, lab_name, db_options,
             if suite_name != "lava":
                 # LAVA adds a prefix index to the test suite names "X_" except
                 # for the lava key.  Remove it to get the original name.
-                suite_name = suite_name.split("_")[1]
+                suite_name = suite_name.partition("_")[2]
             elif plan_name != "boot":
                 continue
             group = dict(meta)
