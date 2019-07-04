@@ -2,57 +2,96 @@
 
 Test results summary
 --------------------
-{% block plan_description %}
-  Test:    {{ plan }}{% endblock %}
-  Tree:    {{ tree }}
-  Branch:  {{ branch }}
-  Kernel:  {{ kernel }}
-  URL:     {{ git_url }}
-  Commit:  {{ git_commit }}
 
-{% for t in test_groups|sort(attribute='name') %}
-{{ "%-2s | %-22s | %-8s | %-5s | %3s total: %3s PASS %3s FAIL %3s SKIP"|format(loop.index, t.board, t.build_environment, t.arch, t.total_tests, t.total["PASS"], t.total["FAIL"], t.total["SKIP"]) }}
+run | platform                 | arch   | lab                      | compiler | defconfig          | errors
+----+--------------------------+--------+--------------------------+----------+--------------------+-------
+{%- for group in test_groups %}
+{{ "%3d | %-24s | %-6s | %-24s | %-8s | %-18s | %d/%d"|format(
+   loop.index,
+   group.board,
+   group.arch,
+   group.lab_name,
+   group.build_environment,
+   group.defconfig,
+   group.total_results.FAIL,
+   group.total_tests) }}
 {%- endfor %}
 
+{% block plan_description %}
+  Test:     {{ plan }}{% endblock %}
+  Tree:     {{ tree }}
+  Branch:   {{ branch }}
+  Describe: {{ kernel }}
+  URL:      {{ git_url }}
+  SHA:      {{ git_commit }}
 
-{%- set print_header = true %}
-{%- for t in test_groups|sort(attribute='name') %} {# test_groups #}
-  {%- if t.total["FAIL"] or t.regressions %} {# fail or regressions #}
-    {% if print_header %}
+{%- if test_suites %}
 
-Test failures
+  Test suite revisions:
+  {%- for suite in test_suites|sort(attribute='name') %}
+    {{ suite.name }}
+      URL:  {{ suite.git_url }}
+      SHA:  {{ suite.git_commit }}
+  {%- endfor %}
+{%- endif %}
+
+{%- if totals.FAIL != 0 %} {# total fail #}
+
+
+Test Failures
 -------------
-        {%- set print_header = false %}
-    {%- endif %} {# print_header #}
-{{ "%-2s | %-22s | %-8s | %-5s | %3s total: %3s PASS %3s FAIL %3s SKIP"|format(loop.index, t.board, t.build_environment, t.arch, t.total_tests, t.total["PASS"], t.total["FAIL"], t.total["SKIP"]) }}
+{% for group in test_groups %} {# test_groups #}
+  {%- if group.total_results.FAIL %} {# group fail #}
 
-  Config:      {{ t.defconfig_full }}
-  Compiler:    {{ t.build_environment }}{% if t.compiler_version_full %} ({{ t.compiler_version_full }}){% endif %}
-  Lab Name:    {{ t.lab_name }}
-  Plain log:   {{ storage_url }}/{{ t.job }}/{{ t.git_branch }}/{{ t.kernel }}/{{ t.arch }}/{{ t.defconfig_full }}/{{ t.build_environment }}/{{ t.lab_name }}/{{ t.boot_log }}
-  HTML log:    {{ storage_url }}/{{ t.job }}/{{ t.git_branch }}/{{ t.kernel }}/{{ t.arch }}/{{ t.defconfig_full }}/{{ t.build_environment }}/{{ t.lab_name }}/{{ t.boot_log_html }}
-    {%- if t.initrd %}
-  Rootfs:      {{ t.initrd }}
+run | platform                 | arch   | lab                      | compiler | defconfig          | errors
+----+--------------------------+--------+--------------------------+----------+--------------------+-------
+{{ "%3d | %-24s | %-6s | %-24s | %-8s | %-18s | %d/%d"|format(
+    loop.index,
+    group.board,
+    group.arch,
+    group.lab_name,
+    group.build_environment,
+    group.defconfig,
+    group.total_results.FAIL,
+    group.total_tests) }}
+
+  Results:     {{ group.total_results.PASS }} PASS, {{ group.total_results.FAIL }} FAIL, {{ group.total_results.SKIP }} SKIP
+  Full config: {{ group.defconfig_full }}
+  Compiler:    {{ group.build_environment }}{% if group.compiler_version_full %} ({{ group.compiler_version_full }}){% endif %}
+  Plain log:   {{ storage_url }}/{{ group.job }}/{{ group.git_branch }}/{{ group.kernel }}/{{ group.arch }}/{{ group.defconfig_full }}/{{ group.build_environment }}/{{ group.lab_name }}/{{ group.boot_log }}
+  HTML log:    {{ storage_url }}/{{ group.job }}/{{ group.git_branch }}/{{ group.kernel }}/{{ group.arch }}/{{ group.defconfig_full }}/{{ group.build_environment }}/{{ group.lab_name }}/{{ group.boot_log_html }}
+    {%- if group.initrd %}
+  Rootfs:      {{ group.initrd }}
     {%- endif %}
-    {%- for e in t.initrd_info.tests_suites %}
-  Test Git:    {{ e.git_url }}
-  Test Commit: {{ e.git_commit }}
-    {%- endfor %}
-    {% for tc in t.test_cases %}
-      {%- if 'FAIL' == tc.status %}
-    * {{ tc.name }}: {{ tc.failure_message }}
-      {%- endif %}
-    {%- endfor %}
-    {%- for sg in t.sub_groups|sort(attribute='index') %} {# sub_groups #}
-      {%- if sg.total["FAIL"] or sg.regressions %} {# sg fail or regressions #}
+    {%- if not test_suites and group.initrd_info.tests_suites %} {# suites_info #}
 
-    {{ sg.name }} - {{ sg.total_tests }} tests: {{ sg.total["PASS"] }}  PASS, {{ sg.total["FAIL"] }} FAIL, {{ sg.total["SKIP"] }} SKIP
+  Test suite revisions:
+      {%- for suite in group.initrd_info.tests_suites|sort(attribute='name') %}
+    {{ suite.name }}
+      URL:  {{ suite.git_url }}
+      SHA:  {{ suite.git_commit }}
+      {%- endfor %}
+    {%- endif %} {# suites_info #}
+    {%- if group.results.FAIL %} {# group fail #}
+
+  {{ group.test_cases|length }} tests: {{ group.results.PASS }} PASS, {{ group.results.FAIL }} FAIL, {{ group.results.SKIP }} SKIP
+      {%- for tc in group.test_cases %}
+        {%- if 'FAIL' == tc.status %}
+    * {{ tc.name }}: {{ tc.failure_message }}
+        {%- endif %}
+      {%- endfor %}
+    {%- endif %}  {# group fail #}
+    {%- for sg in group.sub_groups|sort(attribute='index') %} {# sub_groups #}
+      {%- if sg.results.FAIL %} {# sg fail #}
+
+  {{ sg.name }} - {{ sg.test_cases|length }} tests: {{ sg.results.PASS }}  PASS, {{ sg.results.FAIL }} FAIL, {{ sg.results.SKIP }} SKIP
         {%- for tc in sg.test_cases %}
           {%- if 'FAIL' == tc.status %}
-      * {{ tc.name }}: {{ tc.failure_message }}
+    * {{ tc.name }}: {{ tc.failure_message }}
           {%- endif %}
         {%- endfor %}
-      {%- endif %} {# sg fail or regressions #}
+      {%- endif %} {# sg fail #}
     {%- endfor %} {# sub_groups #}
-  {%- endif %} {# fail or regressions #}
-{% endfor %} {# test_groups #}
+  {% endif %}  {# group fail #}
+{%- endfor %} {# test_groups #}
+{%-endif %} {# total fail #}

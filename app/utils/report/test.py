@@ -14,6 +14,7 @@
 """Create the tests email report."""
 
 import models
+import pymongo
 import utils
 import utils.db
 import utils.report.common as rcommon
@@ -119,23 +120,27 @@ def _add_test_group_data(group, db, spec, hierarchy=[]):
         _add_test_group_data(sub_group, db, spec, hierarchy)
         sub_groups.append(sub_group)
 
-    total = {status: 0 for status in ["PASS", "FAIL", "SKIP"]}
+    results = {
+        st: len(list(t for t in test_cases if t[models.STATUS_KEY] == st))
+        for st in ["PASS", "FAIL", "SKIP"]
+    }
 
-    for test_case in test_cases:
-        total[test_case[models.STATUS_KEY]] += 1
+    total_results = dict(results)
 
-    for sub_group_total in (sg["total"] for sg in sub_groups):
-        for status, count in sub_group_total.iteritems():
-            total[status] += count
+    for sub_group_sums in (sg["total_results"] for sg in sub_groups):
+        for status, count in sub_group_sums.iteritems():
+            total_results[status] += count
 
-    regr_count += sum(sg["regressions"] for sg in sub_groups)
+    total_regr = regr_count + sum(sg["regr_count"] for sg in sub_groups)
 
     group.update({
         "test_cases": test_cases,
+        "results": results,
+        "regr_count": regr_count,
         "sub_groups": sub_groups,
-        "regressions": regr_count,
-        "total_tests": sum(total.values()),
-        "total": total,
+        "total_regr": total_regr,
+        "total_tests": sum(total_results.values()),
+        "total_results": total_results,
     })
 
 
@@ -175,7 +180,15 @@ def create_test_report(data, email_format, db_options,
     groups = list(utils.db.find(
         database[models.TEST_GROUP_COLLECTION],
         spec=group_spec,
-        fields=TEST_REPORT_FIELDS))
+        fields=TEST_REPORT_FIELDS,
+        sort=[
+            (models.BOARD_KEY, pymongo.ASCENDING),
+            (models.BUILD_ENVIRONMENT_KEY, pymongo.ASCENDING),
+            (models.DEFCONFIG_KEY, pymongo.ASCENDING),
+            (models.LAB_NAME_KEY, pymongo.ASCENDING),
+            (models.ARCHITECTURE_KEY, pymongo.ASCENDING),
+        ])
+    )
 
     if not groups:
         utils.LOG.warning("Failed to find test group documents")
@@ -194,14 +207,35 @@ def create_test_report(data, email_format, db_options,
         _add_test_group_data(group, database, group_spec)
 
     tests_total = sum(group["total_tests"] for group in groups)
-    regr_total = sum(group["regressions"] for group in groups)
+    regr_total = sum(group["total_regr"] for group in groups)
 
     plan_subject = plan_options.get("subject", plan)
-    subject_str = "{}/{} {}: {} tests, {} regressions ({})".format(
-        job, branch, plan_subject, tests_total, regr_total, kernel)
+    subject_str = "{}/{} {}: {} runs, {} regressions ({})".format(
+        job, branch, plan_subject, len(groups), regr_total, kernel)
 
     git_url, git_commit = (groups[0][k] for k in [
         models.GIT_URL_KEY, models.GIT_COMMIT_KEY])
+
+    # Add test suites info if it's the same for all the groups (typical case)
+    keys = set()
+    last_test_suites = None
+    for g in groups:
+        info = g[models.INITRD_INFO_KEY]
+        if not info:
+            continue
+        last_test_suites = info.get('tests_suites')
+        if not last_test_suites:
+            continue
+        keys.add(tuple(
+            (ts['name'], ts['git_commit']) for ts in last_test_suites)
+        )
+
+    test_suites = list(last_test_suites) if len(keys) == 1 else None
+
+    totals = {
+        status: sum(g['total_results'][status] for g in groups)
+        for status in ["PASS", "FAIL", "SKIP"]
+    }
 
     headers = {
         rcommon.X_REPORT: rcommon.TEST_REPORT_TYPE,
@@ -222,6 +256,8 @@ def create_test_report(data, email_format, db_options,
         "boot_log_html": models.BOOT_LOG_HTML_KEY,
         "storage_url": rcommon.DEFAULT_STORAGE_URL,
         "test_groups": groups,
+        "test_suites": test_suites,
+        "totals": totals,
     }
 
     template = plan_options.get("template", "test.txt")
