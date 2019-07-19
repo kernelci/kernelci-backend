@@ -61,7 +61,7 @@ HTML_HEAD = """\
 """
 
 # datetime follows this format: 2018-12-04T10:44:15.938887
-DT_RE = re.compile("([0-9-]+)T([0-9:.]+)")
+DT_RE = re.compile(r"([0-9-]+)T([0-9:.]+)")
 
 
 def run(log, boot, txt, html):
