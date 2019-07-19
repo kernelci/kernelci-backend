@@ -30,25 +30,25 @@ import utils.build
 import utils.database.redisdb as redisdb
 import utils.errors
 
-ERROR_PATTERN_1 = re.compile("[Ee]rror:")
-ERROR_PATTERN_2 = re.compile("^ERROR")
-ERROR_PATTERN_3 = re.compile("undefined reference", re.IGNORECASE)
-ERROR_PATTERN_4 = re.compile("gcc doesn't support", re.IGNORECASE)
-ERROR_PATTERN_5 = re.compile("command not found", re.IGNORECASE)
-ERROR_PATTERN_6 = re.compile("^\/bin\/([bd]a)?sh", re.IGNORECASE)
-ERROR_PATTERN_7 = re.compile("^\/bin\/((tc)?z?c?k?)?sh", re.IGNORECASE)
-WARNING_PATTERN = re.compile("warning:?", re.IGNORECASE)
-MISMATCH_PATTERN = re.compile("Section mismatch", re.IGNORECASE)
+ERROR_PATTERN_1 = re.compile(r"[Ee]rror:")
+ERROR_PATTERN_2 = re.compile(r"^ERROR")
+ERROR_PATTERN_3 = re.compile(r"undefined reference", re.IGNORECASE)
+ERROR_PATTERN_4 = re.compile(r"gcc doesn't support", re.IGNORECASE)
+ERROR_PATTERN_5 = re.compile(r"command not found", re.IGNORECASE)
+ERROR_PATTERN_6 = re.compile(r"^\/bin\/([bd]a)?sh", re.IGNORECASE)
+ERROR_PATTERN_7 = re.compile(r"^\/bin\/((tc)?z?c?k?)?sh", re.IGNORECASE)
+WARNING_PATTERN = re.compile(r"warning:?", re.IGNORECASE)
+MISMATCH_PATTERN = re.compile(r"Section mismatch", re.IGNORECASE)
 
 # Regex pattern to exclude.
 NO_WARNING_PATTERN_1 = re.compile(
     # pylint: disable=fixme
-    "TODO: return_address should use unwind tables", re.IGNORECASE)
+    r"TODO: return_address should use unwind tables", re.IGNORECASE)
 # pylint: enable=fixme
 NO_WARNING_PATTERN_2 = re.compile(
-    "NPTL on non MMU needs fixing", re.IGNORECASE)
+    r"NPTL on non MMU needs fixing", re.IGNORECASE)
 NO_WARNING_PATTERN_3 = re.compile(
-    "Sparse checking disabled for this file", re.IGNORECASE)
+    r"Sparse checking disabled for this file", re.IGNORECASE)
 
 EXCLUDE_PATTERNS = [
     # Exclude also the mismatch pattern, and treat it separately.
