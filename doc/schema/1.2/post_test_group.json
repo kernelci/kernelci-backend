@@ -1,0 +1,97 @@
+{
+    "$schema": "http://api.kernelci.org/json-schema/1.2/post_test_group.json",
+    "id": "http://api.kernelci.org/json-schema/1.2/post_test_group.json",
+    "title": "test_group",
+    "description": "A test group JSON object",
+    "type": "object",
+    "properties": {
+        "version": {
+            "type": "string",
+            "description": "The version number of this JSON schema",
+            "enum": ["1.0", "1.2"]
+        },
+        "name": {
+            "type": "string",
+            "description": "The name given to this test group"
+        },
+        "lab_name": {
+            "type": "string",
+            "description": "The name of the lab executing this test group"
+        },
+        "time": {
+            "type": "number",
+            "description": "The number of seconds it took to execute the entire test group",
+            "default": -1
+        },
+        "job": {
+            "type": "string",
+            "description": "The name of the job (aka the git tree)"
+        },
+        "kernel": {
+            "type": "string",
+            "description": "The name of the kernel or the git describe value"
+        },
+        "defconfig": {
+            "type": "string",
+            "description": "The name of the defconfig"
+        },
+        "defconfig_full": {
+            "type": "string",
+            "description": "The full name of the defconfig, can also contain config fragments information",
+            "default": "The defconfig value"
+        },
+        "arch": {
+            "type": "string",
+            "description": "The architecture type of this board",
+            "enum": ["arm", "arm64", "x86"],
+            "default": "arm"
+        },
+        "board": {
+            "type": "string",
+            "description": "The name of the board"
+        },
+        "board_instance": {
+            "type": "string",
+            "description": "The instance identifier of the board"
+        },
+        "build_environment": {
+            "type": "string",
+            "description": "Build environment name as used in the build configuration e.g. gcc-8"
+        },
+        "git_branch": {
+            "type": "string",
+            "description": "The branch used for testing"
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Free form object where to store accessory test group data"
+        },
+        "test_cases": {
+            "type": "array",
+            "description": "The list of test case objects executed by this test group",
+            "items": {"$ref": "http://api.kernelci.org/json-schema/1.0/test_case_get.json"},
+            "additionalItems": true
+        },
+        "sub_groups": {
+            "type": "array",
+            "description": "The list of sub-group objects included in this group",
+            "items": {"$ref": "http://api.kernelci.org/json-schema/1.2/post_test_group.json.json"},
+            "additionalItems": true
+        },
+        "definition_uri": {
+            "type": "string",
+            "description": "The URI where this test group definition is stored"
+        },
+        "vcs_commit": {
+            "type": "string",
+            "description": "The VCS commit value if the $definition_uri field is a VCS URI"
+        },
+        "log": {
+            "type": "string",
+            "description": "Test log content, which to be saved in a file"
+        }
+
+    },
+    "required": ["arch", "build_environment", "defconfig", "git_branch", "job",
+        "kernel", "name", "lab_name"]
+}
