@@ -36,7 +36,7 @@ def lava_boot(json_obj, job_meta, lab_name):
 
 
 @taskc.app.task(name="lava-test")
-def lava_test(json_obj, job_meta, lab_name):
+def lava_test(json_obj, job_meta, lava_multinode, lab_name):
     """Add test data from a LAVA v2 test job callback
 
     This is a wrapper around the actual function which runs in a Celery task.
@@ -48,5 +48,5 @@ def lava_test(json_obj, job_meta, lab_name):
     :type lab_name: string
     :return ObjectId The test document object id.
     """
-    return utils.callback.lava.add_tests(json_obj, job_meta, lab_name,
-                                         taskc.app.conf.db_options)
+    return utils.callback.lava.add_tests(json_obj, job_meta, lava_multinode,
+                                         lab_name, taskc.app.conf.db_options)
