@@ -282,7 +282,14 @@ def _add_test_log(meta, job_log, suite):
     dir_path = meta[models.DIRECTORY_PATH]
 
     utils.LOG.info("Generating {} log files in {}".format(suite, dir_path))
-    file_name = "-".join([suite, meta[models.BOARD_KEY]])
+    lava_multinode = meta.get(models.LAVA_MULTINODE_KEY)
+    if lava_multinode:
+        file_name = "-".join([
+            suite,
+            lava_multinode[models.LAVA_MULTINODE_KEYS['MULTINODE_ROLE_KEY']],
+            meta[models.BOARD_KEY]])
+    else:
+        file_name = "-".join([suite, meta[models.BOARD_KEY]])
     files = tuple(".".join([file_name, ext]) for ext in ["txt", "html"])
     meta[models.BOOT_LOG_KEY], meta[models.BOOT_LOG_HTML_KEY] = files
     txt_path, html_path = (os.path.join(dir_path, f) for f in files)
@@ -312,7 +319,14 @@ def _store_lava_json(job_data, meta, base_path=utils.BASE_PATH):
     :type base_path: string
     """
 
-    file_name = "-".join(["lava-json", meta[models.BOARD_KEY]])
+    lava_multinode = meta.get(models.LAVA_MULTINODE_KEY)
+    if lava_multinode:
+        file_name = "-".join([
+            "lava-json",
+            lava_multinode[models.LAVA_MULTINODE_KEYS['MULTINODE_ROLE_KEY']],
+            meta[models.BOARD_KEY]])
+    else:
+        file_name = "-".join(["lava-json", meta[models.BOARD_KEY]])
     file_name = ".".join([file_name, "json"])
 
     dir_path = meta[models.DIRECTORY_PATH]
