@@ -28,7 +28,7 @@ Notes
 POST
 ****
 
-.. literalinclude:: schema/1.0/get_test_group.json
+.. literalinclude:: schema/1.2/post_test_group.json
     :language: json
 
 Notes

@@ -105,13 +105,20 @@ POST
 .. http:post:: /test/group
 
  Create a new test group as defined in the JSON data. The request will be accepted and, if test cases have been specified in the JSON data, it will begin to parse the data.
+ During the processing handler will try to determine job_id and build_id based on the data provided in the JSON.
 
  If saving the test group has success, it will return the associated ID value.
 
  For more info on all the required JSON request fields, see the :ref:`test group schema for POST requests <schema_test_group_post>`.
 
  :reqjson string name: The name of the test group.
- :reqjson string build_id: The ID of the build report used for testing.
+ :reqjson string arch: The architecture type of the board.
+ :reqjson string build_environment: The name of the build environment.
+ :reqjson string defconfig: The name of the defconfig.
+ :reqjson string git_branch: The branch used for testing.
+ :reqjson string job: The name of the job (aka the git tree).
+ :reqjson string kernel: The name of the kernel or the git describe value.
+ :reqjson string lab_name: The name of the lab executing this test group.
  :reqjson string version: The version of the JSON schema format.
 
  :reqheader Authorization: The token necessary to authorize the request.
@@ -120,7 +127,7 @@ POST
 
  :resheader Content-Type: Will be ``application/json; charset=UTF-8``.
 
- :status 202: The request has been accepted and is going to be created.
+ :status 201: Test group document created.
  :status 400: JSON data not valid.
  :status 403: Not authorized to perform the operation.
  :status 415: Wrong content type.
@@ -138,8 +145,14 @@ POST
 
     {
         "name": "LSK test group",
-        "build_id": "01234567890123456789ABCD",
-        "version": "1.0"
+        "defconfig": "x86_64_defconfig",
+        "job": "kernelci-local-snapshot-032",
+        "arch": "x86",
+        "kernel" : "kernelci-local-snapshot-032",
+        "build_environment": "gcc-8",
+        "git_branch": "next",
+        "lab_name": "local_lab",
+        "version": "1.2"
     }
 
  .. sourcecode:: http
@@ -152,8 +165,14 @@ POST
 
     {
         "name": "LSK test group",
-        "build_id": "01234567890123456789ABCD",
-        "version": "1.0",
+        "defconfig": "x86_64_defconfig",
+        "job": "kernelci-local-snapshot-032",
+        "arch": "x86",
+        "kernel" : "kernelci-local-snapshot-032",
+        "build_environment": "gcc-8",
+        "git_branch": "next",
+        "lab_name": "local_lab",
+        "version": "1.2",
         "test_cases": [
             {
                 "name": "Test case 0",
@@ -184,28 +203,6 @@ POST
         "reason": "Test group 'LSK test group' created"
     }
 
- .. sourcecode:: http
-
-    HTTP/1.1 202 Test group 'LSK test group' created
-    Vary: Accept-Encoding
-    Date: Mon, 16 Mar 2014 12:29:51 GMT
-    Content-Type: application/json; charset=UTF-8
-    Location: /test/group/01234567890123456789ABCD
-
-    {
-        "code": 202,
-        "result": [
-            {
-                "_id": {
-                    "$oid": "01234567890123456789ABCD"
-                }
-            }
-        ],
-        "reason": "Test group 'LSK test group' created",
-        "messages": [
-            "Test cases will be parsed and imported"
-        ]
-    }
 
 PUT
 ***
