@@ -14,10 +14,12 @@
 """Create the tests email report."""
 
 import models
+import os
 import pymongo
 import utils
 import utils.db
 import utils.report.common as rcommon
+import yaml
 
 TEST_REPORT_FIELDS = [
     models.ARCHITECTURE_KEY,
@@ -55,23 +57,9 @@ TEST_REPORT_FIELDS = [
     models.VERSION_KEY,
 ]
 
-# FIXME: get this from test-configs.yaml
-TEST_PLAN_OPTIONS = {
-    "v4l2-compliance-uvc": {
-        "subject": "v4l2-compliance on uvcvideo",
-        "template": "plans/v4l2-compliance.txt",
-        "params": {
-            "driver_name": "uvcvideo",
-        },
-    },
-    "v4l2-compliance-vivid": {
-        "subject": "v4l2-compliance on vivid",
-        "template": "plans/v4l2-compliance.txt",
-        "params": {
-            "driver_name": "vivid",
-        },
-    },
-}
+TEMPLATES_YAML = os.path.join(rcommon.TEMPLATES_DIR, "templates.yaml")
+with open(TEMPLATES_YAML) as templates_file:
+    TEMPLATES = yaml.load(templates_file)["templates"]
 
 
 def _regression_message(data):
@@ -170,7 +158,7 @@ def create_test_report(db_options, data, email_format, email_template=None,
         models.PLAN_KEY,
     ])
 
-    plan_options = TEST_PLAN_OPTIONS.get(email_template or plan, {})
+    template = TEMPLATES.get(email_template or plan, {})
 
     spec = {x: y for x, y in data.iteritems() if x != models.PLAN_KEY}
     group_spec = dict(spec)
@@ -211,7 +199,7 @@ def create_test_report(db_options, data, email_format, email_template=None,
     tests_total = sum(group["total_tests"] for group in groups)
     regr_total = sum(group["total_regr"] for group in groups)
 
-    plan_subject = plan_options.get("subject", plan)
+    plan_subject = template.get("subject", plan)
     subject_str = "{}/{} {}: {} runs, {} regressions ({})".format(
         job, branch, plan_subject, len(groups), regr_total, kernel)
 
@@ -262,8 +250,8 @@ def create_test_report(db_options, data, email_format, email_template=None,
         "totals": totals,
     }
 
-    template = plan_options.get("template", "test.txt")
-    template_data.update(plan_options.get("params", {}))
-    body = rcommon.create_txt_email(template, **template_data)
+    template_file = template.get("file", "test.txt")
+    template_data.update(template.get("params", {}))
+    body = rcommon.create_txt_email(template_file, **template_data)
 
     return body, subject_str, headers

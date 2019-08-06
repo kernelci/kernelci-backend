@@ -1,0 +1,14 @@
+# FIXME: get this from test-configs.yaml or email-configs.yaml
+
+templates:
+  v4l2-compliance-uvc:
+    file: "plans/v4l2-compliance.txt"
+    subject: "v4l2-compliance on uvcvideo"
+    params:
+      driver_name: "uvcvideo"
+
+  v4l2-compliance-vivid:
+    file: "plans/v4l2-compliance.txt"
+    subject: "v4l2-compliance on vivid"
+    params:
+      driver_name: "vivid"
