@@ -1,5 +1,4 @@
 ---
-
 - name: Add MongoDB apt key (Ubuntu)
   apt_key:  id=7F0CEB10
             keyserver=hkp://keyserver.ubuntu.com
@@ -18,11 +17,11 @@
     - mongodb
     - deps
 
-- name: Add MongoDB repository (Ubuntu)
-  apt_repository: repo='deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen'
-                  state=present
-                  update_cache=yes
-  when: ansible_distribution == "Ubuntu"
+- name: Add MongoDB apt key (Debian Buster)
+  apt_key:
+      url: https://www.mongodb.org/static/pgp/server-3.2.asc
+      state: present
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "10"
   tags:
     - install
     - mongodb
@@ -36,7 +35,15 @@
   tags:
     - install
     - mongodb
-    - deps
+
+- name: Add MongoDB repository (Debian Buster)
+  apt_repository: repo='deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse'
+                  state=present
+                  update_cache=yes
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "10"
+  tags:
+    - install
+    - mongodb    
 
 - name: Disable kernel transparent huge-page defrag
   when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
@@ -51,8 +58,22 @@
     - mongodb
     - kernel
 
+- name: Install MongoDB on Buster
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "10"
+  apt:  pkg={{ item }}
+        state=latest
+  with_items:
+    - mongodb-org
+    - mongodb-org-shell
+    - mongodb-org-server
+    - mongodb-org-mongos
+  tags:
+    - install
+    - mongodb
+    - deps  
+
 - name: Install MongoDB
-  when: ansible_distribution == "Ubuntu" or ( ansible_distribution == "Debian" and ansible_distribution_major_version == 8)
+  when: ansible_distribution == "Ubuntu" or ( ansible_distribution == "Debian" and ansible_distribution_major_version == "8")
   apt:  pkg={{ item }}
         state=latest
   with_items:
@@ -64,7 +85,7 @@
     - deps
 
 - name: Install MongoDB
-  when: ansible_distribution == "Debian" and ansible_distribution_major_version > 8
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "8"
   apt:  pkg={{ item }}
         state=latest
   with_items:
@@ -72,7 +93,7 @@
   tags:
     - install
     - mongodb
-    - deps
+    - deps  
 
 - name: Install EPEL7
   yum:
@@ -97,15 +118,15 @@
   set_fact:
     mongodb_service: "mongod"
 
-- name: set mongodb_service fact for Debian
-  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+- name: set mongodb_service fact for Ubuntu
+  when: ansible_distribution == "Ubuntu"
   set_fact:
     mongodb_service: "mongodb"
 
 - name: set mongodb_service fact for Debian
-  when: ansible_distribution == "Debian" and ansible_distribution_major_version == 8
+  when: ansible_distribution == "Debian"
   set_fact:
-    mongodb_service: "mongod"
+    mongodb_service: "mongod" 
 
 - name: Make sure MongoDB is running
   service:  name={{ mongodb_service }}
@@ -114,3 +135,4 @@
     - install
     - mongodb
     - deps
+    

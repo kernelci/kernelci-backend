@@ -1,8 +1,21 @@
 ---
+- name: Install OS dependencies - Debian Buster
+  apt:  pkg={{ item }}
+        state=latest
+        update_cache=yes
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "10"
+  with_items:
+    - s4cmd
+    - xz-utils
+  tags:
+    - backup
+    - deps
+
 - name: Install OS dependencies
   apt:  pkg={{ item }}
         state=latest
         update_cache=yes
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "8" or ansible_distribution == "Ubuntu"
   with_items:
     - s3cmd
     - xz-utils
@@ -18,7 +31,7 @@
   tags:
     - backup
 
-- name: Copy s3cmd config file
+- name: Copy s3cmd/s4cmd(for Debian Buster) config file
   template: src=s3cfg
             dest=/home/kernelci/.s3cfg
             owner=kernelci
