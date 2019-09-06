@@ -22,14 +22,6 @@ GET
 .. literalinclude:: schema/1.0/get_test_case.json
     :language: json
 
-.. _schema_test_case_post:
-
-POST
-****
-
-.. literalinclude:: schema/1.0/post_test_case.json
-    :language: json
-
 Notes
 +++++
 
