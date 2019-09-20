@@ -38,8 +38,12 @@ HTML_HEAD = """\
   body {{ background-color: black; color: white; }}
   pre {{ font-size: 0.8em; }}
   span.pass {{ color: green; }}
-  span.err {{ color: red; }}
-  span.warn {{ color: #F88017; }}
+  span.alert {{ color: red; }}
+  span.err {{ color: #FF7F7F; }}
+  span.debug {{color: #FFFFFF; }}
+  span.info {{color: #CCCCCC; }}
+  span.lavainfo {{color: #B3BEE8; }}
+  span.warn {{ color: #FFA500; }}
   span.timestamp {{ color: #AAFFAA; }}
   a:link {{text-decoration: none }}
   a:visited {{text-decoration: none }}
@@ -73,10 +77,49 @@ def run(log, boot, txt, html):
         boot_result_html = "<span class=\"warn\">{}</span>".format(boot_result)
 
     formats = {
-        "warning": "<span class=\"warn\">{}</span>\n",
+        "emerg": "<span class=\"alert\">{}</span>\n",
+        "alert": "<span class=\"alert\">{}</span>\n",
+        "crit": "<span class=\"alert\">{}</span>\n",
         "error": "<span class=\"err\">{}</span>\n",
+        "warning": "<span class=\"warn\">{}</span>\n",
+        "notice": "<span class=\"info\">{}</span>\n",
+        "info": "<span class=\"lavainfo\">{}</span>\n",
+        "debug": "<span class=\"lavainfo\">{}</span>\n"
     }
-    numbers = {"warning": 0, "error": 0}
+
+    kernel_log_levels = {
+        "0": "<span class=\"alert\">{}</span>\n",
+        "1": "<span class=\"alert\">{}</span>\n",
+        "2": "<span class=\"alert\">{}</span>\n",
+        "3": "<span class=\"err\">{}</span>\n",
+        "4": "<span class=\"warn\">{}</span>\n",
+        "5": "<span class=\"info\">{}</span>\n",
+        "6": "<span class=\"info\">{}</span>\n",
+        "7": "<span class=\"debug\">{}</span>\n",
+    }
+
+    numbers = {
+        "emerg": 0,
+        "alert": 0,
+        "crit": 0,
+        "error": 0,
+        "warning": 0,
+        "notice": 0,
+        "info": 0,
+        "debug": 0,
+    }
+
+    kernel_numbers = {
+        "0": 0,  # define KERN_EMERG
+        "1": 0,  # define KERN_ALERT
+        "2": 0,  # define KERN_CRIT
+        "3": 0,  # define KERN_ERR
+        "4": 0,  # define KERN_WARNI
+        "5": 0,  # define KERN_NOTIC
+        "6": 0,  # define KERN_INFO
+        "7": 0   # define KERN_DEBUG
+    }
+
     start_ts = None
     log_buffer = []
 
@@ -86,14 +129,20 @@ def run(log, boot, txt, html):
         timestamp = "<span class=\"timestamp\">{}  </span>".format(raw_ts)
 
         if isinstance(msg, list):
-            msg = ' '.join(msg)  
+            msg = ' '.join(msg)
 
         fmt = formats.get(level)
         if fmt:
             log_buffer.append(timestamp + fmt.format(cgi.escape(msg)))
             numbers[level] += 1
         elif level == "target":
-            log_buffer.append(timestamp + cgi.escape(msg) + "\n")
+            kernel_level = re.match(r'^\<([0-7])\>', msg)
+            if kernel_level:
+                fmt = kernel_log_levels[kernel_level.group(1)]
+                log_buffer.append(timestamp + fmt.format(cgi.escape(msg)))
+                kernel_numbers[kernel_level.group(1)] += 1
+            else:
+                log_buffer.append(timestamp + cgi.escape(msg) + "\n")
             txt.write(msg)
             txt.write("\n")
         elif level == "info" and msg.startswith("Start time: "):
@@ -105,7 +154,10 @@ def run(log, boot, txt, html):
         "Boot result": boot_result_html,
         "Errors": numbers["error"],
         "Warnings": numbers["warning"],
+        "Kernel Errors": sum(kernel_numbers[level] for level in "0123"),
+        "Kernel Warnings": kernel_numbers["4"]
     }
+
     for title, value in results.iteritems():
         html.write("<li class=\"result\">{}: {}</li>".format(title, value))
     if start_ts:
