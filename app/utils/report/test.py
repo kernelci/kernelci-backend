@@ -141,6 +141,42 @@ def _add_test_group_data(group, db, spec, hierarchy=[]):
     })
 
 
+def _create_summaries(groups):
+    def squash(item, max_length):
+        if len(item) > max_length:
+            n = (max_length - 3) / 2
+            m = max_length - 3 - n
+            item = item[:m] + '...' + item[-n:]
+        return item
+
+    columns = [
+        "run", 'platform', 'arch', 'lab', 'compiler', 'defconfig', "errors"
+    ]
+    rows = [
+        (
+            str(i + 1),
+            g['board'],
+            g['arch'],
+            g['lab_name'],
+            g['build_environment'],
+            g['defconfig_full'],
+            "{}/{}".format(g['total_results']['FAIL'], g['total_tests']),
+        ) for i, g in enumerate(groups)
+    ]
+    squashed = [tuple(squash(item, 28) for item in row)for row in rows]
+
+    widths = [len(col) for col in columns]
+    for row in squashed:
+        row_widths = [len(col) for col in row]
+        widths = [max(col) for col in zip(widths, row_widths)]
+    fmt = " | ".join("{{:{w}}}".format(w=w) for w in widths)
+    sep = '-+-'.join('-' * w for w in widths)
+    headers = '\n'.join([fmt.format(*tuple(columns)), sep])
+    summaries = [fmt.format(*row) for row in squashed]
+
+    return headers, summaries
+
+
 def create_test_report(db_options, data, email_format, email_template=None,
                        base_path=utils.BASE_PATH):
     """Create the tests report email to be sent.
@@ -243,8 +279,13 @@ def create_test_report(db_options, data, email_format, email_template=None,
         rcommon.X_KERNEL: kernel,
     }
 
+    summary_headers, summaries = _create_summaries(groups)
+    for group, summary in zip(groups, summaries):
+        group['summary'] = summary
+
     template_data = {
         "subject_str": subject_str,
+        "summary_headers": summary_headers,
         "tree": job,
         "branch": branch,
         "git_url": git_url,

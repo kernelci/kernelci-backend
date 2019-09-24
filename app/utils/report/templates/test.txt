@@ -3,18 +3,9 @@
 Test results summary
 --------------------
 
-run | platform                 | arch   | lab                      | compiler | defconfig          | errors
-----+--------------------------+--------+--------------------------+----------+--------------------+-------
+{{ summary_headers }}
 {%- for group in test_groups %}
-{{ "%3d | %-24s | %-6s | %-24s | %-8s | %-18s | %d/%d"|format(
-   loop.index,
-   group.board,
-   group.arch,
-   group.lab_name,
-   group.build_environment,
-   group.defconfig,
-   group.total_results.FAIL,
-   group.total_tests) }}
+{{ group.summary }}
 {%- endfor %}
 
 {% block plan_description %}
@@ -43,17 +34,8 @@ Test Failures
 {% for group in test_groups %} {# test_groups #}
   {%- if group.total_results.FAIL %} {# group fail #}
 
-run | platform                 | arch   | lab                      | compiler | defconfig          | errors
-----+--------------------------+--------+--------------------------+----------+--------------------+-------
-{{ "%3d | %-24s | %-6s | %-24s | %-8s | %-18s | %d/%d"|format(
-    loop.index,
-    group.board,
-    group.arch,
-    group.lab_name,
-    group.build_environment,
-    group.defconfig,
-    group.total_results.FAIL,
-    group.total_tests) }}
+{{ summary_headers }}
+{{ group.summary }}
 
   Results:     {{ group.total_results.PASS }} PASS, {{ group.total_results.FAIL }} FAIL, {{ group.total_results.SKIP }} SKIP
   Full config: {{ group.defconfig_full }}
