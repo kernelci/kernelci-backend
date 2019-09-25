@@ -524,12 +524,8 @@ def import_single_build(json_obj, db_options, base_path=utils.BASE_PATH):
     git_branch = utils.clean_branch_name(git_branch)
 
     if (utils.valid_name(job) and utils.valid_name(kernel)):
-        # New directory structure:
-        # $job/$branch/$kernel/$arch/$defconfig/$environment
-
-        parent_dir = os.path.join(base_path, job, git_branch, kernel, arch)
-        build_dir = os.path.join(
-            parent_dir, defconfig_full or defconfig, build_environment)
+        file_server_resource = j_get(models.FILE_SERVER_RESOURCE_KEY)
+        build_dir = os.path.join(base_path, file_server_resource)
 
         if os.path.isdir(build_dir):
             try:
