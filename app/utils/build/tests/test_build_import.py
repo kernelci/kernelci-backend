@@ -506,7 +506,8 @@ class TestBuildUtils(unittest.TestCase):
             "defconfig": "defconfig",
             "arch": "arch",
             "git_branch": "branch",
-            "build_environment": "build_environment"
+            "build_environment": "build_environment",
+            "file_server_resource": "path/to/build/data",
         }
         build_id, job_id, errors = utils.build.import_single_build(
             json_obj, {})
@@ -548,7 +549,8 @@ class TestBuildUtils(unittest.TestCase):
             "defconfig": "defconfig",
             "git_branch": "branch",
             "arch": "arch",
-            "build_environment": "build_environment"
+            "build_environment": "build_environment",
+            "file_server_resource": "path/to/build/data",
         }
         build_id, job_id, errors = utils.build.import_single_build(
             json_obj, {})

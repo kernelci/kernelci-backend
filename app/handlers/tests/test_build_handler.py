@@ -139,7 +139,8 @@ class TestBuildHandler(TestHandlerBase):
                 defconfig="defconfig",
                 arch="arch",
                 git_branch="branch",
-                build_environment="build_environment"
+                build_environment="build_environment",
+                file_server_resource="path/to/build/data"
             )
         )
 

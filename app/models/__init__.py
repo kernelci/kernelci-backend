@@ -601,6 +601,7 @@ BUILD_VALID_KEYS = {
             ARCHITECTURE_KEY,
             BUILD_ENVIRONMENT_KEY,
             DEFCONFIG_KEY,
+            FILE_SERVER_RESOURCE_KEY,
             GIT_BRANCH_KEY,
             JOB_KEY,
             KERNEL_KEY
@@ -610,6 +611,7 @@ BUILD_VALID_KEYS = {
             BUILD_ENVIRONMENT_KEY,
             DEFCONFIG_FULL_KEY,
             DEFCONFIG_KEY,
+            FILE_SERVER_RESOURCE_KEY,
             GIT_BRANCH_KEY,
             JOB_KEY,
             KERNEL_KEY,

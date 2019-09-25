@@ -594,15 +594,8 @@ def parse_single_build_log(
     if json_obj:
         build_doc = mbuild.BuildDocument.from_json(json_obj)
         if build_doc:
-            build_dir = os.path.join(
-                base_path,
-                build_doc.job,
-                build_doc.git_branch,
-                build_doc.kernel,
-                build_doc.arch,
-                build_doc.defconfig_full,
-                build_doc.build_environment)
-
+            file_server_resource = build_doc.file_server_resource
+            build_dir = os.path.join(base_path, file_server_resource)
             log_file = os.path.join(build_dir, build_log)
             status, err_lines, warn_lines, mism_lines = _parse_log(
                 build_doc, log_file, build_dir, errors)
