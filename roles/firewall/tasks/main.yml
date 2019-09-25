@@ -1,8 +1,11 @@
 ---
 - name: Install ufw package
-  apt:  pkg=ufw
-        state=latest
-        update_cache=yes
+  apt:  
+    pkg: [
+      'ufw'
+    ]
+    state: latest
+    update_cache: yes
   tags:
     - firewall
     - deps

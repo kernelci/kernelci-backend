@@ -10,7 +10,10 @@
 
 - name: Install redis server
   when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
-  apt: pkg=redis-server
+  apt: 
+    pkg: [
+      'redis-server'
+    ]
   tags:
     - install
     - redis
@@ -18,7 +21,10 @@
 
 - name: Install redis server
   when: ansible_distribution == "CentOS"
-  yum: pkg=redis
+  yum: 
+    pkg: [ 
+      'redis'
+    ]
   tags:
     - install
     - redis

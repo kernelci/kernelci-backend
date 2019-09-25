@@ -60,13 +60,14 @@
 
 - name: Install MongoDB on Buster
   when: ansible_distribution == "Debian" and ansible_distribution_major_version == "10"
-  apt:  pkg={{ item }}
-        state=latest
-  with_items:
-    - mongodb-org
-    - mongodb-org-shell
-    - mongodb-org-server
-    - mongodb-org-mongos
+  apt:  
+    pkg: [
+      'mongodb-org',
+      'mongodb-org-shell',
+      'mongodb-org-server', 
+      'mongodb-org-mongos'
+    ]
+    state: latest
   tags:
     - install
     - mongodb
@@ -74,11 +75,12 @@
 
 - name: Install MongoDB
   when: ansible_distribution == "Ubuntu" or ( ansible_distribution == "Debian" and ansible_distribution_major_version == "8")
-  apt:  pkg={{ item }}
-        state=latest
-  with_items:
-    - mongodb-org
-    - libsnappy1
+  apt:  
+    pkg: [
+      'mongodb-org',
+      'libsnappy1'
+    ]
+    state: latest
   tags:
     - install
     - mongodb
@@ -86,10 +88,11 @@
 
 - name: Install MongoDB
   when: ansible_distribution == "Debian" and ansible_distribution_major_version == "8"
-  apt:  pkg={{ item }}
-        state=latest
-  with_items:
-    - mongodb
+  apt:  
+    pkg: [
+      'mongodb',
+    ]
+    state: latest
   tags:
     - install
     - mongodb
@@ -104,10 +107,11 @@
 
 - name: Install MongoDB for CentOS
   when: ansible_distribution == "CentOS"
-  yum:  pkg={{ item }}
-        state=latest
-  with_items:
-    - mongodb-server
+  yum:  
+    pkg: [
+      'mongodb-server'
+    ]
+    state: latest
   tags:
     - install
     - mongodb

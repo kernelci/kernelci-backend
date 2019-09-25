@@ -1,24 +1,26 @@
 ---
 - name: Install OS dependencies - Debian Buster
-  apt:  pkg={{ item }}
-        state=latest
-        update_cache=yes
+  apt:  
+    pkg: [
+      's4cmd',
+      'xz-utils'
+    ]
+    state: latest
+    update_cache: yes
   when: ansible_distribution == "Debian" and ansible_distribution_major_version == "10"
-  with_items:
-    - s4cmd
-    - xz-utils
   tags:
     - backup
     - deps
 
 - name: Install OS dependencies
-  apt:  pkg={{ item }}
-        state=latest
-        update_cache=yes
+  apt:  
+    pkg: [
+      's3cmd',
+      'xz-utils'
+    ]
+    state: latest
+    update_cache: yes
   when: ansible_distribution == "Debian" and ansible_distribution_major_version == "8" or ansible_distribution == "Ubuntu"
-  with_items:
-    - s3cmd
-    - xz-utils
   tags:
     - backup
     - deps

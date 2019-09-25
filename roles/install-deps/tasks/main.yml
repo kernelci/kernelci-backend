@@ -1,27 +1,24 @@
 ---
 - name: Install OS dependencies
   when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
-  apt:  pkg={{ item }}
-        state=latest
-        update_cache=yes
-  with_items:
-    - build-essential
-    - git
-    - lsb-release
-    - python-apt
-    - python-pip
-    - python-pycurl
-    - python-virtualenv
-    - python2.7-dev
-    - sysfsutils
-    - python3
-    - python3-yaml
-    - python3-setproctitle
-    - python3-zmq
-    - libyaml-dev
-    - libpython2.7-dev
-    - python-selinux
-    - python-semanage
+  apt:  
+        pkg: [
+          'build-essential', 
+          'git', 'lsb-release', 
+          'python-apt', 'python-pip', 
+          'python-pycurl', 
+          'python-virtualenv', 
+          'python2.7-dev', 'sysfsutils', 
+          'python3', 'python3-yaml', 
+          'python3-setproctitle',
+          'python3-zmq', 
+          'libyaml-dev', 
+          'libpython2.7-dev', 
+          'python-selinux', 
+          'python-semanage'
+        ]
+        state: latest
+        update_cache: yes
   tags:
     - install
     - deps
@@ -29,15 +26,15 @@
 - name: Install OS dependencies
   when: ansible_distribution == "CentOS"
   yum:
-        pkg={{ item }}
-  with_items:
-    - PyYAML
-    - git
-    - libselinux-python
-    - libsemanage-python
-    - python-virtualenv
-    - gcc
-    - libyaml-devel
+        pkg: [
+          'PyYAML', 
+          'git', 
+          'libselinux-python', 
+          'libsemanage-python', 
+          'python-virtualenv', 
+          'gcc', 
+          'libyaml-devel'
+        ]
   tags:
     - install
     - deps
