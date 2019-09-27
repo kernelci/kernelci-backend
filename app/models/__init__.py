@@ -248,7 +248,7 @@ SKIP_STATUS = "SKIP"
 DONE_FILE = ".done"
 DONE_FILE_PATTERN = "*.done"
 BUILD_META_FILE = "build.meta"
-BUILD_META_JSON_FILE = "build.json"
+BUILD_META_JSON_FILE = "bmeta.json"
 BUILD_FAIL_FILE = "build.FAIL"
 BUILD_PASS_FILE = "build.PASS"
 
