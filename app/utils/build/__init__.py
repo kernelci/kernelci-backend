@@ -258,7 +258,7 @@ def parse_build_data(build_data, job, kernel, build_dir):
         build_doc.modules_dir = build_data.get(
             models.MODULES_DIR_KEY, None)
         build_doc.status = build_data.get(
-            models.BUILD_RESULT_KEY, models.UNKNOWN_STATUS)
+            models.STATUS_KEY, models.UNKNOWN_STATUS)
         build_doc.system_map = build_data.get(
             models.SYSTEM_MAP_KEY, None)
         build_doc.text_offset = build_data.get(
