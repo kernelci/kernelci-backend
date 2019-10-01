@@ -85,6 +85,9 @@ def run(log, boot, txt, html):
         raw_ts = DT_RE.match(dt).groups()[1]
         timestamp = "<span class=\"timestamp\">{}  </span>".format(raw_ts)
 
+        if isinstance(msg, list):
+            msg = ' '.join(msg)  
+
         fmt = formats.get(level)
         if fmt:
             log_buffer.append(timestamp + fmt.format(cgi.escape(msg)))
