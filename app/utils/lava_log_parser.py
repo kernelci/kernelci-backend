@@ -86,7 +86,7 @@ def run(log, boot, txt, html):
         timestamp = "<span class=\"timestamp\">{}  </span>".format(raw_ts)
 
         if isinstance(msg, list):
-            msg = ' '.join(msg)  
+            msg = ' '.join(msg)
 
         fmt = formats.get(level)
         if fmt:
