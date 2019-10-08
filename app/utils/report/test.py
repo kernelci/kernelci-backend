@@ -98,6 +98,11 @@ def _add_test_group_data(group, db, spec, hierarchy=[]):
     test_cases = []
     for test_case_id in group[models.TEST_CASES_KEY]:
         test_case = utils.db.find_one2(case_collection, test_case_id)
+        measurements = test_case[models.MEASUREMENTS_KEY]
+        for measurement in measurements:
+            value = measurement['value']
+            if (value % 1.0) == 0:
+                measurement['value'] = int(value)
         if test_case[models.STATUS_KEY] == "FAIL":
             regr_spec[models.HIERARCHY_KEY] = (
                 hierarchy + [test_case[models.NAME_KEY]])
