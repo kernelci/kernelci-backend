@@ -59,7 +59,13 @@ Test Failures
   {{ group.test_cases|length }} tests: {{ group.results.PASS }} PASS, {{ group.results.FAIL }} FAIL, {{ group.results.SKIP }} SKIP
       {%- for tc in group.test_cases %}
         {%- if 'FAIL' == tc.status %}
-    * {{ tc.name }}: {{ tc.failure_message }}
+    * {{ tc.name }}:
+        {{ tc.failure_message }}
+          {%- if tc.measurements %}
+            {%- for measurement in tc.measurements %}
+        {{measurement.value}} {{measurement.unit}}
+            {%- endfor -%}
+          {% endif %}
         {%- endif %}
       {%- endfor %}
     {%- endif %}  {# group fail #}
@@ -69,7 +75,13 @@ Test Failures
   {{ sg.name }} - {{ sg.test_cases|length }} tests: {{ sg.results.PASS }}  PASS, {{ sg.results.FAIL }} FAIL, {{ sg.results.SKIP }} SKIP
         {%- for tc in sg.test_cases %}
           {%- if 'FAIL' == tc.status %}
-    * {{ tc.name }}: {{ tc.failure_message }}
+    * {{ tc.name }}:
+        {{ tc.failure_message }}
+            {%- if tc.measurements %}
+              {%- for measurement in tc.measurements %}
+        {{measurement.value}} {{measurement.unit}}
+              {%- endfor -%}
+            {% endif %}
           {%- endif %}
         {%- endfor %}
       {%- endif %} {# sg fail #}
