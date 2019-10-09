@@ -150,7 +150,7 @@ def _create_summaries(groups):
         return item
 
     columns = [
-        "run", 'platform', 'arch', 'lab', 'compiler', 'defconfig', "errors"
+        "run", 'platform', 'arch', 'lab', 'compiler', 'defconfig', "results"
     ]
     rows = [
         (
@@ -160,7 +160,7 @@ def _create_summaries(groups):
             g['lab_name'],
             g['build_environment'],
             g['defconfig_full'],
-            "{}/{}".format(g['total_results']['FAIL'], g['total_tests']),
+            "{}/{}".format(g['total_results']['PASS'], g['total_tests']),
         ) for i, g in enumerate(groups)
     ]
     squashed = [tuple(squash(item, 28) for item in row)for row in rows]
