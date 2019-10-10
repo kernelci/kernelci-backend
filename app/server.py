@@ -37,7 +37,7 @@ import utils.database.redisdb as redisdb
 import utils.db
 
 
-DEFAULT_CONFIG_FILE = "/etc/linaro/kernelci-backend.cfg"
+DEFAULT_CONFIG_FILE = "/etc/kernelci/kernelci-backend.cfg"
 
 topt.define(
     "master_key", default=str(uuid.uuid4()), type=str, help="The master key")

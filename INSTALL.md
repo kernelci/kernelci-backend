@@ -5,9 +5,9 @@ All installation docs are now on the dedicated [kernelci-backend-config](https:/
 # Configuration/Administration
 
 ## Main configurations files
-/etc/linaro/kernelci-frontend.cfg
-/etc/linaro/kernelci-backend.cfg
-/etc/linaro/kernelci-celery.cfg
+/etc/kernelci/kernelci-frontend.cfg
+/etc/kernelci/kernelci-backend.cfg
+/etc/kernelci/kernelci-celery.cfg
 
 They are filled with informations from secrets.yml.
 

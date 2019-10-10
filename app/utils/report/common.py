@@ -65,7 +65,7 @@ BOOT_REGRESSIONS_URL = BOOT_SUMMARY_URL + u"#regressions"
 BUILD_SUMMARY_URL = \
     u"{build_url:s}/{job:s}/branch/{git_branch:s}/kernel/{kernel:s}/"
 
-DEFAULT_CONFIG_FILE = "/etc/linaro/kernelci-backend.cfg"
+DEFAULT_CONFIG_FILE = "/etc/kernelci/kernelci-backend.cfg"
 
 if os.path.isfile(DEFAULT_CONFIG_FILE):
     with open(DEFAULT_CONFIG_FILE, 'r') as infile:
