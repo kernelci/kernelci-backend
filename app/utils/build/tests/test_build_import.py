@@ -61,7 +61,7 @@ class TestBuildUtils(unittest.TestCase):
             build_dir = os.path.join(temp_dir, "build_dir")
             os.mkdir(build_dir)
 
-            build_file = os.path.join(build_dir, "build.json")
+            build_file = os.path.join(build_dir, "bmeta.json")
 
             with io.open(build_file, mode="w") as write_f:
                 write_f.write(json.dumps(dict(foo="bar"), ensure_ascii=False))
@@ -89,7 +89,7 @@ class TestBuildUtils(unittest.TestCase):
             build_dir = os.path.join(temp_dir, "build_dir")
             os.mkdir(build_dir)
 
-            build_file = os.path.join(build_dir, "build.json")
+            build_file = os.path.join(build_dir, "bmeta.json")
 
             with io.open(build_file, mode="w") as write_f:
                 write_f.write(json.dumps(dict(foo="bar"), ensure_ascii=False))
@@ -116,7 +116,7 @@ class TestBuildUtils(unittest.TestCase):
             temp_dir = tempfile.mkdtemp()
             build_dir = os.path.join(temp_dir, "build_dir")
             os.mkdir(build_dir)
-            io.open(os.path.join(build_dir, "build.json"), mode="w")
+            io.open(os.path.join(build_dir, "bmeta.json"), mode="w")
 
             job_doc = mjob.JobDocument("job", "kernel", "git_branch")
 
@@ -135,7 +135,7 @@ class TestBuildUtils(unittest.TestCase):
             temp_dir = tempfile.mkdtemp()
             build_dir = os.path.join(temp_dir, "build_dir")
             os.mkdir(build_dir)
-            with io.open(os.path.join(build_dir, "build.json"), mode="w") as f:
+            with io.open(os.path.join(build_dir, "bmeta.json"), mode="w") as f:
                 f.write(u"a string of text")
 
             job_doc = mjob.JobDocument("job", "kernel", "branch")
@@ -178,7 +178,7 @@ class TestBuildUtils(unittest.TestCase):
             temp_dir = tempfile.mkdtemp()
             build_dir = os.path.join(temp_dir, "build_dir")
             os.mkdir(build_dir)
-            with io.open(os.path.join(build_dir, "build.json"), mode="w") as f:
+            with io.open(os.path.join(build_dir, "bmeta.json"), mode="w") as f:
                 f.write(json.dumps(build_data, ensure_ascii=False))
 
             build_doc = utils.build._traverse_build_dir(
@@ -232,7 +232,7 @@ class TestBuildUtils(unittest.TestCase):
             temp_dir = tempfile.mkdtemp()
             build_dir = os.path.join(temp_dir, "build_dir")
             os.mkdir(build_dir)
-            with io.open(os.path.join(build_dir, "build.json"), mode="w") as f:
+            with io.open(os.path.join(build_dir, "bmeta.json"), mode="w") as f:
                 f.write(json.dumps(build_data, ensure_ascii=False))
 
             build_doc = utils.build._traverse_build_dir(
