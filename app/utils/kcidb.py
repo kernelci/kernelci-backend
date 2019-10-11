@@ -41,6 +41,9 @@ def _make_id(raw_id, ns):
 
 def _submit(data, bq_options):
     json_data = json.dumps(data, indent=2)
+    if bq_options.get("debug"):
+        utils.LOG.info("Submitting with kcidb:")
+        utils.LOG.info(json_data)
     local_env = dict(os.environ)
     local_env["GOOGLE_APPLICATION_CREDENTIALS"] = bq_options["credentials"]
     kcidb_path = bq_options.get("kcidb_path", "")
