@@ -45,6 +45,7 @@ TEST_REPORT_FIELDS = [
     models.DEFCONFIG_KEY,
     models.DEFINITION_URI_KEY,
     models.DEVICE_TYPE_KEY,
+    models.FILE_SERVER_RESOURCE_KEY,
     models.GIT_BRANCH_KEY,
     models.GIT_COMMIT_KEY,
     models.GIT_DESCRIBE_KEY,
