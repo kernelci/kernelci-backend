@@ -40,8 +40,8 @@ Test Failures
   Results:     {{ group.total_results.PASS }} PASS, {{ group.total_results.FAIL }} FAIL, {{ group.total_results.SKIP }} SKIP
   Full config: {{ group.defconfig_full }}
   Compiler:    {{ group.build_environment }}{% if group.compiler_version_full %} ({{ group.compiler_version_full }}){% endif %}
-  Plain log:   {{ storage_url }}/{{ group.job }}/{{ group.git_branch }}/{{ group.kernel }}/{{ group.arch }}/{{ group.defconfig_full }}/{{ group.build_environment }}/{{ group.lab_name }}/{{ group.boot_log }}
-  HTML log:    {{ storage_url }}/{{ group.job }}/{{ group.git_branch }}/{{ group.kernel }}/{{ group.arch }}/{{ group.defconfig_full }}/{{ group.build_environment }}/{{ group.lab_name }}/{{ group.boot_log_html }}
+  Plain log:   {{ storage_url }}/{{ group.file_server_resource }}/{{ group.lab_name }}/{{ group.boot_log }}
+  HTML log:    {{ storage_url }}/{{ group.file_server_resource }}/{{ group.lab_name }}/{{ group.boot_log_html }}
     {%- if group.initrd %}
   Rootfs:      {{ group.initrd }}
     {%- endif %}
