@@ -112,7 +112,7 @@ Other non-secrets variable might need to be defined, please look at the comments
 From the root directory of this repository run:
 
 ```
-$ ansible-playbook -i hosts site.yml -e "@../secrets.yml" -l <$TARGET_NAME> 
+$ ansible-playbook -i hosts site.yml -e "@../secrets.yml" -l <$TARGET_NAME>
 ```
 
 This will deploy the [KernelCI backend code](https://github.com/kernelci/kernelci-backend.git) into `/srv/$hostname`, install all dependencies and set up an nginx host called `$hostname`.
@@ -173,7 +173,7 @@ Important steps once the token is created:
 
 * Note the FRONTEND_TOKEN_VALUE
 * On the machine running the KernelCI Frontend services:
-    * Edit the file `/etc/linaro/kernelci-frontend.cfg`
+    * Edit the file `/etc/kernelci/kernelci-frontend.cfg`
     * Add (or replace) the line ```BACKEND_TOKEN = ''``` and write FRONTEND_TOKEN_VALUE between the quotes
         * Example: ```BACKEND_TOKEN = 'de41df12-4s35-a547-b597-cebef80ae5ef'```
         * Where ```de41df12-4s35-a547-b597-cebef80ae5ef``` is the FRONTEND_TOKEN_VALUE returned by the curl command.

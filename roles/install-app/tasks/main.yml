@@ -52,8 +52,8 @@
     - install
     - app
 
-- name: Does /etc/linaro exists?
-  file: path=/etc/linaro
+- name: Does /etc/kernelci exist?
+  file: path=/etc/kernelci
         state=directory
         owner=root
         group=root
@@ -64,7 +64,7 @@
 
 - name: Install configuration file
   template: src=kernelci-backend.cfg
-            dest=/etc/linaro/kernelci-backend.cfg
+            dest=/etc/kernelci/kernelci-backend.cfg
             owner=root
             group=root
             mode=0644
@@ -75,7 +75,7 @@
 
 - name: Install celery configuration file
   template: src=kernelci-celery.cfg
-            dest=/etc/linaro/kernelci-celery.cfg
+            dest=/etc/kernelci/kernelci-celery.cfg
             owner=root
             group=root
             mode=0644
