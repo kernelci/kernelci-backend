@@ -1,0 +1,27 @@
+dist: xenial
+
+language: python
+
+python:
+  - "2.7"
+
+install:
+  - pip install -r requirements.txt
+  - pip install -r requirements-dev.txt
+  - pip install pycodestyle
+
+script:
+  - cd app
+  - >
+    for dir in
+    models/tests
+    utils/tests
+    utils/build/tests
+    utils/bisect/tests
+    utils/report/tests
+    handlers/common/tests;
+    do
+      echo Running tests in $dir
+      python -m unittest discover $dir || exit 1
+    done
+  - pycodestyle .
