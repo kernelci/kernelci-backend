@@ -354,7 +354,7 @@ def _parse_and_structure_results(**kwargs):
     else:
         platforms["failed_data"] = None
 
-    if error_data:
+    if errors_count or warnings_count:
         platforms["error_data"] = {}
 
         if errors_count > 0 and warnings_count > 0:
@@ -368,73 +368,72 @@ def _parse_and_structure_results(**kwargs):
         platforms["error_data"]["summary"]["txt"] = [summary_string]
         platforms["error_data"]["summary"]["html"] = [summary_string]
 
-        if errors_count > 0 or warnings_count > 0:
-            platforms["error_data"]["data"] = {}
-            error_struct = platforms["error_data"]["data"]
+        platforms["error_data"]["data"] = {}
+        error_struct = platforms["error_data"]["data"]
 
-            err_get = error_data.get
-            subs = gen_subs.copy()
+        err_get = error_data.get
+        subs = gen_subs.copy()
 
-            for arch in error_data.viewkeys():
-                subs["arch"] = arch
-                arch_string = G_(u"{:s}:").format(arch)
-                error_struct[arch_string] = []
+        for arch in error_data.viewkeys():
+            subs["arch"] = arch
+            arch_string = G_(u"{:s}:").format(arch)
+            error_struct[arch_string] = []
 
-                error_append = error_struct[arch_string].append
+            error_append = error_struct[arch_string].append
 
-                for struct in err_get(arch):
-                    subs["defconfig"] = struct[0]
-                    subs["build_environment"] = struct[1]
-                    subs["status"] = struct[2]
-                    subs["warnings"] = struct[4]
-                    subs["errors"] = struct[5]
-                    err_numb = subs["errors"]
-                    warn_numb = subs["warnings"]
-                    if err_numb == 0 and warn_numb == 0:
-                        continue
-                    txt_desc_str = ""
-                    html_desc_str = ""
+            for struct in err_get(arch):
+                subs["defconfig"] = struct[0]
+                subs["build_environment"] = struct[1]
+                subs["status"] = struct[2]
+                subs["warnings"] = struct[4]
+                subs["errors"] = struct[5]
+                err_numb = subs["errors"]
+                warn_numb = subs["warnings"]
+                if err_numb == 0 and warn_numb == 0:
+                    continue
+                txt_desc_str = ""
+                html_desc_str = ""
 
-                    if struct[3]:
-                        subs["defconfig_url"] = DEFCONFIG_ID_URL
-                        subs["build_id"] = struct[3]
+                if struct[3]:
+                    subs["defconfig_url"] = DEFCONFIG_ID_URL
+                    subs["build_id"] = struct[3]
 
-                    err_string = P_(
-                        u"{errors:d} error",
-                        u"{errors:d} errors", subs["errors"])
-                    warn_string = P_(
-                        u"{warnings:d} warning",
-                        u"{warnings:d} warnings", subs["warnings"])
-                    subs["err_string"] = err_string
-                    subs["warn_string"] = warn_string
+                err_string = P_(
+                    u"{errors:d} error",
+                    u"{errors:d} errors", subs["errors"])
+                warn_string = P_(
+                    u"{warnings:d} warning",
+                    u"{warnings:d} warnings", subs["warnings"])
+                subs["err_string"] = err_string
+                subs["warn_string"] = warn_string
 
-                    if err_numb > 0 and warn_numb > 0:
-                        txt_desc_str = G_(
-                            u"{err_string:s}, {warn_string:s}")
-                        html_desc_str = (
-                            ERR_STR_HTML.format(**subs).format(**subs),
-                            WARN_STR_HTML.format(**subs).format(**subs)
-                        )
-                    elif err_numb > 0 and warn_numb == 0:
-                        txt_desc_str = u"{err_string:s}"
-                        html_desc_str = (
-                            ERR_STR_HTML.format(**subs).format(**subs), u"")
-                    elif err_numb == 0 and warn_numb > 0:
-                        txt_desc_str = u"{warn_string:s}"
-                        html_desc_str = (
-                            u"", WARN_STR_HTML.format(**subs).format(**subs))
+                if err_numb > 0 and warn_numb > 0:
+                    txt_desc_str = G_(
+                        u"{err_string:s}, {warn_string:s}")
+                    html_desc_str = (
+                        ERR_STR_HTML.format(**subs).format(**subs),
+                        WARN_STR_HTML.format(**subs).format(**subs)
+                    )
+                elif err_numb > 0 and warn_numb == 0:
+                    txt_desc_str = u"{err_string:s}"
+                    html_desc_str = (
+                        ERR_STR_HTML.format(**subs).format(**subs), u"")
+                elif err_numb == 0 and warn_numb > 0:
+                    txt_desc_str = u"{warn_string:s}"
+                    html_desc_str = (
+                        u"", WARN_STR_HTML.format(**subs).format(**subs))
 
-                    txt_desc_str = txt_desc_str.format(**subs)
-                    subs["txt_desc_str"] = txt_desc_str
+                txt_desc_str = txt_desc_str.format(**subs)
+                subs["txt_desc_str"] = txt_desc_str
 
-                    txt_defconfig_str = (
-                        G_(u"{defconfig:s} ({build_environment:s}): " +
-                           u"{txt_desc_str:s}").format(**subs)
-                    ).format(**subs)
-                    html_defconfing_str = (
-                        DEFCONFIG_URL_HTML.format(**subs).format(**subs),
-                        html_desc_str)
-                    error_append((txt_defconfig_str, html_defconfing_str))
+                txt_defconfig_str = (
+                    G_(u"{defconfig:s} ({build_environment:s}): " +
+                       u"{txt_desc_str:s}").format(**subs)
+                ).format(**subs)
+                html_defconfing_str = (
+                    DEFCONFIG_URL_HTML.format(**subs).format(**subs),
+                    html_desc_str)
+                error_append((txt_defconfig_str, html_defconfing_str))
     else:
         platforms["error_data"] = None
 
