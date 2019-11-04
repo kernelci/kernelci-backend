@@ -90,6 +90,7 @@ META_DATA_MAP_TEST = {
     models.VCS_COMMIT_KEY: "git.commit",
     models.IMAGE_TYPE_KEY: "image.type",
     models.PLAN_KEY: "test.plan",
+    models.PLAN_VARIANT_KEY: "test.plan_variant",
     models.BUILD_ENVIRONMENT_KEY: "job.build_environment",
     models.FILE_SERVER_RESOURCE_KEY: "job.file_server_resource",
 }

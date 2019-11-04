@@ -161,6 +161,7 @@ NOT_FIELD_KEY = "nfield"
 PARAMETERS_KEY = "parameters"
 PARENT_ID_KEY = "parent_id"
 PLAN_KEY = "plan"
+PLAN_VARIANT_KEY = "plan_variant"
 PRIVATE_KEY = "private"
 PROPERTIES_KEY = "properties"
 QEMU_COMMAND_KEY = "qemu_command"
@@ -1186,6 +1187,7 @@ LAVA_CALLBACK_VALID_METADATA_KEYS = {
             "platform.dtb_short",
             "platform.fastboot",
             "platform.mach",
+            "test.plan_variant",
         ],
     },
 }
