@@ -76,6 +76,7 @@ class TestTestGroupModel(unittest.TestCase):
         test_group.mach = "mach"
         test_group.metadata = {"foo": "bar"}
         test_group.parent_id = "parent-id"
+        test_group.plan_variant = "tother"
         test_group.qemu = "qemu"
         test_group.qemu_command = "qemu-command"
         test_group.retries = 2
@@ -129,6 +130,7 @@ class TestTestGroupModel(unittest.TestCase):
             "mach": "mach",
             "metadata": {"foo": "bar"},
             "parent_id": "parent-id",
+            "plan_variant": "tother",
             "name": "name",
             "qemu": "qemu",
             "qemu_command": "qemu-command",
@@ -156,6 +158,7 @@ class TestTestGroupModel(unittest.TestCase):
         self.assertIsNone(mtgroup.TestGroupDocument.from_json(""))
 
     def test_group_doc_from_json(self):
+        self.maxDiff = None
         group_json = {
             "_id": "id",
             "arch": "arm",
@@ -200,6 +203,7 @@ class TestTestGroupModel(unittest.TestCase):
             "metadata": {"foo": "bar"},
             "name": "name",
             "parent_id": "parent-id",
+            "plan_variant": "tother",
             "qemu": None,
             "qemu_command": None,
             "retries": 0,

@@ -90,6 +90,7 @@ class TestGroupDocument(modb.BaseDocument):
         self.load_addr = None
         self.mach = None
         self.metadata = {}
+        self.plan_variant = None
         self.qemu = None
         self.qemu_command = None
         self.retries = 0
@@ -208,6 +209,7 @@ class TestGroupDocument(modb.BaseDocument):
             models.QEMU_COMMAND_KEY: self.qemu_command,
             models.RETRIES_KEY: self.retries,
             models.NAME_KEY: self.name,
+            models.PLAN_VARIANT_KEY: self.plan_variant,
             models.TEST_CASES_KEY: self.test_cases,
             models.PARENT_ID_KEY: self.parent_id,
             models.SUB_GROUPS_KEY: self.sub_groups,

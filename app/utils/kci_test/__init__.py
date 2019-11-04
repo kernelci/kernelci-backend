@@ -394,6 +394,7 @@ def _update_test_group_doc_from_json(group_doc, test_dict, errors):
         models.KERNEL_IMAGE_SIZE_KEY, None)
     group_doc.load_addr = test_dict.get(models.BOOT_LOAD_ADDR_KEY, None)
     group_doc.metadata = test_dict.get(models.METADATA_KEY, {})
+    group_doc.plan_variant = test_dict.get(models.PLAN_VARIANT_KEY)
     group_doc.qemu = test_dict.get(models.QEMU_KEY, None)
     group_doc.qemu_command = test_dict.get(models.QEMU_COMMAND_KEY, None)
     group_doc.retries = test_dict.get(models.BOOT_RETRIES_KEY, 0)
