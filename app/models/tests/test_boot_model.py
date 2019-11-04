@@ -61,7 +61,7 @@ class TestBootModel(unittest.TestCase):
         boot_doc.uimage_addr = "uimage_addr"
         boot_doc.qemu = "qemu_binary"
         boot_doc.qemu_command = "qemu_command"
-        boot_doc.metadata = {"foo": "bar"}
+        boot_doc.metadata = {"foo": "baz"}
         boot_doc.mach = "soc"
         boot_doc.lab_name = "lab-name"
         boot_doc.bootloader = "bootloader"
