@@ -83,6 +83,8 @@ class TestBisectModel(unittest.TestCase):
             "build_environment": None,
             "git_branch": None,
             "git_url": None,
+            "plan": None,
+            "plan_variant": None,
         }
         self.assertDictEqual(expected, bisect_doc.to_dict())
 
@@ -120,6 +122,8 @@ class TestBisectModel(unittest.TestCase):
             "build_environment": None,
             "git_branch": None,
             "git_url": None,
+            "plan": None,
+            "plan_variant": None,
         }
         self.assertDictEqual(expected, bisect_doc.to_dict())
 
@@ -137,6 +141,7 @@ class TestBisectModel(unittest.TestCase):
         bisect_doc.log = "https://storage.org/log.txt"
         bisect_doc.device_type = "qemu"
         bisect_doc.lab_name = "secret-lab"
+        bisect_doc.plan = "cunning"
 
         expected = {
             "_id": "bar",
@@ -172,6 +177,8 @@ class TestBisectModel(unittest.TestCase):
             "log": "https://storage.org/log.txt",
             "found_summary": None,
             "checks": {},
+            "plan": "cunning",
+            "plan_variant": None,
         }
         self.assertDictEqual(expected, bisect_doc.to_dict())
 
@@ -229,6 +236,8 @@ class TestBisectModel(unittest.TestCase):
         bisect_doc.compiler = "randomcc"
         bisect_doc.compiler_version = "123.456"
         bisect_doc.build_environment = "build-env"
+        bisect_doc.plan = "cunning"
+        bisect_doc.plan_variant = "similar"
 
         expected = {
             "_id": "bar",
@@ -260,6 +269,8 @@ class TestBisectModel(unittest.TestCase):
             "kernel": "v4.56",
             "log": None,
             "checks": {},
+            "plan": "cunning",
+            "plan_variant": "similar",
         }
 
         self.assertDictEqual(expected, bisect_doc.to_dict())

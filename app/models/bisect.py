@@ -60,6 +60,8 @@ class BisectDocument(modb.BaseDocument):
         self.compiler_version = None
         self.build_environment = None
         self.build_id = None
+        self.plan = None
+        self.plan_variant = None
 
     @property
     def collection(self):
@@ -141,6 +143,8 @@ class BisectDocument(modb.BaseDocument):
             models.COMPILER_VERSION_KEY: self.compiler_version,
             models.BUILD_ENVIRONMENT_KEY: self.build_environment,
             models.BUILD_ID_KEY: self.build_id,
+            models.PLAN_KEY: self.plan,
+            models.PLAN_VARIANT_KEY: self.plan_variant,
         }
 
         if self.id:

@@ -507,6 +507,8 @@ def _start_bisection(bisection, jopts):
         "CC": models.COMPILER_KEY,
         "CC_VERSION": models.COMPILER_VERSION_KEY,
         "BUILD_ENVIRONMENT": models.BUILD_ENVIRONMENT_KEY,
+        "TEST_PLAN": models.PLAN_KEY,
+        "TEST_PLAN_VARIANT": models.PLAN_VARIANT_KEY,
     }
     params = {
         k: v for (k, v) in (

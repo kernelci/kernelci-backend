@@ -347,6 +347,8 @@ def create_boot_bisect(good, bad, db_options):
     doc.kernel = bad[models.KERNEL_KEY]
     doc.git_branch = bad[models.GIT_BRANCH_KEY]
     doc.git_url = bad[models.GIT_URL_KEY]
+    doc.plan = bad[models.PLAN_KEY]
+    doc.plan_variant = bad[models.PLAN_VARIANT_KEY]
     doc.arch = bad[models.ARCHITECTURE_KEY]
     doc.defconfig = bad[models.DEFCONFIG_KEY]
     doc.defconfig_full = bad[models.DEFCONFIG_FULL_KEY]
