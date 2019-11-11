@@ -1151,6 +1151,7 @@ LAVA_CALLBACK_VALID_METADATA_KEYS = {
             "platform.fastboot",
             "platform.mach",
             "test.plan",
+            "test.plan_variant",
         ],
     },
     "test": {

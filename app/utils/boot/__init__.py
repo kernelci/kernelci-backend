@@ -269,6 +269,8 @@ def _update_boot_doc_from_json(boot_doc, boot_dict, errors):
     boot_doc.metadata = boot_dict.get(models.METADATA_KEY, {})
     boot_doc.qemu = boot_dict.get(models.QEMU_KEY, None)
     boot_doc.qemu_command = boot_dict.get(models.QEMU_COMMAND_KEY, None)
+    boot_doc.plan = boot_dict.get(models.PLAN_KEY, None)
+    boot_doc.plan_variant = boot_dict.get(models.PLAN_VARIANT_KEY, None)
     boot_doc.retries = boot_dict.get(models.BOOT_RETRIES_KEY, 0)
     boot_doc.uimage = boot_dict.get(models.UIMAGE_KEY, None)
     boot_doc.uimage_addr = boot_dict.get(models.UIMAGE_ADDR_KEY, None)
