@@ -118,6 +118,8 @@ class BootDocument(modb.BaseDocument):
         self.load_addr = None
         self.mach = None
         self.metadata = {}
+        self.plan = None
+        self.plan_variant = None
         self.qemu = None
         self.qemu_command = None
         self.retries = 0
@@ -218,6 +220,8 @@ class BootDocument(modb.BaseDocument):
             models.LOAD_ADDR_KEY: self.load_addr,
             models.MACH_KEY: self.mach,
             models.METADATA_KEY: self.metadata,
+            models.PLAN_KEY: self.plan,
+            models.PLAN_VARIANT_KEY: self.plan_variant,
             models.QEMU_COMMAND_KEY: self.qemu_command,
             models.QEMU_KEY: self.qemu,
             models.RETRIES_KEY: self.retries,

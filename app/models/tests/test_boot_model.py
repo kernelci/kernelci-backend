@@ -61,6 +61,8 @@ class TestBootModel(unittest.TestCase):
         boot_doc.uimage_addr = "uimage_addr"
         boot_doc.qemu = "qemu_binary"
         boot_doc.qemu_command = "qemu_command"
+        boot_doc.plan = "boot"
+        boot_doc.plan_variant = "welly"
         boot_doc.metadata = {"foo": "bar"}
         boot_doc.mach = "soc"
         boot_doc.lab_name = "lab-name"
@@ -115,6 +117,8 @@ class TestBootModel(unittest.TestCase):
             "metadata": {"foo": "bar"},
             "qemu": "qemu_binary",
             "qemu_command": "qemu_command",
+            "plan": "boot",
+            "plan_variant": "welly",
             "retries": 10,
             "status": None,
             "time": 0,
@@ -193,6 +197,8 @@ class TestBootModel(unittest.TestCase):
             "metadata": {"foo": "bar"},
             "qemu": "qemu_binary",
             "qemu_command": "qemu_command",
+            "plan": "boot",
+            "plan_variant": "welly",
             "retries": 10,
             "status": "PASS",
             "time": 0,
