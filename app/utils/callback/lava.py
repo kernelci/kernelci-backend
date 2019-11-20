@@ -377,6 +377,11 @@ def add_boot(job_data, job_meta, lab_name, db_options,
     utils.LOG.info("Processing LAVA boot data: job {} from {}".format(
         job_data["id"], lab_name))
 
+    if job_data.get("status") not in (COMPLETE, INCOMPLETE):
+        utils.LOG.warning("Skipping LAVA job due to unsupported status: "
+                          "{}".format(job_data["status_string"]))
+        return None
+
     meta = {
         models.VERSION_KEY: "1.1",
         models.LAB_NAME_KEY: lab_name,
@@ -593,6 +598,11 @@ def add_tests(job_data, job_meta, lab_name, db_options,
 
     utils.LOG.info("Processing LAVA test data: job {} from {}".format(
         job_data["id"], lab_name))
+
+    if job_data.get("status") not in (COMPLETE, INCOMPLETE):
+        utils.LOG.warning("Skipping LAVA job due to unsupported status: "
+                          "{}".format(job_data["status_string"]))
+        return None
 
     meta = {
         models.VERSION_KEY: "1.1",
