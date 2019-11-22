@@ -128,23 +128,17 @@ def _search_prev_build_doc(build_doc, database):
             models.KERNEL_KEY: build_doc.kernel,
             models.BUILD_ENVIRONMENT_KEY: build_doc.build_environment
         }
-        prev_doc = utils.db.find(
-            database[models.BUILD_COLLECTION],
-            10,
-            0,
-            spec=spec,
-            fields=[models.ID_KEY, models.CREATED_KEY]
-        )
+        collection = database[models.BUILD_COLLECTION]
+        prev_doc_count = collection.count_documents(spec, limit=2)
 
-        prev_doc_count = prev_doc.count()
         if prev_doc_count > 0:
             if prev_doc_count == 1:
-                doc_id = prev_doc[0].get(models.ID_KEY, None)
-                c_date = prev_doc[0].get(models.CREATED_KEY, None)
+                prev_doc = utils.db.find_one2(collection, spec)
+                doc_id = prev_doc.get(models.ID_KEY)
+                c_date = prev_doc.get(models.CREATED_KEY)
             else:
                 utils.LOG.warn(
-                    "Found multiple defconfig docs matching: %s",
-                    spec)
+                    "Found multiple defconfig docs matching: {}".format(spec))
                 utils.LOG.error(
                     "Cannot keep old document ID, don't know which one to "
                     "use!")
