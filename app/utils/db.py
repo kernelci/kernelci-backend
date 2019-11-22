@@ -242,8 +242,9 @@ def find_and_count(collection, limit=0, skip=0, spec=None, fields=None,
     """
     db_result = collection.find(
         spec, fields, limit=limit, skip=skip, sort=sort)
-
-    return db_result, db_result.count()
+    kw = {'limit': limit} if limit else {}
+    db_results_count = collection.count_documents(spec, skip=skip, **kw)
+    return db_result, db_results_count
 
 
 def count(collection):
