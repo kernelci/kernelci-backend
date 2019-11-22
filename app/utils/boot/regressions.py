@@ -239,6 +239,7 @@ def track_regression(boot_doc, pass_doc, old_regr, db_options):
     # Keep a lock here when looking for the previous regressions or we might
     # end up with multiple boot regression creations.
     redis_conn = redisdb.get_db_connection(db_options)
+    db = utils.db.get_db_connection2(db_options)
     lock_key = LOCK_KEY_FMT.format(job, branch, kernel)
 
     with redis.lock.Lock(redis_conn, lock_key, timeout=5):
@@ -266,17 +267,17 @@ def track_regression(boot_doc, pass_doc, old_regr, db_options):
             if prev_reg_doc[1]:
                 # If we also have the same key in the document, append the
                 # new boot report.
-                document = {"$addToSet": {regr_data_key: boot_doc}}
+                document = {regr_data_key: boot_doc}
+                op = "$addToSet"
             else:
                 # Otherwise just set the new key.
-                document = {"$set": {regr_data_key: regr_docs}}
+                document = {regr_data_key: regr_docs}
+                op = "$set"
 
-            ret_val = utils.db.update3(
-                models.BOOT_REGRESSIONS_COLLECTION,
+            ret_val = utils.db.find_and_update(
+                db[models.BOOT_REGRESSIONS_COLLECTION],
                 {models.ID_KEY: prev_reg_doc[0]},
-                document,
-                db_options=db_options
-            )
+                document)
         else:
             regression_doc = {
                 models.CREATED_KEY: created_on,

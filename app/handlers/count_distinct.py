@@ -157,7 +157,7 @@ def get_distinct_query(field, collection, query_args_func, valid_keys):
         get_all_query_values(query_args_func, valid_keys)
 
     result = collection.find(
-        spec=spec, limit=limit, skip=skip, fields=fields, sort=sort)
+        spec, fields, limit=limit, skip=skip, sort=sort)
     if result:
         result = len(result.distinct(field))
     else:
