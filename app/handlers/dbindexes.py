@@ -24,105 +24,40 @@
 import pymongo
 
 import models
+import utils
 
 
-def ensure_indexes(database):
-    """Ensure that mongodb indexes exists, if not create them.
+INDEX_SPECS = {
+    models.BISECT_COLLECTION: [
+        [(models.NAME_KEY, pymongo.DESCENDING)],
+        [(models.CREATED_KEY, pymongo.ASCENDING)],
+    ],
 
-    This should be called at server startup.
-
-    :param database: The database connection.
-    """
-    _ensure_job_indexes(database)
-    _ensure_boot_indexes(database)
-    _ensure_boot_regressions_indexes(database)
-    _ensure_build_indexes(database)
-    _ensure_token_indexes(database)
-    _ensure_lab_indexes(database)
-    _ensure_bisect_indexes(database)
-    _ensure_error_logs_indexes(database)
-    _ensure_stats_indexes(database)
-    _ensure_reports_indexes(database)
-    _ensure_test_group_indexes(database)
-    _ensure_test_case_indexes(database)
-    _ensure_test_regression_indexes(database)
-
-
-def _ensure_job_indexes(database):
-    """Ensure indexes exists for the 'job' collection.
-
-    :param database: The database connection.
-    """
-    collection = database[models.JOB_COLLECTION]
-    collection.ensure_index(
+    models.BOOT_COLLECTION: [
         [
-            (models.CREATED_KEY, pymongo.DESCENDING)
+            (models.CREATED_KEY, pymongo.DESCENDING),
         ],
-        background=True
-    )
-    collection.ensure_index(
-        [
-            (models.JOB_KEY, pymongo.ASCENDING)
-        ],
-        background=True
-    )
-    collection.ensure_index(
-        [
-            (models.KERNEL_KEY, pymongo.ASCENDING)
-        ],
-        background=True
-    )
-
-
-def _ensure_boot_indexes(database):
-    """Ensure indexes exists for the 'boot' collection.
-
-    :param database: The database connection.
-    """
-    collection = database[models.BOOT_COLLECTION]
-    collection.ensure_index(
-        [
-            (models.CREATED_KEY, pymongo.DESCENDING)
-        ],
-        background=True
-    )
-    collection.ensure_index(
         [
             (models.STATUS_KEY, pymongo.ASCENDING),
-            (models.CREATED_KEY, pymongo.DESCENDING)
+            (models.CREATED_KEY, pymongo.DESCENDING),
         ],
-        background=True
-    )
-    collection.ensure_index(
         [
             (models.STATUS_KEY, pymongo.ASCENDING),
             (models.JOB_KEY, pymongo.ASCENDING),
-            (models.KERNEL_KEY, pymongo.ASCENDING)
+            (models.KERNEL_KEY, pymongo.ASCENDING),
         ],
-        background=True
-    )
-    collection.ensure_index(
         [
             (models.JOB_KEY, pymongo.ASCENDING),
-            (models.KERNEL_KEY, pymongo.ASCENDING)
+            (models.KERNEL_KEY, pymongo.ASCENDING),
         ],
-        background=True
-    )
-    collection.ensure_index(
         [
             (models.MACH_KEY, pymongo.ASCENDING),
-            (models.BOARD_KEY, pymongo.ASCENDING)
+            (models.BOARD_KEY, pymongo.ASCENDING),
         ],
-        background=True
-    )
-    collection.ensure_index(
         [
             (models.MACH_KEY, pymongo.ASCENDING),
-            (models.CREATED_KEY, pymongo.DESCENDING)
+            (models.CREATED_KEY, pymongo.DESCENDING),
         ],
-        background=True
-    )
-    collection.ensure_index(
         [
             (models.CREATED_KEY, pymongo.DESCENDING),
             (models.ID_KEY, pymongo.DESCENDING),
@@ -133,27 +68,33 @@ def _ensure_boot_indexes(database):
             (models.BOARD_KEY, pymongo.ASCENDING),
             (models.LAB_NAME_KEY, pymongo.ASCENDING),
             (models.STATUS_KEY, pymongo.ASCENDING),
-            (models.GIT_BRANCH_KEY, pymongo.ASCENDING)
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
         ],
-        background=True
-    )
+    ],
 
+    models.BOOT_REGRESSIONS_COLLECTION: [
+        [
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.DESCENDING),
+            (models.CREATED_KEY, pymongo.DESCENDING),
+        ],
+        [(models.JOB_ID_KEY, pymongo.DESCENDING)],
+    ],
 
-def _ensure_build_indexes(database):
-    """Ensure indexes exists for the 'build' collection.
+    models.BOOT_REGRESSIONS_BY_BOOT_COLLECTION: [
+        [
+            (models.BOOT_ID_KEY, pymongo.DESCENDING),
+        ],
+        [
+            (models.CREATED_KEY, pymongo.DESCENDING),
+        ],
+    ],
 
-    :param database: The database connection.
-    """
-    collection = database[models.BUILD_COLLECTION]
-
-    collection.ensure_index(
+    models.BUILD_COLLECTION: [
         [
             (models.STATUS_KEY, pymongo.ASCENDING),
-            (models.CREATED_KEY, pymongo.DESCENDING)
+            (models.CREATED_KEY, pymongo.DESCENDING),
         ],
-        background=True
-    )
-    collection.ensure_index(
         [
             (models.CREATED_KEY, pymongo.DESCENDING),
             (models.JOB_KEY, pymongo.ASCENDING),
@@ -162,158 +103,75 @@ def _ensure_build_indexes(database):
             (models.ARCHITECTURE_KEY, pymongo.ASCENDING),
             (models.STATUS_KEY, pymongo.ASCENDING),
             (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
-            (models.ID_KEY, pymongo.ASCENDING)
+            (models.ID_KEY, pymongo.ASCENDING),
         ],
-        background=True
-    )
-    collection.ensure_index(
         [
-            (models.JOB_KEY, pymongo.ASCENDING)
+            (models.JOB_KEY, pymongo.ASCENDING),
         ],
-        background=True
-    )
-    collection.ensure_index(
         [
-            (models.KERNEL_KEY, pymongo.ASCENDING)
+            (models.KERNEL_KEY, pymongo.ASCENDING),
         ],
-        background=True
-    )
-    collection.ensure_index(
         [
             (models.JOB_KEY, pymongo.ASCENDING),
             (models.KERNEL_KEY, pymongo.DESCENDING),
-            (models.CREATED_KEY, pymongo.DESCENDING)
+            (models.CREATED_KEY, pymongo.DESCENDING),
         ],
-        background=True
-    )
-    # This is used in the aggregation pipeline.
-    collection.ensure_index(
         [
+            # This is used in the aggregation pipeline.
             (models.JOB_KEY, pymongo.ASCENDING),
             (models.KERNEL_KEY, pymongo.DESCENDING),
             (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
             (models.GIT_URL_KEY, pymongo.ASCENDING),
             (models.GIT_COMMIT_KEY, pymongo.ASCENDING),
             (models.CREATED_KEY, pymongo.DESCENDING),
-            (models.ID_KEY, pymongo.DESCENDING)
+            (models.ID_KEY, pymongo.DESCENDING),
         ],
-        background=True
-    )
+    ],
 
-
-def _ensure_token_indexes(database):
-    """Ensure indexes exists for the 'token' collection.
-
-    :param database: The database connection.
-    """
-    collection = database[models.TOKEN_COLLECTION]
-
-    collection.ensure_index(
-        [(models.TOKEN_KEY, pymongo.DESCENDING)], background=True
-    )
-
-
-def _ensure_lab_indexes(database):
-    """Ensure indexes exists for the 'lab' collection.
-
-    :param database: The database connection.
-    """
-    collection = database[models.LAB_COLLECTION]
-
-    collection.ensure_index(
+    models.DAILY_STATS_COLLECTION: [
         [
-            (models.NAME_KEY, pymongo.ASCENDING),
-            (models.TOKEN_KEY, pymongo.ASCENDING)
+            (models.CREATED_KEY, pymongo.DESCENDING),
+        ]
+    ],
+
+    models.ERROR_LOGS_COLLECTION: [
+        [
+            (models.BUILD_ID_KEY, pymongo.DESCENDING),
         ],
-        background=True
-    )
+    ],
 
-
-def _ensure_bisect_indexes(database):
-    """Ensure indexes exists for the 'bisect' collection.
-
-    :param database: The database connection.
-    """
-    collection = database[models.BISECT_COLLECTION]
-
-    collection.ensure_index(
-        [(models.NAME_KEY, pymongo.DESCENDING)],
-        background=True
-    )
-    collection.ensure_index(
-        models.CREATED_KEY,
-        expireAfterSeconds=1209600,
-        background=True
-    )
-
-
-def _ensure_error_logs_indexes(database):
-    """Ensure indexes exists for the 'error_logs' collection.
-
-    :param database: The database connection.
-    """
-    collection = database[models.ERROR_LOGS_COLLECTION]
-    collection.ensure_index(
-        [(models.BUILD_ID_KEY, pymongo.DESCENDING)],
-        background=True
-    )
-
-
-def _ensure_stats_indexes(database):
-    """Ensure indexes exists for the 'daily_stats' collection.
-
-    :param database: The database connection.
-    """
-    collection = database[models.DAILY_STATS_COLLECTION]
-    collection.ensure_index(
-        [(models.CREATED_KEY, pymongo.DESCENDING)], background=True)
-
-
-def _ensure_boot_regressions_indexes(database):
-    """Ensure indexes exist on the boot regression collection.
-
-    :param database: The database connection.
-    """
-    collection = database[models.BOOT_REGRESSIONS_COLLECTION]
-    collection.ensure_index(
+    models.JOB_COLLECTION: [
+        [
+            (models.CREATED_KEY, pymongo.DESCENDING),
+        ],
         [
             (models.JOB_KEY, pymongo.ASCENDING),
-            (models.KERNEL_KEY, pymongo.DESCENDING),
-            (models.CREATED_KEY, pymongo.DESCENDING)
         ],
-        background=True
-    )
-    collection.ensure_index(
-        [(models.JOB_ID_KEY, pymongo.DESCENDING)], background=True)
+        [
+            (models.KERNEL_KEY, pymongo.ASCENDING),
+        ],
+    ],
 
-    # The index collection.
-    collection = database[models.BOOT_REGRESSIONS_BY_BOOT_COLLECTION]
-    collection.ensure_index(
-        [(models.BOOT_ID_KEY, pymongo.DESCENDING)], background=True)
-    collection.ensure_index(
-        [(models.CREATED_KEY, pymongo.DESCENDING)], background=True)
+    models.LAB_COLLECTION: [
+        [
+            (models.NAME_KEY, pymongo.ASCENDING),
+            (models.TOKEN_KEY, pymongo.ASCENDING),
+        ],
+    ],
 
+    models.REPORT_COLLECTION: [
+        [
+            (models.CREATED_KEY, pymongo.ASCENDING),
+        ],
+    ],
 
-def _ensure_reports_indexes(database):
-    """Ensure indexes exist on the report collection.
+    models.TEST_CASE_COLLECTION: [
+        [
+            (models.TEST_GROUP_ID_KEY, pymongo.ASCENDING),
+        ],
+    ],
 
-    :param database: The database connection.
-    """
-    collection = database[models.REPORT_COLLECTION]
-    collection.ensure_index(
-        models.CREATED_KEY,
-        expireAfterSeconds=604800,
-        background=True
-    )
-
-
-def _ensure_test_group_indexes(database):
-    """Ensure indexes exist on the test_group collection.
-
-    :param database: The database connection.
-    """
-    collection = database[models.TEST_GROUP_COLLECTION]
-    collection.ensure_index(
+    models.TEST_GROUP_COLLECTION: [
         [
             (models.ARCHITECTURE_KEY, pymongo.ASCENDING),
             (models.BOARD_KEY, pymongo.ASCENDING),
@@ -324,27 +182,9 @@ def _ensure_test_group_indexes(database):
             (models.LAB_NAME_KEY, pymongo.ASCENDING),
             (models.NAME_KEY, pymongo.ASCENDING),
         ],
-        background=True
-    )
+    ],
 
-
-def _ensure_test_case_indexes(database):
-    """Ensure indexes exist on the test_case collection.
-
-    :param database: The database connection.
-    """
-    collection = database[models.TEST_CASE_COLLECTION]
-    collection.ensure_index(
-        [(models.TEST_GROUP_ID_KEY, pymongo.ASCENDING)], background=True)
-
-
-def _ensure_test_regression_indexes(database):
-    """Ensure indexes exist on the test_regression collection.
-
-    :param database: The database connection.
-    """
-    collection = database[models.TEST_REGRESSION_COLLECTION]
-    collection.ensure_index(
+    models.TEST_REGRESSION_COLLECTION: [
         [
             (models.JOB_KEY, pymongo.ASCENDING),
             (models.KERNEL_KEY, pymongo.DESCENDING),
@@ -354,9 +194,6 @@ def _ensure_test_regression_indexes(database):
             (models.ARCHITECTURE_KEY, pymongo.ASCENDING),
             (models.HIERARCHY_KEY, pymongo.ASCENDING),
         ],
-        background=True
-    )
-    collection.ensure_index(
         [
             (models.JOB_KEY, pymongo.ASCENDING),
             (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
@@ -365,5 +202,36 @@ def _ensure_test_regression_indexes(database):
             (models.ARCHITECTURE_KEY, pymongo.ASCENDING),
             (models.HIERARCHY_KEY, pymongo.ASCENDING),
         ],
-        background=True
-    )
+    ],
+
+    models.TOKEN_COLLECTION: [
+        [
+            (models.TOKEN_KEY, pymongo.DESCENDING),
+        ],
+    ],
+}
+
+
+INDEX_EXPIRATION = {
+    (models.BISECT_COLLECTION, 'created_on_1'): 1209600,
+    (models.REPORT_COLLECTION, 'created_on_1'): 604800,
+}
+
+
+def ensure_indexes(database):
+    """Ensure that mongodb indexes exists, if not create them.
+
+    This should be called at server startup.
+
+    :param database: The database connection.
+    """
+    for collection, index_specs in INDEX_SPECS.iteritems():
+        db_collection = database[models.BUILD_COLLECTION]
+        db_indexes = db_collection.index_information()
+
+        for index in index_specs:
+            name = '_'.join('_'.join(str(x) for x in spec) for spec in index)
+            expire = INDEX_EXPIRATION.get((collection, name))
+            if name not in db_indexes:
+                kw = {'expireAfterSeconds': expire} if expire else {}
+                db_collection.create_index(index, background=True, **kw)
