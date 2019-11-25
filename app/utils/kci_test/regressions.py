@@ -78,7 +78,7 @@ def _check_and_track(test_case, group, last_case, last_group, db, spec,
         ]
         regr[models.KERNEL_KEY] = spec[models.KERNEL_KEY]
         doc = models.test_regression.TestRegressionDocument.from_json(regr)
-        return utils.db.save(db, doc, manipulate=True) if doc else (500, None)
+        return utils.db.save(db, doc) if doc else (500, None)
 
     regr[models.KERNEL_KEY] = last_group[models.KERNEL_KEY]
     regr_doc = utils.db.find_one2(db[models.TEST_REGRESSION_COLLECTION], regr)
@@ -93,7 +93,7 @@ def _check_and_track(test_case, group, last_case, last_group, db, spec,
     del regr_doc[models.ID_KEY]  # Save a separate doc for each kernel revision
     del regr_doc[models.CREATED_KEY]
     doc = models.test_regression.TestRegressionDocument.from_json(regr_doc)
-    return utils.db.save(db, doc, manipulate=True) if doc else (500, None)
+    return utils.db.save(db, doc) if doc else (500, None)
 
 
 def _add_test_group_regressions(group, last_group, db, spec, hierarchy=None,

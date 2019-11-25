@@ -44,8 +44,7 @@ def save_bisect_doc(database, bisect_doc, doc_id):
     :param bisect_doc: The document to save.
     :param doc_id: The ID of the document.
     """
-    return_code, saved_id = utils.db.save(
-        database, bisect_doc, manipulate=True)
+    return_code, saved_id = utils.db.save(database, bisect_doc)
     if return_code == 201:
         bisect_doc.id = saved_id
     else:

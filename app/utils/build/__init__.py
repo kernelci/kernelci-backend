@@ -482,8 +482,7 @@ def _get_or_create_job(job, kernel, git_branch, database, db_options):
             job_doc = mjob.JobDocument(job, kernel, git_branch)
             job_doc.status = models.BUILD_STATUS
             job_doc.created_on = datetime.datetime.now(tz=bson.tz_util.utc)
-            ret_val, job_id = utils.db.save(
-                database, job_doc, manipulate=True)
+            ret_val, job_id = utils.db.save(database, job_doc)
             job_doc.id = job_id
 
     return ret_val, job_doc, job_id
@@ -555,8 +554,7 @@ def import_single_build(json_obj, db_options, base_path=utils.BASE_PATH):
                     ERR_ADD(
                         errors, ret_val, err_msg % (job, git_branch, kernel))
                 if build_doc:
-                    ret_val, build_id = utils.db.save(
-                        database, build_doc, manipulate=True)
+                    ret_val, build_id = utils.db.save(database, build_doc)
                 if ret_val != 201:
                     err_msg = "Error saving build document '%s-%s-%s-%s-%s-%s'"
                     utils.LOG.error(

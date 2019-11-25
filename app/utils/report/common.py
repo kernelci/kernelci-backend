@@ -191,7 +191,7 @@ def save_report(job, branch, kernel, r_type, status, errors, db_options):
         report = mreport.ReportDocument.from_json(prev_doc)
         report.status = status
         report.errors = errors
-
+        report.id = prev_doc[models.ID_KEY]
         utils.db.save(database, report)
     else:
         report = mreport.ReportDocument(name)
@@ -201,8 +201,7 @@ def save_report(job, branch, kernel, r_type, status, errors, db_options):
         report.report_type = r_type
         report.status = status
         report.errors = errors
-
-        utils.db.save(database, report, manipulate=True)
+        utils.db.save(database, report)
 
 
 def get_unique_data(results, unique_keys=None):

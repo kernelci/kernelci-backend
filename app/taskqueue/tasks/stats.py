@@ -31,6 +31,6 @@ def calculate_daily_statistics():
     daily_stats = utils.stats.daily.calculate_daily_stats(db_options)
 
     database = utils.db.get_db_connection(db_options)
-    ret_val, doc_id = utils.db.save(database, daily_stats, manipulate=True)
+    ret_val, doc_id = utils.db.save(database, daily_stats)
 
     return ret_val, doc_id
