@@ -358,8 +358,7 @@ def import_test_case(
             if test_case:
                 test_case.created_on = datetime.datetime.now(
                     tz=bson.tz_util.utc)
-                ret_val, doc_id = utils.db.save(
-                    database, test_case, manipulate=True)
+                ret_val, doc_id = utils.db.save(database, test_case)
 
                 if ret_val != 201:
                     err_msg = "Error saving test case '%s'" % test_name

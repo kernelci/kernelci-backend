@@ -114,7 +114,7 @@ def save_or_update(boot_doc, database, errors):
         utils.LOG.info("Updating boot document with id '%s'", doc_id)
         ret_val, _ = utils.db.save(database, boot_doc)
     else:
-        ret_val, doc_id = utils.db.save(database, boot_doc, manipulate=True)
+        ret_val, doc_id = utils.db.save(database, boot_doc)
 
     if ret_val == 500:
         err_msg = (

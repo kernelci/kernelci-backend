@@ -46,7 +46,7 @@ def save_delta_doc(json_obj, result, collection, db_options):
     doc_id = None
 
     try:
-        doc_id = database[collection].save(json_obj, manipulate=True)
+        ret_value, doc_id = database[collection].save(json_obj)
     except pymongo.errors.OperationFailure:
         utils.LOG.error("Error saving delta doc for %s", collection)
 

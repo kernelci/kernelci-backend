@@ -194,7 +194,7 @@ def _get_or_create_token(lab_doc, database):
         token_doc.is_delete_token = True
         token_doc.is_lab_token = True
         token = token_doc.token
-        ret_val, token_id = utils.db.save(database, token_doc, manipulate=True)
+        ret_val, token_id = utils.db.save(database, token_doc)
         if ret_val == 500:
             token = None
 
@@ -228,7 +228,7 @@ def create_lab(json_obj, database, request_uri):
                 "Error saving or retrieving lab token: no token associated"
 
         lab_doc.token = token_id
-        ret_val, lab_id = utils.db.save(database, lab_doc, manipulate=True)
+        ret_val, lab_id = utils.db.save(database, lab_doc)
 
         if ret_val == 201:
             response.result = {

@@ -228,7 +228,7 @@ def _create_new_summary(
     error_summary.mismatches = _dict_to_list(mismatches)
     error_summary.warnings = _dict_to_list(warnings)
 
-    ret_val, _ = utils.db.save(database, error_summary, manipulate=True)
+    ret_val, _ = utils.db.save(database, error_summary)
     return ret_val
 
 
@@ -372,12 +372,10 @@ def save_defconfig_errors(
     err_doc.compiler_version_full = build_doc.compiler_version_full
     err_doc.build_environment = build_doc.build_environment
 
-    manipulate = True
     if prev_doc:
-        manipulate = False
         err_doc.id = prev_doc[models.ID_KEY]
 
-    ret_val, _ = utils.db.save(database, err_doc, manipulate=manipulate)
+    ret_val, _ = utils.db.save(database, err_doc)
 
     return ret_val
 
