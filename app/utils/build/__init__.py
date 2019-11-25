@@ -571,7 +571,8 @@ def import_single_build(json_obj, db_options, base_path=utils.BASE_PATH):
                     ERR_ADD(
                         errors,
                         ret_val, err_msg % (
-                            job, git_branch, kernel, arch, defconfig))
+                            job, git_branch, kernel, arch, defconfig,
+                            build_environment))
             except pymongo.errors.ConnectionFailure, ex:
                 utils.LOG.exception(ex)
                 utils.LOG.error("Error getting database connection")
