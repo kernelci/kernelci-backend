@@ -15,11 +15,8 @@ script:
   - >
     for dir in
     models/tests
-    utils/tests
-    utils/build/tests
     utils/bisect/tests
-    utils/report/tests
-    handlers/common/tests;
+    utils/report/tests;
     do
       echo Running tests in $dir
       python -m unittest discover $dir || exit 1
