@@ -451,12 +451,12 @@ def _save(
         job_id, len(err_lines), len(warn_lines), len(mism_lines), db_options)
 
     if status != 200:
-        error_msg = \
+        err_msg = \
             "Error updating build errors count for {}-{}-{}-{}-{}".format(
                 build_doc.job,
                 build_doc.git_branch,
                 build_doc.kernel, build_doc.arch, build_doc.defconfig_full)
-        utils.LOG.error(error_msg)
+        utils.LOG.error(err_msg)
         ERR_ADD(errors, status, err_msg)
 
     # Once done, save the summary.
@@ -465,11 +465,11 @@ def _save(
         all_warnings, all_mismatches, job_id, build_doc, db_options)
 
     if status == 500:
-        error_msg = "Error saving errors summary for {}-{}-{}-{}-{}".format(
+        err_msg = "Error saving errors summary for {}-{}-{}-{}-{}".format(
             build_doc.job,
             build_doc.git_branch,
             build_doc.kernel, build_doc.arch, build_doc.defconfig_full)
-        ERR_ADD(errors, status, error_msg)
+        ERR_ADD(errors, status, err_msg)
 
     return status
 
