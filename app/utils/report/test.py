@@ -69,7 +69,7 @@ TEST_REPORT_FIELDS = [
 
 TEMPLATES_YAML = os.path.join(rcommon.TEMPLATES_DIR, "templates.yaml")
 with open(TEMPLATES_YAML) as templates_file:
-    TEMPLATES = yaml.load(templates_file)["templates"]
+    TEMPLATES = yaml.safe_load(templates_file)["templates"]
 
 
 def _regression_message(data):
