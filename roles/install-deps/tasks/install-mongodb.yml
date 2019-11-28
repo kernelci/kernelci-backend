@@ -1,25 +1,7 @@
 ---
-- name: Add MongoDB apt key (Ubuntu)
-  apt_key:  id=7F0CEB10
-            keyserver=hkp://keyserver.ubuntu.com
-  when: ansible_distribution == "Ubuntu"
-  tags:
-    - install
-    - mongodb
-    - deps
-
-- name: Add MongoDB apt key (Debian)
-  apt_key:  id=EA312927
-            keyserver=hkp://keyserver.ubuntu.com
-  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "8"
-  tags:
-    - install
-    - mongodb
-    - deps
-
-- name: Add MongoDB apt key (Debian Buster)
+- name: Add MongoDB 4.2 apt key (Debian Buster)
   apt_key:
-      url: https://www.mongodb.org/static/pgp/server-3.2.asc
+      url: https://www.mongodb.org/static/pgp/server-4.2.asc
       state: present
   when: ansible_distribution == "Debian" and ansible_distribution_major_version == "10"
   tags:
@@ -27,17 +9,8 @@
     - mongodb
     - deps
 
-- name: Add MongoDB repository (Debian)
-  apt_repository: repo='deb http://repo.mongodb.org/apt/debian wheezy/mongodb-org/3.2 main'
-                  state=present
-                  update_cache=yes
-  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "8"
-  tags:
-    - install
-    - mongodb
-
-- name: Add MongoDB repository (Debian Buster)
-  apt_repository: repo='deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse'
+- name: Add MongoDB 4.2 repository (Debian Buster)
+  apt_repository: repo='deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main'
                   state=present
                   update_cache=yes
   when: ansible_distribution == "Debian" and ansible_distribution_major_version == "10"
@@ -72,60 +45,6 @@
     - install
     - mongodb
     - deps  
-
-- name: Install MongoDB
-  when: ansible_distribution == "Ubuntu" or ( ansible_distribution == "Debian" and ansible_distribution_major_version == "8")
-  apt:  
-    pkg: [
-      'mongodb-org',
-      'libsnappy1'
-    ]
-    state: latest
-  tags:
-    - install
-    - mongodb
-    - deps
-
-- name: Install MongoDB
-  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "8"
-  apt:  
-    pkg: [
-      'mongodb',
-    ]
-    state: latest
-  tags:
-    - install
-    - mongodb
-    - deps  
-
-- name: Install EPEL7
-  yum:
-        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
-  tags:
-    - install
-
-- name: Install MongoDB for CentOS
-  when: ansible_distribution == "CentOS"
-  yum:  
-    pkg: [
-      'mongodb-server'
-    ]
-    state: latest
-  tags:
-    - install
-    - mongodb
-    - deps
-
-- name: set mongodb_service fact for CentOS
-  when: ansible_distribution == "CentOS"
-  set_fact:
-    mongodb_service: "mongod"
-
-- name: set mongodb_service fact for Ubuntu
-  when: ansible_distribution == "Ubuntu"
-  set_fact:
-    mongodb_service: "mongodb"
 
 - name: set mongodb_service fact for Debian
   when: ansible_distribution == "Debian"
