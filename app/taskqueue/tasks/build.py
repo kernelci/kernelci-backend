@@ -21,6 +21,7 @@
 """All build/job related celery tasks."""
 
 import taskqueue.celery as taskc
+import models
 import utils.build
 import utils.log_parser
 import utils.logs.build
@@ -37,14 +38,29 @@ def import_build(json_obj):
     :type json_obj: dictionary
     :param db_options: The database connection options.
     :type db_options: dictionary
-    :return The build ID and the job ID.
+    :return The build ID, the job ID and whether this is the first build with
+            this kernel revision being imported into the database.
     """
+    db = utils.db.get_db_connection(taskc.app.conf.db_options)
+
+    # There is a small window for a race condition here, if another build is
+    # being imported between this request and when import_single_build() is
+    # run.  A lock would solve it but with a cost, as builds would then not be
+    # imported in parallel.  However it is benign to have duplicate revision
+    # records in the data sent by kcidb, this test is merely to avoid sending
+    # another record for _every_ build and limit the duplicates without
+    # impacting performance.
+    n_builds = db[models.BUILD_COLLECTION].count_documents(
+        {models.KERNEL_KEY: json_obj[models.KERNEL_KEY]})
+    first = (n_builds == 0)
+
     # build_id and job_id are necessary since they are injected by Celery into
     # another function.
     build_id, job_id, errors = utils.build.import_single_build(
         json_obj, taskc.app.conf.db_options)
+
     # TODO: handle errors.
-    return build_id, job_id
+    return build_id, job_id, first
 
 
 @taskc.app.task(name="parse-single-build-log")
