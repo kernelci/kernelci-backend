@@ -436,7 +436,6 @@ def _update_test_group_doc_ids(group_doc, database):
         models.ARCHITECTURE_KEY: arch,
         models.DEFCONFIG_KEY: defconfig,
         models.JOB_KEY: job,
-        models.KERNEL_KEY: kernel,
         models.BUILD_ENVIRONMENT_KEY: build_env,
     })
 
