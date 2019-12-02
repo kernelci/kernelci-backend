@@ -41,6 +41,7 @@ TASKS_LIST = [
     "taskqueue.tasks.callback",
     "taskqueue.tasks.common",
     "taskqueue.tasks.compare",
+    "taskqueue.tasks.kcidb",
     "taskqueue.tasks.report",
     "taskqueue.tasks.stats",
     "taskqueue.tasks.test"
