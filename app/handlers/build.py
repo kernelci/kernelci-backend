@@ -17,9 +17,12 @@
 
 """The RequestHandler for /build URLs."""
 
+import celery
 import handlers.base as hbase
 import handlers.response as hresponse
 import models
+import taskqueue.tasks
+import taskqueue.tasks.kcidb
 import taskqueue.tasks.build as taskq
 import utils.db
 
@@ -42,10 +45,13 @@ class BuildHandler(hbase.BaseHandler):
         response = hresponse.HandlerResponse(202)
         response.reason = "Request accepted and being imported"
 
-        taskq.import_build.apply_async(
-            [kwargs["json_obj"]],
-            link=[taskq.parse_single_build_log.s()]
-        )
+        tasks = [
+            taskq.import_build.s(kwargs["json_obj"]),
+            taskqueue.tasks.kcidb.push_build.s(),
+            taskq.parse_single_build_log.s(),
+        ]
+        celery.chain(tasks).apply_async(
+            link_error=taskqueue.tasks.error_handler.s())
 
         return response
 
