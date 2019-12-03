@@ -20,8 +20,8 @@
 
 """The RequestHandler for /callback URLs."""
 
+import celery
 import tornado.web
-from celery import chain
 import yaml
 
 import handlers.base as hbase
@@ -32,6 +32,7 @@ import models
 import models.token as mtoken
 import taskqueue.tasks.boot
 import taskqueue.tasks.callback
+import taskqueue.tasks.kcidb
 import utils.callback.lava
 import utils.db
 
@@ -200,8 +201,9 @@ class LavaCallbackHandler(CallbackHandler):
                     self.json_obj, self.job_meta, lab_name),
             ]
             if action == "test":
+                tasks.append(taskqueue.tasks.kcidb.push_tests.s())
                 tasks.append(taskqueue.tasks.test.find_regression.s())
-            chain(tasks).apply_async(
+            celery.chain(tasks).apply_async(
                 link_error=taskqueue.tasks.error_handler.s())
         else:
             response.status_code = 404
@@ -214,7 +216,7 @@ class LavaCallbackHandler(CallbackHandler):
                     self.json_obj, self.job_meta, lab_name),
                 taskqueue.tasks.boot.find_regression.s(),
             ]
-            chain(tasks).apply_async(
+            celery.chain(tasks).apply_async(
                 link_error=taskqueue.tasks.error_handler.s())
 
         return response
