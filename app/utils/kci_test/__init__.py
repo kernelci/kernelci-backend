@@ -302,7 +302,7 @@ def _parse_test_case_from_json(group_name, group_doc_id, test_case,
     """
     try:
         _check_for_null(test_case, NON_NULL_KEYS_CASE)
-    except TestValidationError, ex:
+    except TestValidationError as ex:
         utils.LOG.exception(ex)
         ERR_ADD(errors, 400, str(ex))
         return None
@@ -310,7 +310,7 @@ def _parse_test_case_from_json(group_name, group_doc_id, test_case,
     try:
         name = test_case[models.NAME_KEY]
         status = test_case[models.STATUS_KEY].upper()
-    except KeyError, ex:
+    except KeyError as ex:
         err_msg = "Missing mandatory key in test case data"
         utils.LOG.exception(ex)
         utils.LOG.error(err_msg)
@@ -502,7 +502,7 @@ def _parse_test_group_from_json(test_json, database, errors):
 
     try:
         _check_for_null(test_json, NON_NULL_KEYS_GROUP)
-    except TestValidationError, ex:
+    except TestValidationError as ex:
         utils.LOG.exception(ex)
         ERR_ADD(errors, 400, str(ex))
         return None
@@ -510,7 +510,7 @@ def _parse_test_group_from_json(test_json, database, errors):
     try:
         name = test_json[models.NAME_KEY]
         lab_name = test_json[models.LAB_NAME_KEY]
-    except KeyError, ex:
+    except KeyError as ex:
         err_msg = "Missing mandatory key in test group data"
         utils.LOG.exception(ex)
         utils.LOG.error(err_msg)
@@ -669,7 +669,7 @@ def import_and_save_kci_tests(group, db_options, base_path=utils.BASE_PATH):
             ret_code = 201
             # TODO fix this: need to define a save_to_disk method
             # save_to_disk(ts_doc, test_group_obj, base_path, errors)
-    except pymongo.errors.ConnectionFailure, ex:
+    except pymongo.errors.ConnectionFailure as ex:
         utils.LOG.exception(ex)
         utils.LOG.error("Error getting database connection")
         ERR_ADD(errors, 500, "Error connecting to the database")

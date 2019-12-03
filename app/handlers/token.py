@@ -143,7 +143,7 @@ class TokenHandler(hbase.BaseHandler):
                         response = hresponse.HandlerResponse(400)
                         response.reason = "Provided JSON is not valid"
                         response.errors = errors
-                except ValueError, ex:
+                except ValueError as ex:
                     self.log.exception(ex)
                     error = "No JSON data found in the PUT request"
                     self.log.error(error)
@@ -190,7 +190,7 @@ class TokenHandler(hbase.BaseHandler):
         except (TypeError, ValueError):
             response.status_code = 400
             response.reason = "Wrong field value or type in the JSON data"
-        except Exception, ex:
+        except Exception as ex:
             response.status_code = 400
             response.reason = str(ex)
 
@@ -224,20 +224,20 @@ class TokenHandler(hbase.BaseHandler):
                     response.result = {models.TOKEN_KEY: token.token}
             else:
                 response.status_code = 404
-        except bson.errors.InvalidId, ex:
+        except bson.errors.InvalidId as ex:
             self.log.exception(ex)
             self.log.error("Wrong ID '%s' value passed for object ID", doc_id)
             response.status_code = 400
             response.reason = "Wrong ID value provided"
-        except KeyError, ex:
+        except KeyError as ex:
             self.log.exception(ex)
             response.status_code = 400
             response.reason = "Mandatory field missing"
-        except (TypeError, ValueError), ex:
+        except (TypeError, ValueError) as ex:
             self.log.exception(ex)
             response.status_code = 400
             response.reason = "Wrong field value or type in the JSON data"
-        except Exception, ex:
+        except Exception as ex:
             self.log.exception(ex)
             response.status_code = 400
             response.reason = str(ex)
@@ -344,7 +344,7 @@ class TokenHandler(hbase.BaseHandler):
             else:
                 response.status_code = 404
                 response.reason = "Resource '%s' not found" % doc_id
-        except bson.errors.InvalidId, ex:
+        except bson.errors.InvalidId as ex:
             error = "Wrong ID value '%s' passed" % doc_id
             self.log.exception(ex)
             self.log.error(error)

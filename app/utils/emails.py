@@ -229,20 +229,22 @@ def send_email(subject, txt_body, html_body, email_opts, config, headers=None):
 
             server.sendmail(from_addr, send_to, email_msg)
             status = models.SENT_STATUS
-        except (smtplib.SMTPAuthenticationError, smtplib.SMTPConnectError), ex:
+        except (smtplib.SMTPAuthenticationError,
+                smtplib.SMTPConnectError) as ex:
             utils.LOG.error("SMTP conn/auth error")
             errors.append((ex.smtp_code, ex.smtp_error))
-        except (smtplib.SMTPRecipientsRefused, smtplib.SMTPSenderRefused), ex:
+        except (smtplib.SMTPRecipientsRefused,
+                smtplib.SMTPSenderRefused) as ex:
             utils.LOG.error(
                 "Error sending email: recipients or sender refused")
             errors.append((ex.smtp_code, ex.smtp_error))
-        except (smtplib.SMTPHeloError, smtplib.SMTPDataError), ex:
+        except (smtplib.SMTPHeloError, smtplib.SMTPDataError) as ex:
             utils.LOG.error("SMTP server error")
             errors.append((ex.smtp_code, ex.smtp_error))
-        except smtplib.SMTPException, ex:
+        except smtplib.SMTPException as ex:
             utils.LOG.error("Generic SMTP error: no auth method, ...")
             errors.append((ex.smtp_code, ex.smtp_error))
-        except Exception, ex:
+        except Exception as ex:
             utils.LOG.exception(ex)
             utils.LOG.error(
                 "Unexpected SMTP error: %s", str(ex))

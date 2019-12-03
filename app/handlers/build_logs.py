@@ -73,7 +73,7 @@ class BuildLogsHandler(hbase.BaseHandler):
             else:
                 response.status_code = 404
                 response.reason = "Resource '%s' not found" % doc_id
-        except bson.errors.InvalidId, ex:
+        except bson.errors.InvalidId as ex:
             self.log.exception(ex)
             self.log.error("Provided doc ID '%s' is not valid", doc_id)
             response.status_code = 400

@@ -434,7 +434,7 @@ def check_expires_date(value):
     try:
         if value:
             value = datetime.datetime.strptime(value, "%Y-%m-%d")
-    except ValueError, ex:
+    except ValueError as ex:
         raise ex
     else:
         return value

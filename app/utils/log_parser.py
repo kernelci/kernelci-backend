@@ -543,7 +543,7 @@ def _parse_log(build_doc, log_file, build_dir, errors):
                 if re.search(MISMATCH_PATTERN, line):
                     line = line.strip()
                     mismatch_append(_clean_path(line))
-    except IOError, ex:
+    except IOError as ex:
         err_msg = "Cannot read build log file {}".format(log_file)
         utils.LOG.exception(ex)
         utils.LOG.error(err_msg)
@@ -555,7 +555,7 @@ def _parse_log(build_doc, log_file, build_dir, errors):
         _save_lines(error_lines, errors_file)
         _save_lines(warning_lines, warnings_file)
         _save_lines(mismatch_lines, mismatches_file)
-    except IOError, ex:
+    except IOError as ex:
         err_msg = "Error writing errors/warnings file for {}-{}-{}-{}".format(
             build_doc.job,
             build_doc.git_branch, build_doc.kernel, build_doc.defconfig_full

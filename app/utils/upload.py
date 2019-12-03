@@ -74,7 +74,7 @@ def check_or_create_upload_dir(path, base_path=utils.BASE_PATH):
     else:
         try:
             os.makedirs(real_path, mode=0775)
-        except OSError, ex:
+        except OSError as ex:
             # errno.EEXIST (17) means the directory already exists, so do not
             # treat it as an error.
             if ex.errno != errno.EEXIST:
@@ -145,7 +145,7 @@ def create_or_update_file(path,
             w_stream = io.open(real_path, mode="bw")
             ret_dict["bytes"] = w_stream.write(content)
             w_stream.flush()
-        except IOError, ex:
+        except IOError as ex:
             utils.LOG.exception(ex)
             utils.LOG.error("Unable to open file '%s'", file_path)
             ret_dict["status"] = 500

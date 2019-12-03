@@ -59,7 +59,7 @@ class BootRegressionsHandler(hbase.BaseHandler):
 
         try:
             obj_id = bson.objectid.ObjectId(doc_id)
-        except bson.errors.InvalidId, ex:
+        except bson.errors.InvalidId as ex:
             self.log.exception(ex)
             self.log.error("Provided doc ID '%s' is not valid", doc_id)
             response = hresponse.HandlerResponse()

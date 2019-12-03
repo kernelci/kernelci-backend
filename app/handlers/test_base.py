@@ -83,7 +83,7 @@ class TestBaseHandler(hbase.BaseHandler):
                                     j_reason)
                             else:
                                 response.reason = "Provided JSON is not valid"
-                    except ValueError, ex:
+                    except ValueError as ex:
                         self.log.exception(ex)
                         error = "No JSON data found in the PUT request"
                         self.log.error(error)
@@ -131,7 +131,7 @@ class TestBaseHandler(hbase.BaseHandler):
                 error = "Test group with ID '%s' not found" % test_group_id
             else:
                 group_name = test_group[models.NAME_KEY]
-        except bson.errors.InvalidId, ex:
+        except bson.errors.InvalidId as ex:
             error = "Test group ID '%s' is not valid" % test_group_id
             self.log.exception(ex)
             self.log.error(error)

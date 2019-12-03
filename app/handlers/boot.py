@@ -144,7 +144,7 @@ class BootHandler(hbase.BaseHandler):
                     else:
                         response = hresponse.HandlerResponse(404)
                         response.reason = "Resource '%s' not found" % doc_id
-                except bson.errors.InvalidId, ex:
+                except bson.errors.InvalidId as ex:
                     self.log.exception(ex)
                     self.log.error(
                         "Wrong ID '%s' value passed as object ID", doc_id)

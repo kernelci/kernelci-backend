@@ -121,7 +121,7 @@ class JobHandler(hbase.BaseHandler):
             else:
                 response.status_code = 404
                 response.reason = self._get_status_message(404)
-        except bson.errors.InvalidId, ex:
+        except bson.errors.InvalidId as ex:
             self.log.exception(ex)
             self.log.error("Invalid ID specified: %s", job_id)
             response.status_code = 400

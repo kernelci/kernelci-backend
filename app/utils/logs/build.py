@@ -64,7 +64,7 @@ def create_build_logs_summary(job, kernel, git_branch, db_options):
                     for line in itertools.chain(errors, warnings, mismatches):
                         to_write.write(
                             u"{:>4d} {:s}\n".format(line[0], line[1]))
-            except IOError, ex:
+            except IOError as ex:
                 ret_val = 500
                 error = (
                     "Error writing logs summary for {}-{}-{}: {}".format(

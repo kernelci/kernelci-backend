@@ -165,7 +165,7 @@ def save_to_disk(boot_doc, json_obj, base_path, errors):
         if not os.path.isdir(dir_path):
             try:
                 os.makedirs(dir_path)
-            except OSError, ex:
+            except OSError as ex:
                 if ex.errno != errno.EEXIST:
                     raise ex
 
@@ -177,7 +177,7 @@ def save_to_disk(boot_doc, json_obj, base_path, errors):
                     encoding="utf-8"
                 )
             )
-    except (OSError, IOError), ex:
+    except (OSError, IOError) as ex:
         err_msg = "Error saving boot report to '{}'".format(file_path)
         utils.LOG.exception(ex)
         utils.LOG.error(err_msg)
@@ -414,7 +414,7 @@ def _parse_boot_from_json(boot_json, database, errors):
 
     try:
         _check_for_null(boot_json)
-    except BootValidationError, ex:
+    except BootValidationError as ex:
         utils.LOG.exception(ex)
         ERR_ADD(errors, 400, str(ex))
         return None
@@ -427,7 +427,7 @@ def _parse_boot_from_json(boot_json, database, errors):
         lab_name = boot_json[models.LAB_NAME_KEY]
         git_branch = boot_json[models.GIT_BRANCH_KEY]
         build_environment = boot_json[models.BUILD_ENVIRONMENT_KEY]
-    except KeyError, ex:
+    except KeyError as ex:
         err_msg = "Missing mandatory key in boot data"
         utils.LOG.exception(ex)
         utils.LOG.error(err_msg)
@@ -474,7 +474,7 @@ def import_and_save_boot(json_obj, db_options, base_path=utils.BASE_PATH):
             save_to_disk(doc, json_obj, base_path, errors)
         else:
             utils.LOG.warn("No boot report imported nor saved")
-    except pymongo.errors.ConnectionFailure, ex:
+    except pymongo.errors.ConnectionFailure as ex:
         utils.LOG.exception(ex)
         utils.LOG.error("Error getting database connection")
         ERR_ADD(errors, 500, "Error connecting to the database")

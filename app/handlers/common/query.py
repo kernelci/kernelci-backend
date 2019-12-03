@@ -131,7 +131,7 @@ def _parse_and_add_gte_lt_value(
         if val_type and val_type == "int":
             try:
                 value = int(value)
-            except ValueError, ex:
+            except ValueError as ex:
                 utils.LOG.error(
                     "Error converting value to %s: %s",
                     val_type, value)
@@ -141,7 +141,7 @@ def _parse_and_add_gte_lt_value(
         if field is not None and _valid_value(value):
             _add_gte_lt_value(
                 field, value, operator, spec, spec_get_func)
-    except ValueError, ex:
+    except ValueError as ex:
         error_msg = (
             "Wrong value specified for '%s' query argument: %s" %
             (operator, arg)
@@ -256,7 +256,7 @@ def get_query_spec(query_args_func, valid_keys):
                     if val_type and val_type == "int":
                         try:
                             val = int(val[0])
-                        except ValueError, ex:
+                        except ValueError as ex:
                             utils.LOG.error(
                                 "Error converting value to %s: %s",
                                 val_type, val[0])
@@ -269,7 +269,7 @@ def get_query_spec(query_args_func, valid_keys):
                     if val_type and val_type == "int":
                         try:
                             val = {"$in": [int(v) for v in val]}
-                        except ValueError, ex:
+                        except ValueError as ex:
                             utils.LOG.error(
                                 "Error converting list of values to %s: %s",
                                 val_type, val)

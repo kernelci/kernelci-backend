@@ -282,7 +282,7 @@ def save(database, document):
                 result = collection.insert_one(doc_data)
                 doc_id = result.inserted_id
             ret_value = 201
-        except pymongo.errors.OperationFailure, ex:
+        except pymongo.errors.OperationFailure as ex:
             utils.LOG.error("Error saving document into {}".format(collection))
             utils.LOG.exception(ex)
     else:
@@ -416,7 +416,7 @@ def update(collection, spec, document, operation="$set"):
 
     try:
         collection.find_one_and_update(spec, {operation: document})
-    except pymongo.errors.OperationFailure, ex:
+    except pymongo.errors.OperationFailure as ex:
         utils.LOG.exception(str(ex))
         ret_val = 500
 
@@ -439,7 +439,7 @@ def update2(connection, collection, search, document):
     ret_val = 200
     try:
         connection[collection].find_one_and_replace(search, document)
-    except pymongo.errors.OperationFailure, ex:
+    except pymongo.errors.OperationFailure as ex:
         utils.LOG.exception(str(ex))
         ret_val = 500
 
@@ -464,7 +464,7 @@ def update3(collection, search, document, db_options=None):
     db = get_db_connection2(db_options)
     try:
         db[collection].find_one_and_replace(search, document)
-    except pymongo.errors.OperationFailure, ex:
+    except pymongo.errors.OperationFailure as ex:
         utils.LOG.exception(str(ex))
         ret_val = 500
 
@@ -494,7 +494,7 @@ def find_and_update(collection, query, document, operation="$set"):
         if not result:
             utils.LOG.error("Document with query '%s' not found", query)
             ret_val = 404
-    except pymongo.errors.OperationFailure, ex:
+    except pymongo.errors.OperationFailure as ex:
         ret_val = 500
         utils.LOG.error(
             "Error searching and updating the document with query: %s", query)
@@ -517,7 +517,7 @@ def delete(collection, spec_or_id):
 
     try:
         collection.remove(spec_or_id)
-    except pymongo.errors.OperationFailure, ex:
+    except pymongo.errors.OperationFailure as ex:
         utils.LOG.error(
             "Error removing the following document: %s", str(spec_or_id))
         utils.LOG.exception(str(ex))

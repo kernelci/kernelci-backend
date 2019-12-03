@@ -269,7 +269,7 @@ class BaseHandler(tornado.web.RequestHandler):
                         response = hresponse.HandlerResponse(400)
                         response.reason = "Provided JSON is not valid"
                         response.errors = errors
-                except ValueError, ex:
+                except ValueError as ex:
                     self.log.exception(ex)
                     error = "No JSON data found in the POST request"
                     self.log.error(error)
@@ -402,7 +402,7 @@ class BaseHandler(tornado.web.RequestHandler):
             else:
                 response.status_code = 404
                 response.reason = "Resource '%s' not found" % doc_id
-        except bson.errors.InvalidId, ex:
+        except bson.errors.InvalidId as ex:
             self.log.exception(ex)
             self.log.error("Provided doc ID '%s' is not valid", doc_id)
             response.status_code = 400

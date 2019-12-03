@@ -107,7 +107,7 @@ class UploadHandler(hbase.BaseHandler):
                             job, branch, kernel, arch, defconfig_full)
                         if lab is not None:
                             path = os.path.join(path, lab)
-                    except tornado.web.MissingArgumentError, ex:
+                    except tornado.web.MissingArgumentError as ex:
                         self.log.exception(ex)
                         response = hresponse.HandlerResponse(
                             ex.status_code)

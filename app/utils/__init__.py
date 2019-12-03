@@ -96,7 +96,7 @@ def update_id_fields(spec):
         for key in common_keys:
             try:
                 spec[key] = bson.objectid.ObjectId(spec[key])
-            except bson.errors.InvalidId, ex:
+            except bson.errors.InvalidId as ex:
                 # We remove the key since it won't serve anything good.
                 utils.LOG.error(
                     "Wrong ID value for key '%s', got '%s': ignoring",

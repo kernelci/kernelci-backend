@@ -105,7 +105,7 @@ class BisectHandler(hbase.BaseHandler):
                     else:
                         response = hresponse.HandlerResponse(404)
                         response.reason = "Resource not found"
-                except bson.errors.InvalidId, ex:
+                except bson.errors.InvalidId as ex:
                     self.log.exception(ex)
                     self.log.error(
                         "Wrong ID '%s' value passed as object ID", doc_id)
@@ -224,7 +224,7 @@ class BisectHandler(hbase.BaseHandler):
                         "compare_to": s_get(models.COMPARE_TO_KEY, None)}
                     response = bisect_func(
                         doc_id, self.settings["dboptions"], **kwargs)
-            except bson.errors.InvalidId, ex:
+            except bson.errors.InvalidId as ex:
                 self.log.exception(ex)
                 self.log.error(
                     "Wrong ID '%s' value passed as object ID", doc_id)

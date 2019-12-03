@@ -371,7 +371,7 @@ def import_test_case(
                         doc_id, group_oid, group_name, database)
             else:
                 ADD_ERR(errors, 400, "Missing mandatory key in JSON data")
-        except ValueError, ex:
+        except ValueError as ex:
             ADD_ERR(errors, 400, "Error parsing test case '%s'" % test_name)
             error = (
                 "Error parsing test case '{}': {}".format(test_name, ex))

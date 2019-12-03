@@ -296,7 +296,7 @@ def parse_build_data(build_data, job, kernel, build_dir):
             models.MODULES_SIZE_KEY: build_doc.modules,
             models.SYSTEM_MAP_SIZE_KEY: build_doc.system_map,
         }
-    except KeyError, ex:
+    except KeyError as ex:
         msg = "Missing mandatory key '%s' in build data (job: %s, kernel: %s)"
         raise BuildError(500, msg % (ex.args[0], job, kernel), from_exc=ex)
 
@@ -330,17 +330,17 @@ def _traverse_build_dir(build_dir, job_doc, errors, database):
                 utils.LOG.error(err_msg)
                 ERR_ADD(errors, 500, err_msg)
                 return
-        except OSError, ex:
+        except OSError as ex:
             err_msg = "Error retrieving build data file size"
             utils.LOG.error(err_msg)
             utils.LOG.exception(ex)
             ERR_ADD(errors, 500, err_msg)
-        except IOError, ex:
+        except IOError as ex:
             err_msg = "Error reading json data file from {}".format(build_dir)
             utils.LOG.exception(ex)
             utils.LOG.error(err_msg)
             ERR_ADD(errors, 500, err_msg)
-        except json.JSONDecodeError, ex:
+        except json.JSONDecodeError as ex:
             err_msg = "Error loading json data from {}".format(build_dir)
             utils.LOG.exception(ex)
             utils.LOG.error(err_msg)
@@ -565,7 +565,7 @@ def import_single_build(json_obj, db_options, base_path=utils.BASE_PATH):
                         ret_val, err_msg % (
                             job, git_branch, kernel, arch, defconfig,
                             build_environment))
-            except pymongo.errors.ConnectionFailure, ex:
+            except pymongo.errors.ConnectionFailure as ex:
                 utils.LOG.exception(ex)
                 utils.LOG.error("Error getting database connection")
                 utils.LOG.warn(
