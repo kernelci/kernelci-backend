@@ -168,7 +168,7 @@ class LavaCallbackHandler(CallbackHandler):
             json_obj, **kwargs)
         if not valid:
             return valid, errors
-        definition = yaml.load(json_obj["definition"], Loader=yaml.CLoader)
+        definition = yaml.safe_load(json_obj["definition"])
         job_meta = definition.get("metadata")
         if not job_meta:
             return False, "metadata missing from LAVA job definition"
