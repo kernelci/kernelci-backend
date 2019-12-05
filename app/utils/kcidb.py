@@ -154,6 +154,9 @@ def push_tests(group_id, bq_options, db_options={}, db=None):
     ns = bq_options.get("namespace", "kernelci.org")
     test_cases = _get_test_cases(group, db, [], ns)
     build = _get_build_doc(group, db)
+    if not build:
+        utils.LOG.warn("kcidb: Missing build, unable to push tests.")
+        return
     build_id = _make_id(build[models.ID_KEY], ns)
     env_description = "{} in {}".format(
         group[models.DEVICE_TYPE_KEY],
