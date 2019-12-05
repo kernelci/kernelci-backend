@@ -179,6 +179,20 @@ def push_tests(group_id, bq_options, db_options={}, db=None):
         'instance': group[models.BOARD_INSTANCE_KEY],
     }
 
+    files = {
+        'txt': group[models.BOOT_LOG_KEY],
+        'html': group[models.BOOT_LOG_HTML_KEY],
+        'lava_json': 'lava-{}.json'.format(group[models.DEVICE_TYPE_KEY]),
+    }
+
+    output_files = []
+    for name, file in files.iteritems():
+        url = "/".join([
+            STORAGE_URL,
+            build[models.FILE_SERVER_RESOURCE_KEY],
+            file])
+        output_files.append({"name": name, "url": url})
+
     bq_data = {
         'version': '1',
         "tests": [
@@ -195,6 +209,7 @@ def push_tests(group_id, bq_options, db_options={}, db=None):
                 'description': test_description,
                 'status': test['status'],
                 'start_time': test['start_time'],
+                'output_files': output_files,
                 'misc': misc,
             }
             for test in test_cases
