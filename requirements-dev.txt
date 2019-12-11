@@ -1,5 +1,5 @@
 -r requirements.txt
 lupa
 mock>0.7.2
-mongomock==2.0.0
+mongomock==3.18.0
 fakeredis

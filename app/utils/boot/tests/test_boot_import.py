@@ -43,7 +43,8 @@ class TestParseBoot(unittest.TestCase):
 
     def setUp(self):
         logging.disable(logging.CRITICAL)
-        self.db = mongomock.Database(mongomock.Connection(), "kernel-ci")
+        self.db = mongomock.Database(mongomock.MongoClient(),
+                                     "kernel-ci", None)
         self.base_path = tempfile.gettempdir()
 
         self.boot_report = dict(

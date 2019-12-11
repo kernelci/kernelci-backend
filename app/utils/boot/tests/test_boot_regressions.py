@@ -32,7 +32,8 @@ class TestBootRegressions(unittest.TestCase):
 
     def setUp(self):
         logging.disable(logging.CRITICAL)
-        self.db = mongomock.Database(mongomock.Connection(), "kernel-ci")
+        self.db = mongomock.Database(mongomock.MongoClient(),
+                                     "kernel-ci", None)
 
         self.boot_id = "".join(
             [random.choice(string.digits) for x in xrange(24)])

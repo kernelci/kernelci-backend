@@ -28,7 +28,8 @@ class TestDailyStats(unittest.TestCase):
 
     def setUp(self):
         logging.disable(logging.CRITICAL)
-        self.db = mongomock.Database(mongomock.Connection(), "kernel-ci")
+        self.db = mongomock.Database(mongomock.MongoClient(),
+                                     "kernel-ci", None)
         self.today = datetime.datetime(
             2015, 8, 10, hour=0, minute=1, second=0, microsecond=0)
 

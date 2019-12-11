@@ -28,7 +28,8 @@ class TestBootCompare(unittest.TestCase):
 
     def setUp(self):
         logging.disable(logging.CRITICAL)
-        self.db = mongomock.Database(mongomock.Connection(), "kernel-ci")
+        self.db = mongomock.Database(mongomock.MongoClient(),
+                                     "kernel-ci", None)
 
         patcher = mock.patch("utils.db.get_db_connection")
         mock_db = patcher.start()

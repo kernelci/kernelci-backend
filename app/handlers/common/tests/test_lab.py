@@ -33,7 +33,7 @@ class TestLabCommon(unittest.TestCase):
     def setUp(self):
         super(TestLabCommon, self).setUp()
         logging.disable(logging.CRITICAL)
-        self.database = mongomock.Connection()["kernel-ci"]
+        self.database = mongomock.MongoClient()["kernel-ci"]
         self.doc_id = "".join(
             [random.choice(string.digits) for x in xrange(24)])
         self.valid_keys = [

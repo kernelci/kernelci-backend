@@ -29,7 +29,8 @@ class TestTests(unittest.TestCase):
 
     def setUp(self):
         logging.disable(logging.CRITICAL)
-        self._db = mongomock.Database(mongomock.Connection(), "kernel-ci")
+        self._db = mongomock.Database(mongomock.MongoClient(),
+                                      "kernel-ci", None)
 
     def tearDown(self):
         logging.disable(logging.NOTSET)

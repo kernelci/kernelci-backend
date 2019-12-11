@@ -33,7 +33,8 @@ import utils.log_parser as lparser
 class TestBuildLogParser(unittest.TestCase):
 
     def setUp(self):
-        self.db = mongomock.Database(mongomock.Connection(), "kernel-ci")
+        self.db = mongomock.Database(mongomock.MongoClient(),
+                                     "kernel-ci", None)
         logging.disable(logging.CRITICAL)
 
     def tearDown(self):
