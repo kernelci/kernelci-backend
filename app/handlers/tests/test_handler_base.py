@@ -40,7 +40,7 @@ class TestHandlerBase(AsyncHTTPTestCase, LogTrapTestCase):
         # Default Content-Type header returned by Tornado.
         self.content_type = "application/json; charset=UTF-8"
         self.req_token = mtoken.Token()
-        self.database = mongomock.Connection()["kernel-ci"]
+        self.database = mongomock.MongoClient()["kernel-ci"]
         self.redisdb = fakeredis.FakeStrictRedis()
         self.dboptions = {
             "mongodb_password": "",
