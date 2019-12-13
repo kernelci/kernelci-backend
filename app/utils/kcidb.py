@@ -190,6 +190,7 @@ def push_tests(group_id, bq_options, db_options={}, db=None):
         url = "/".join([
             STORAGE_URL,
             build[models.FILE_SERVER_RESOURCE_KEY],
+            group[models.LAB_NAME_KEY],
             file])
         output_files.append({"name": name, "url": url})
 
