@@ -15,7 +15,10 @@ script:
   - >
     for dir in
     models/tests
+    utils/tests
+    utils/build/tests
     utils/bisect/tests
+    handlers/common/tests
     utils/report/tests;
     do
       echo Running tests in $dir
