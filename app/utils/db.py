@@ -253,7 +253,7 @@ def count(collection):
     :param collection: The collection whose documents should be counted.
     :return The number of documents in the collection.
     """
-    return collection.count_documents()
+    return collection.count_documents({})
 
 
 def save(database, document):
