@@ -173,7 +173,7 @@ class TestBootRegressions(unittest.TestCase):
         self.assertTupleEqual((None, None), results)
 
     @mock.patch("utils.db.find_one3")
-    @mock.patch("utils.db.get_db_connection")
+    @mock.patch("utils.db.get_db_connection2")
     def test_find_not_fail(self, mock_db, mock_find):
         mock_find.return_value = {"status": "PASS"}
 
@@ -181,7 +181,7 @@ class TestBootRegressions(unittest.TestCase):
         self.assertTupleEqual((None, None), results)
 
     @mock.patch("utils.db.find_one3")
-    @mock.patch("utils.db.get_db_connection")
+    @mock.patch("utils.db.get_db_connection2")
     def test_find_no_old_doc(self, mock_db, mock_find):
         mock_find.side_effects = [self.fail_boot, None]
 
