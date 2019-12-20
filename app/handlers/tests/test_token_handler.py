@@ -418,7 +418,7 @@ class TestTokenHandler(TestHandlerBase):
     def test_delete_with_token_with_document(self, mock_id):
         mock_id.return_value = "token"
 
-        self.database["api-token"].insert(
+        self.database["api-token"].insert_one(
             dict(_id="token", token="token", email="email"))
 
         headers = {"Authorization": "foo"}
@@ -435,7 +435,7 @@ class TestTokenHandler(TestHandlerBase):
         self.assertEqual(response.code, 404)
 
     def test_delete_wrong_id_value(self):
-        self.database["api-token"].insert(
+        self.database["api-token"].insert_one(
             dict(_id="token", token="token", email="email"))
 
         headers = {"Authorization": "foo"}
