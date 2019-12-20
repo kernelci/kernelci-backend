@@ -152,7 +152,7 @@ class TestBuildHandler(TestHandlerBase):
             response.headers["Content-Type"], self.content_type)
 
     def test_delete(self):
-        self.database["build"].insert(dict(_id=self.doc_id, job_id="job"))
+        self.database["build"].insert_one(dict(_id=self.doc_id, job_id="job"))
 
         headers = {"Authorization": "foo"}
 

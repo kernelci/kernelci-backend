@@ -232,7 +232,7 @@ class TestCompareHandler(TestHandlerBase):
     @mock.patch("bson.objectid.ObjectId")
     def test_delete_with_token_with_job(self, mock_id):
         mock_id.return_value = "job"
-        self.database["job"].insert(
+        self.database["job"].insert_one(
             dict(_id="job", job="job", kernel="kernel"))
         headers = {"Authorization": "foo"}
 
