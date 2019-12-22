@@ -19,6 +19,7 @@ script:
     utils/build/tests
     utils/bisect/tests
     handlers/common/tests
+    handlers/tests
     utils/report/tests;
     do
       echo Running tests in $dir
