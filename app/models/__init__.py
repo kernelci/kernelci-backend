@@ -299,9 +299,6 @@ BISECT_REPORT = "bisect"
 TEST_REPORT = "test"
 
 # Bisect values.
-BISECT_BOOT_STATUS_KEY = "boot_status"
-BISECT_BOOT_CREATED_KEY = "boot_created_on"
-BISECT_BOOT_METADATA_KEY = "boot_metadata"
 BISECT_DEFCONFIG_STATUS_KEY = "build_status"
 BISECT_DEFCONFIG_CREATED_KEY = "build_created_on"
 BISECT_DEFCONFIG_METADATA_KEY = "build_metadata"
@@ -370,8 +367,7 @@ VALID_TEST_CASE_STATUS = [
 
 # The valid collections for the bisect handler.
 BISECT_VALID_COLLECTIONS = [
-    BOOT_COLLECTION,
-    BUILD_COLLECTION
+    BUILD_COLLECTION,
 ]
 
 VALID_EMAIL_FORMATS = [

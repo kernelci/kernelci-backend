@@ -21,7 +21,6 @@
 """All bisect related celery tasks."""
 
 import taskqueue.celery as taskc
-import utils.bisect.boot as bootb
 import utils.bisect.defconfig as defconfigb
 import utils.bisect.test
 
@@ -45,52 +44,6 @@ def update_test_bisect(data):
     :return Status code with result of the operation.
     """
     return utils.bisect.test.update_results(data, taskc.app.conf.db_options)
-
-
-@taskc.app.task(name="import-boot-bisect")
-def import_boot_bisect(data):
-    """Just a wrapper around the real boot bisect import function.
-
-    :param data: Bisection results from the JSON data.
-    :type data: dictionary
-    :return Status code with result of the operation.
-    """
-    return bootb.update_results(data, taskc.app.conf.db_options)
-
-
-@taskc.app.task(name="boot-bisect", ignore_result=False)
-def boot_bisect(doc_id, db_options, fields=None):
-    """Run a boot bisect operation on the passed boot document id.
-
-    :param doc_id: The boot document ID.
-    :type doc_id: string
-    :param db_options: The database connection parameters.
-    :type db_options: dictionary
-    :param fields: A `fields` data structure with the fields to return or
-    exclude. Default to None.
-    :type fields: list or dictionary
-    :return The result of the boot bisect operation.
-    """
-    return bootb.execute_boot_bisection(doc_id, db_options, fields=fields)
-
-
-@taskc.app.task(name="boot-bisect-compare-to", ignore_result=False)
-def boot_bisect_compared_to(doc_id, compare_to, db_options, fields=None):
-    """Run a boot bisect operation compared to the provided tree name.
-
-    :param doc_id: The boot document ID.
-    :type doc_id: string
-    :param compare_to: The name of the tree to compare to.
-    :type compare_to: string
-    :param db_options: The database connection parameters.
-    :type db_options: dictionary
-    :param fields: A `fields` data structure with the fields to return or
-    exclude. Default to None.
-    :type fields: list or dictionary
-    :return The result of the boot bisect operation.
-    """
-    return bootb.execute_boot_bisection_compared_to(
-        doc_id, compare_to, db_options, fields=fields)
 
 
 @taskc.app.task(name="build-bisect", ignore_result=False)
