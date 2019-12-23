@@ -29,7 +29,7 @@ class BisectDocument(modb.BaseDocument):
 
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=invalid-name
-    def __init__(self, name):
+    def __init__(self):
         self._created_on = None
         self._id = None
         self._version = None
@@ -160,8 +160,8 @@ class BisectDocument(modb.BaseDocument):
 class BootBisectDocument(BisectDocument):
     """The bisect document class for boot bisection."""
 
-    def __init__(self, name):
-        super(BootBisectDocument, self).__init__(name)
+    def __init__(self):
+        super(BootBisectDocument, self).__init__()
         self.lab_name = None
         self.device_type = None
         self.board = None
@@ -182,6 +182,6 @@ class BootBisectDocument(BisectDocument):
 class DefconfigBisectDocument(BisectDocument):
     """The bisect document class for build bisection."""
 
-    def __init__(self, name):
-        super(DefconfigBisectDocument, self).__init__(name)
+    def __init__(self):
+        super(DefconfigBisectDocument, self).__init__()
         self.type = "build"

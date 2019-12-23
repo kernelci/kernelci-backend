@@ -61,7 +61,7 @@ class BisectUtilsTest(unittest.TestCase):
         self.assertListEqual(doc_list[:3], retrieved_list)
 
     def test_update_doc_fields_list(self):
-        bisect_doc = mbisect.BisectDocument("foo")
+        bisect_doc = mbisect.BisectDocument()
         bisect_doc.id = "bar"
         fields = ["bisect_data", "good_commit", "foo", "bar"]
 
@@ -75,7 +75,7 @@ class BisectUtilsTest(unittest.TestCase):
             expected, bcommon.update_doc_fields(bisect_doc, fields))
 
     def test_update_doc_fields_dict(self):
-        bisect_doc = mbisect.BisectDocument("foo")
+        bisect_doc = mbisect.BisectDocument()
         bisect_doc.id = "bar"
         fields = {
             "bisect_data": True,
@@ -95,7 +95,7 @@ class BisectUtilsTest(unittest.TestCase):
             expected, bcommon.update_doc_fields(bisect_doc, fields))
 
     def test_update_doc_fields_no_fields(self):
-        bisect_doc = mbisect.BisectDocument("foo")
+        bisect_doc = mbisect.BisectDocument()
         bisect_doc.id = "bar"
 
         self.assertDictEqual(
@@ -103,7 +103,7 @@ class BisectUtilsTest(unittest.TestCase):
         )
 
     def test_update_doc_fields_no_fields_type(self):
-        bisect_doc = mbisect.BisectDocument("foo")
+        bisect_doc = mbisect.BisectDocument()
         bisect_doc.id = "bar"
 
         self.assertDictEqual(
