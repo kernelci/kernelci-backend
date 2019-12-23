@@ -331,7 +331,7 @@ def create_boot_bisect(good, bad, db_options):
     if doc:
         return doc
     bad_boot_id = bson.objectid.ObjectId(bad["_id"])
-    doc = mbisect.BootBisectDocument(bad_boot_id)
+    doc = mbisect.BootBisectDocument()
     doc.boot_id = bad_boot_id
     doc.version = "1.0"
     doc.job = bad[models.JOB_KEY]

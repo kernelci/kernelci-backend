@@ -89,7 +89,7 @@ def execute_build_bisection(doc_id, db_options, fields=None):
             code = 400
             result = None
         else:
-            bisect_doc = mbisect.DefconfigBisectDocument(obj_id)
+            bisect_doc = mbisect.DefconfigBisectDocument()
             bisect_doc.version = "1.0"
             bisect_doc.arch = start_doc_get(models.ARCHITECTURE_KEY, None)
             bisect_doc.job = start_doc_get(models.JOB_KEY, None)
@@ -268,7 +268,7 @@ def execute_build_bisection_compared_to(
             arch = start_doc_get(models.ARCHITECTURE_KEY)
             branch = start_doc_get(models.GIT_BRANCH_KEY)
 
-            bisect_doc = mbisect.DefconfigBisectDocument(obj_id)
+            bisect_doc = mbisect.DefconfigBisectDocument()
             bisect_doc.compare_to = compare_to
             bisect_doc.version = "1.0"
             bisect_doc.defconfig = defconfig

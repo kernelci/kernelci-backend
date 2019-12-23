@@ -27,24 +27,24 @@ import models.bisect as modbs
 class TestBisectModel(unittest.TestCase):
 
     def test_bisect_base_document(self):
-        bisect_doc = modbs.BisectDocument("foo")
+        bisect_doc = modbs.BisectDocument()
         self.assertIsInstance(bisect_doc, modb.BaseDocument)
 
     def test_boot_bisect_document(self):
-        bisect_doc = modbs.BootBisectDocument("bar")
+        bisect_doc = modbs.BootBisectDocument()
         self.assertIsInstance(bisect_doc, modbs.BisectDocument)
         self.assertIsInstance(bisect_doc, modb.BaseDocument)
 
     def test_bisect_base_document_collection(self):
-        bisect_doc = modbs.BisectDocument("foo")
+        bisect_doc = modbs.BisectDocument()
         self.assertEqual(bisect_doc.collection, "bisect")
 
     def test_bisect_boot_document_collection(self):
-        bisect_doc = modbs.BootBisectDocument("foo")
+        bisect_doc = modbs.BootBisectDocument()
         self.assertEqual(bisect_doc.collection, "bisect")
 
     def test_bisect_base_from_json(self):
-        bisect_doc = modbs.BisectDocument("foo")
+        bisect_doc = modbs.BisectDocument()
 
         self.assertIsNone(bisect_doc.from_json({}))
         self.assertIsNone(bisect_doc.from_json([]))
@@ -52,7 +52,7 @@ class TestBisectModel(unittest.TestCase):
         self.assertIsNone(bisect_doc.from_json(""))
 
     def test_bisect_base_to_dict(self):
-        bisect_doc = modbs.BisectDocument("foo")
+        bisect_doc = modbs.BisectDocument()
 
         expected = {
             "created_on": None,
@@ -89,7 +89,7 @@ class TestBisectModel(unittest.TestCase):
         self.assertDictEqual(expected, bisect_doc.to_dict())
 
     def test_bisect_base_to_dict_with_id(self):
-        bisect_doc = modbs.BisectDocument("foo")
+        bisect_doc = modbs.BisectDocument()
         bisect_doc.id = "bar"
 
         expected = {
@@ -128,7 +128,7 @@ class TestBisectModel(unittest.TestCase):
         self.assertDictEqual(expected, bisect_doc.to_dict())
 
     def test_bisect_boot_to_dict(self):
-        bisect_doc = modbs.BootBisectDocument("foo")
+        bisect_doc = modbs.BootBisectDocument()
         bisect_doc.id = "bar"
         bisect_doc.board = "baz"
         bisect_doc.version = "1.0"
@@ -183,7 +183,7 @@ class TestBisectModel(unittest.TestCase):
         self.assertDictEqual(expected, bisect_doc.to_dict())
 
     def test_bisect_base_properties(self):
-        bisect_doc = modbs.BootBisectDocument("foo")
+        bisect_doc = modbs.BootBisectDocument()
         bisect_doc.id = "bar"
         bisect_doc.created_on = "now"
         bisect_doc.job = "fooz"
@@ -215,13 +215,13 @@ class TestBisectModel(unittest.TestCase):
         self.assertEqual(bisect_doc.log, "https://storage.org/log.txt")
 
     def test_bisect_boot_properties(self):
-        bisect_doc = modbs.BootBisectDocument("foo")
+        bisect_doc = modbs.BootBisectDocument()
         bisect_doc.board = "bar"
 
         self.assertEqual(bisect_doc.board, "bar")
 
     def test_bisect_defconfig_to_dict(self):
-        bisect_doc = modbs.DefconfigBisectDocument("foo")
+        bisect_doc = modbs.DefconfigBisectDocument()
         bisect_doc.id = "bar"
         bisect_doc.build_id = "build-id"
         bisect_doc.defconfig = "defconfig-name"
