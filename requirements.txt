@@ -17,3 +17,4 @@ simplejson
 sphinx-bootstrap-theme
 sphinxcontrib-httpdomain==1.3.0
 tornado==3.2.2
+six==1.13.0
