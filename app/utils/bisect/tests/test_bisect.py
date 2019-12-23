@@ -63,11 +63,10 @@ class BisectUtilsTest(unittest.TestCase):
     def test_update_doc_fields_list(self):
         bisect_doc = mbisect.BisectDocument()
         bisect_doc.id = "bar"
-        fields = ["bisect_data", "good_commit", "foo", "bar"]
+        fields = ["good_commit", "foo", "bar"]
 
         expected = {
             "_id": "bar",
-            "bisect_data": [],
             "good_commit": None
         }
 
@@ -78,7 +77,6 @@ class BisectUtilsTest(unittest.TestCase):
         bisect_doc = mbisect.BisectDocument()
         bisect_doc.id = "bar"
         fields = {
-            "bisect_data": True,
             "bad_commit": True,
             "_id": False,
             "good_commit": False,
@@ -87,7 +85,6 @@ class BisectUtilsTest(unittest.TestCase):
         }
 
         expected = {
-            "bisect_data": [],
             "bad_commit": None
         }
 

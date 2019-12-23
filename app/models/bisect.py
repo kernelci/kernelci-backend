@@ -37,7 +37,6 @@ class BisectDocument(modb.BaseDocument):
         self.bad_commit = None
         self.bad_commit_date = None
         self.bad_commit_url = None
-        self.bisect_data = []
         self.compare_to = None
         self.good_commit = None
         self.good_commit_date = None
@@ -60,8 +59,6 @@ class BisectDocument(modb.BaseDocument):
         self.compiler_version = None
         self.build_environment = None
         self.build_id = None
-        self.plan = None
-        self.plan_variant = None
 
     @property
     def collection(self):
@@ -118,7 +115,6 @@ class BisectDocument(modb.BaseDocument):
             models.BISECT_BAD_COMMIT_DATE: self.bad_commit_date,
             models.BISECT_BAD_COMMIT_KEY: self.bad_commit,
             models.BISECT_BAD_COMMIT_URL: self.bad_commit_url,
-            models.BISECT_DATA_KEY: self.bisect_data,
             models.BISECT_GOOD_COMMIT_DATE: self.good_commit_date,
             models.BISECT_GOOD_COMMIT_KEY: self.good_commit,
             models.BISECT_GOOD_COMMIT_URL: self.good_commit_url,
@@ -143,8 +139,6 @@ class BisectDocument(modb.BaseDocument):
             models.COMPILER_VERSION_KEY: self.compiler_version,
             models.BUILD_ENVIRONMENT_KEY: self.build_environment,
             models.BUILD_ID_KEY: self.build_id,
-            models.PLAN_KEY: self.plan,
-            models.PLAN_VARIANT_KEY: self.plan_variant,
         }
 
         if self.id:
@@ -155,28 +149,6 @@ class BisectDocument(modb.BaseDocument):
     @staticmethod
     def from_json(json_obj):
         return None
-
-
-class BootBisectDocument(BisectDocument):
-    """The bisect document class for boot bisection."""
-
-    def __init__(self):
-        super(BootBisectDocument, self).__init__()
-        self.lab_name = None
-        self.device_type = None
-        self.board = None
-        self.boot_id = None
-        self.type = "boot"
-
-    def to_dict(self):
-        d = super(BootBisectDocument, self).to_dict()
-        d.update({
-            models.LAB_NAME_KEY: self.lab_name,
-            models.DEVICE_TYPE_KEY: self.device_type,
-            models.BOARD_KEY: self.board,
-            models.BOOT_ID_KEY: self.boot_id,
-        })
-        return d
 
 
 class DefconfigBisectDocument(BisectDocument):

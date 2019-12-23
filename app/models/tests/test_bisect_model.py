@@ -30,8 +30,8 @@ class TestBisectModel(unittest.TestCase):
         bisect_doc = modbs.BisectDocument()
         self.assertIsInstance(bisect_doc, modb.BaseDocument)
 
-    def test_boot_bisect_document(self):
-        bisect_doc = modbs.BootBisectDocument()
+    def test_case_bisect_document(self):
+        bisect_doc = modbs.TestCaseBisectDocument()
         self.assertIsInstance(bisect_doc, modbs.BisectDocument)
         self.assertIsInstance(bisect_doc, modb.BaseDocument)
 
@@ -39,8 +39,8 @@ class TestBisectModel(unittest.TestCase):
         bisect_doc = modbs.BisectDocument()
         self.assertEqual(bisect_doc.collection, "bisect")
 
-    def test_bisect_boot_document_collection(self):
-        bisect_doc = modbs.BootBisectDocument()
+    def test_bisect_case_document_collection(self):
+        bisect_doc = modbs.TestCaseBisectDocument()
         self.assertEqual(bisect_doc.collection, "bisect")
 
     def test_bisect_base_from_json(self):
@@ -57,7 +57,6 @@ class TestBisectModel(unittest.TestCase):
         expected = {
             "created_on": None,
             "job": None,
-            "bisect_data": [],
             "compare_to": None,
             "good_commit": None,
             "good_commit_date": None,
@@ -83,8 +82,6 @@ class TestBisectModel(unittest.TestCase):
             "build_environment": None,
             "git_branch": None,
             "git_url": None,
-            "plan": None,
-            "plan_variant": None,
         }
         self.assertDictEqual(expected, bisect_doc.to_dict())
 
@@ -96,7 +93,6 @@ class TestBisectModel(unittest.TestCase):
             "_id": "bar",
             "created_on": None,
             "job": None,
-            "bisect_data": [],
             "compare_to": None,
             "good_commit": None,
             "good_commit_date": None,
@@ -122,33 +118,31 @@ class TestBisectModel(unittest.TestCase):
             "build_environment": None,
             "git_branch": None,
             "git_url": None,
-            "plan": None,
-            "plan_variant": None,
+
         }
         self.assertDictEqual(expected, bisect_doc.to_dict())
 
-    def test_bisect_boot_to_dict(self):
-        bisect_doc = modbs.BootBisectDocument()
+    def test_bisect_case_to_dict(self):
+        bisect_doc = modbs.TestCaseBisectDocument()
         bisect_doc.id = "bar"
         bisect_doc.board = "baz"
         bisect_doc.version = "1.0"
-        bisect_doc.boot_id = "boot-id"
         bisect_doc.build_id = "build-id"
         bisect_doc.job_id = "job-id"
         bisect_doc.git_url = "https://somewhere.com/blah.git"
         bisect_doc.git_branch = "master"
         bisect_doc.kernel = "v123.456"
         bisect_doc.log = "https://storage.org/log.txt"
+        bisect_doc.test_case_path = "test.case.path"
+        bisect_doc.regression_id = "regr-id"
         bisect_doc.device_type = "qemu"
         bisect_doc.lab_name = "secret-lab"
-        bisect_doc.plan = "cunning"
+        bisect_doc.plan_variant = "cunning"
 
         expected = {
             "_id": "bar",
-            "board": "baz",
             "created_on": None,
             "job": None,
-            "bisect_data": [],
             "compare_to": None,
             "good_commit": None,
             "good_commit_date": None,
@@ -159,16 +153,13 @@ class TestBisectModel(unittest.TestCase):
             "bad_commit_url": None,
             "bad_summary": None,
             "version": "1.0",
-            "boot_id": "boot-id",
             "build_id": "build-id",
             "job_id": "job-id",
-            "type": "boot",
+            "type": "test",
             "compiler": None,
             "compiler_version": None,
             "build_environment": None,
-            "lab_name": "secret-lab",
             "arch": None,
-            "device_type": "qemu",
             "defconfig": None,
             "defconfig_full": None,
             "git_url": "https://somewhere.com/blah.git",
@@ -177,17 +168,19 @@ class TestBisectModel(unittest.TestCase):
             "log": "https://storage.org/log.txt",
             "found_summary": None,
             "checks": {},
-            "plan": "cunning",
-            "plan_variant": None,
+            "test_case_path": "test.case.path",
+            "regression_id": "regr-id",
+            "device_type": "qemu",
+            "lab_name": "secret-lab",
+            "plan_variant": "cunning",
         }
         self.assertDictEqual(expected, bisect_doc.to_dict())
 
     def test_bisect_base_properties(self):
-        bisect_doc = modbs.BootBisectDocument()
+        bisect_doc = modbs.TestCaseBisectDocument()
         bisect_doc.id = "bar"
         bisect_doc.created_on = "now"
         bisect_doc.job = "fooz"
-        bisect_doc.bisect_data = [1, 2, 3]
         bisect_doc.good_commit = "1"
         bisect_doc.good_commit_date = "now"
         bisect_doc.good_commit_url = "url"
@@ -202,7 +195,6 @@ class TestBisectModel(unittest.TestCase):
         self.assertEqual(bisect_doc.id, "bar")
         self.assertEqual(bisect_doc.created_on, "now")
         self.assertEqual(bisect_doc.job, "fooz")
-        self.assertEqual(bisect_doc.bisect_data, [1, 2, 3])
         self.assertEqual(bisect_doc.good_commit, "1")
         self.assertEqual(bisect_doc.good_commit_date, "now")
         self.assertEqual(bisect_doc.good_commit_url, "url")
@@ -214,11 +206,11 @@ class TestBisectModel(unittest.TestCase):
         self.assertEqual(bisect_doc.kernel, "v456.789")
         self.assertEqual(bisect_doc.log, "https://storage.org/log.txt")
 
-    def test_bisect_boot_properties(self):
-        bisect_doc = modbs.BootBisectDocument()
-        bisect_doc.board = "bar"
+    def test_bisect_case_properties(self):
+        bisect_doc = modbs.TestCaseBisectDocument()
+        bisect_doc.device_type = "devboard"
 
-        self.assertEqual(bisect_doc.board, "bar")
+        self.assertEqual(bisect_doc.device_type, "devboard")
 
     def test_bisect_defconfig_to_dict(self):
         bisect_doc = modbs.DefconfigBisectDocument()
@@ -236,14 +228,11 @@ class TestBisectModel(unittest.TestCase):
         bisect_doc.compiler = "randomcc"
         bisect_doc.compiler_version = "123.456"
         bisect_doc.build_environment = "build-env"
-        bisect_doc.plan = "cunning"
-        bisect_doc.plan_variant = "similar"
 
         expected = {
             "_id": "bar",
             "created_on": None,
             "job": "job",
-            "bisect_data": [],
             "compare_to": None,
             "good_commit": None,
             "good_commit_date": None,
@@ -269,8 +258,6 @@ class TestBisectModel(unittest.TestCase):
             "kernel": "v4.56",
             "log": None,
             "checks": {},
-            "plan": "cunning",
-            "plan_variant": "similar",
         }
 
         self.assertDictEqual(expected, bisect_doc.to_dict())

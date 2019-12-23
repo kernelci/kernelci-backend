@@ -143,23 +143,7 @@ class BisectHandler(hbase.BaseHandler):
         response = None
 
         if collection in models.BISECT_VALID_COLLECTIONS:
-            if collection == models.BOOT_COLLECTION:
-                bisect_func = execute_boot_bisect
-                if spec.get(models.COMPARE_TO_KEY, None):
-                    bisect_func = execute_boot_bisect_compared_to
-                else:
-                    # Force the compare_to field to None (null in mongodb)
-                    # so that we can search correctly otherwise we can get
-                    # multiple results out. This is due to how we store the
-                    # bisect calculations in the db.
-                    spec[models.COMPARE_TO_KEY] = None
-
-                response = self._bisect(
-                    models.BOOT_ID_KEY,
-                    spec,
-                    bisect_func,
-                    fields=fields)
-            elif collection == models.BUILD_COLLECTION:
+            if collection == models.BUILD_COLLECTION:
                 bisect_func = execute_build_bisect
                 if spec.get(models.COMPARE_TO_KEY, None):
                     bisect_func = execute_build_bisect_compared_to
@@ -181,120 +165,6 @@ class BisectHandler(hbase.BaseHandler):
                 "Provided bisect collection '%s' is not valid" % collection)
 
         return response
-
-    def _bisect(self, id_key, spec, bisect_func, fields=None):
-        """Perform the bisect operation.
-
-        :param id_key: The name of the key that contains the ID value of the
-        document we want to bisect.
-        :type id_key: string
-        :param spec: The spec data structure as retrieved with the request
-        query args.
-        :type spec: dictionary
-        :param bisect_func: The bisect function that should be called. It
-        should accept the `doc_id` as string, the database options as
-        dictionary and `**kwargs`.
-        :type bisect_func: function
-        :param fields: A `fields` data structure with the fields to return or
-        exclude. Default to None.
-        :type fields: list or dict
-        :return A HandlerResponse instance.
-        """
-        response = None
-        s_get = spec.get
-        doc_id = s_get(id_key, None)
-
-        if doc_id:
-            try:
-                obj_id = bson.objectid.ObjectId(doc_id)
-                spec[id_key] = obj_id
-
-                bisect_result = utils.db.find_one2(
-                    self.db[self.collection],
-                    spec,
-                    fields=fields
-                )
-
-                if bisect_result:
-                    response = hresponse.HandlerResponse()
-                    response.result = bisect_result
-                else:
-                    kwargs = {
-                        "fields": fields,
-                        "compare_to": s_get(models.COMPARE_TO_KEY, None)}
-                    response = bisect_func(
-                        doc_id, self.settings["dboptions"], **kwargs)
-            except bson.errors.InvalidId, ex:
-                self.log.exception(ex)
-                self.log.error(
-                    "Wrong ID '%s' value passed as object ID", doc_id)
-                response = hresponse.HandlerResponse(400)
-                response.reason = "Wrong ID value passed as object ID"
-        else:
-            response = hresponse.HandlerResponse(400)
-            response.reason = "Missing boot ID value to look for"
-
-        return response
-
-
-def execute_boot_bisect(doc_id, db_options, **kwargs):
-    """Execute the boot bisect operation.
-
-    :param doc_id: The ID of the document to execute the bisect on.
-    :type doc_id: str
-    :param db_options: The mongodb database connection parameters.
-    :type db_options: dict
-    :param fields: A `fields` data structure with the fields to return or
-    exclude. Default to None.
-    :type fields: list or dict
-    :return A `HandlerResponse` object.
-    """
-    response = hresponse.HandlerResponse()
-
-    result = taskt.boot_bisect.apply_async(
-        [doc_id, db_options, kwargs.get("fields", None)])
-    while not result.ready():
-        pass
-
-    response.status_code, response.result = result.get()
-    if response.status_code == 404:
-        response.reason = "Boot report not found"
-    elif response.status_code == 400:
-        response.reason = "Boot report cannot be bisected: is it failed?"
-    return response
-
-
-def execute_boot_bisect_compared_to(doc_id, db_options, **kwargs):
-    """Execute the boot bisection compared to another tree.
-
-    :param doc_id: The ID of the document to execute the bisect on.
-    :type doc_id: string
-    :param db_options: The mongodb database connection parameters.
-    :type db_options: dictionary
-    :param compare_to: The name of the tree to compare against.
-    :type compare_to: dictionary
-    :param fields: A `fields` data structure with the fields to return or
-    exclude. Default to None.
-    :type fields: list or dict
-    :return A `HandlerResponse` object.
-    """
-    response = hresponse.HandlerResponse()
-    compare_to = kwargs.get("compare_to", None)
-    fields = kwargs.get("fields", None)
-
-    result = taskt.boot_bisect_compared_to.apply_async(
-        [doc_id, compare_to, db_options, fields])
-    while not result.ready():
-        pass
-
-    response.status_code, response.result = result.get()
-    if response.status_code == 404:
-        response.reason = (
-            "Boot bisection compared to '%s' not found" % compare_to)
-    elif response.status_code == 400:
-        response.reason = "Boot report cannot be bisected: is it failed?"
-
-    return response
 
 
 def execute_build_bisect(doc_id, db_options, **kwargs):
