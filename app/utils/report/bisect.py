@@ -44,13 +44,13 @@ def create_bisect_report(data, email_options, db_options,
     :return A tuple with the TXT email body and the headers as dictionary.  If
     an error occured, None.
     """
-    database = utils.db.get_db_connection(db_options)
+    db = utils.db.get_db_connection(db_options)
 
-    job, branch, kernel, test_suite, lab, target = (data[k] for k in [
+    job, branch, kernel, test_case_path, lab, target = (data[k] for k in [
         models.JOB_KEY,
         models.GIT_BRANCH_KEY,
         models.KERNEL_KEY,
-        models.TYPE_KEY,
+        models.TEST_CASE_PATH_KEY,
         models.LAB_NAME_KEY,
         models.DEVICE_TYPE_KEY,
     ])
@@ -71,8 +71,9 @@ def create_bisect_report(data, email_options, db_options,
         models.DEVICE_TYPE_KEY,
         models.BISECT_GOOD_COMMIT_KEY,
         models.BISECT_BAD_COMMIT_KEY,
+        models.TEST_CASE_PATH_KEY,
     ]}
-    doc = utils.db.find_one2(database[models.BISECT_COLLECTION], specs)
+    doc = utils.db.find_one2(db[models.BISECT_COLLECTION], specs)
     if not doc:
         utils.LOG.warning("Failed to find bisection document")
         return None
@@ -113,18 +114,20 @@ def create_bisect_report(data, email_options, db_options,
     with open(log_path) as log_file:
         log_data = json.load(log_file)
 
-    url_params = {
-        'boot_url': rcommon.DEFAULT_BOOT_URL,
-        'job': job,
-        'git_branch': branch,
-    }
+    regr = utils.db.find_one2(
+        db[models.TEST_REGRESSION_COLLECTION], doc[models.REGRESSION_ID_KEY])
+    test_case = utils.db.find_one2(
+        db[models.TEST_CASE_COLLECTION],
+        regr[models.REGRESSIONS_KEY][-1][models.TEST_CASE_ID_KEY])
+    test_group = utils.db.find_one2(
+        db[models.TEST_GROUP_COLLECTION], test_case[models.TEST_GROUP_ID_KEY])
 
-    boot_data = {b["status"]: b for b in doc[models.BISECT_DATA_KEY]}
-    bad_describe = boot_data["FAIL"]["git_describe"]
-    bad_details_url = '/'.join([
-        rcommon.DEFAULT_BASE_URL, "boot", "id", str(boot_data["FAIL"]["_id"])])
+    # Disabled until we have a working Tests view on the frontend
+    # bad_details_url = '/'.join([
+    #   rcommon.DEFAULT_BASE_URL, "boot", "id", str(boot_data["FAIL"]["_id"])])
+
     log_url_txt, log_url_html = ('/'.join([
-        rcommon.DEFAULT_STORAGE_URL, rel_path, boot_data["FAIL"][k]])
+        rcommon.DEFAULT_STORAGE_URL, rel_path, test_group[k]])
         for k in [models.BOOT_LOG_KEY, models.BOOT_LOG_HTML_KEY])
 
     cc = doc[models.COMPILER_KEY]
@@ -134,8 +137,7 @@ def create_bisect_report(data, email_options, db_options,
     template_data = {
         "subject_str": email_subject,
         "bad": doc[models.BISECT_BAD_SUMMARY_KEY],
-        "bad_details_url": bad_details_url,
-        "bad_describe": bad_describe,
+        # "bad_details_url": bad_details_url,
         "log_url_txt": log_url_txt,
         "log_url_html": log_url_html,
         "found": doc[models.BISECT_FOUND_SUMMARY_KEY],
@@ -148,7 +150,7 @@ def create_bisect_report(data, email_options, db_options,
         "lab_name": lab,
         "defconfig": doc[models.DEFCONFIG_FULL_KEY],
         "compiler": compiler_str,
-        "test_suite": test_suite,
+        "test_case_path": doc[models.TEST_CASE_PATH_KEY],
         "show": log_data["show"],
         "log": log_data["log"],
     }

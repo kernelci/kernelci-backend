@@ -67,6 +67,7 @@ REPORT_TYPE_KEYS = {
         models.DEFCONFIG_FULL_KEY,
         models.BUILD_ENVIRONMENT_KEY,
         models.LAB_NAME_KEY,
+        models.TEST_CASE_PATH_KEY,
         models.BISECT_LOG_KEY,
         models.DEVICE_TYPE_KEY,
         models.BISECT_GOOD_COMMIT_KEY,

@@ -13,8 +13,8 @@
 {{ subject_str }}
 
 Summary:
-  Start:      {{ bad }}
-  Details:    {{ bad_details_url }}
+  Start:      {{ bad }}{% if bad_details_url %}
+  Details:    {{ bad_details_url }}{% endif %}
   Plain log:  {{ log_url_txt }}
   HTML log:   {{ log_url_html }}
   Result:     {{ found }}
@@ -33,7 +33,7 @@ Parameters:
   Lab:        {{ lab_name }}
   Compiler:   {{ compiler }}
   Config:     {{ defconfig }}
-  Test suite: {{ test_suite }}
+  Test case:  {{ test_case_path }}
 
 Breaking commit found:
 
