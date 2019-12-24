@@ -68,8 +68,8 @@ class BisectHandler(hbase.BaseHandler):
         json_obj = kwargs["json_obj"]
         bisect_type = json_obj["type"]
 
-        if bisect_type == "boot":
-            taskt.import_boot_bisect.apply_async(
+        if bisect_type == "test":
+            taskt.update_test_bisect.apply_async(
                 [json_obj],
                 link_error=taskqueue.tasks.error_handler.s()
             )

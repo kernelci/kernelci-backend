@@ -161,7 +161,6 @@ class TestSendHandler(TestHandlerBase):
                 },
             ],
             countdown=60 * 60,
-            link=mock.ANY
         )
 
     def test_post_wrong_delay(self):
@@ -217,7 +216,6 @@ class TestSendHandler(TestHandlerBase):
                 },
             ],
             countdown=100,
-            link=mock.ANY
         )
 
     @mock.patch("taskqueue.tasks.report.send_boot_report")
@@ -256,7 +254,6 @@ class TestSendHandler(TestHandlerBase):
                 },
             ],
             countdown=18000,
-            link=mock.ANY
         )
 
     @mock.patch("taskqueue.tasks.report.send_build_report")
