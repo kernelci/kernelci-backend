@@ -89,18 +89,6 @@ def send_boot_report(job, git_branch, kernel, lab_name, email_opts):
     return status
 
 
-@taskc.app.task(name="trigger-bisections")
-def trigger_bisections(status, job, branch, kernel, lab_name):
-    report_id = "-".join([job, branch, kernel])
-    utils.LOG.info("Triggering bisections for '{}'".format(report_id))
-    return utils.report.boot.trigger_bisections(
-        status,
-        job,
-        branch, kernel, lab_name,
-        taskc.app.conf.get("db_options", {}),
-        taskc.app.conf.get("jenkins_options", None))
-
-
 @taskc.app.task(name="send-build-report")
 def send_build_report(job, git_branch, kernel, email_opts):
     """Create the build report email and send it.

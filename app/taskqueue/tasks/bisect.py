@@ -1,4 +1,4 @@
-# Copyright (C) Collabora Limited 2018
+# Copyright (C) Collabora Limited 2018, 2019
 # Author: Guillaume Tucker <guillaume.tucker@collabora.com>
 #
 # Copyright (C) Linaro Limited 2015
@@ -23,6 +23,28 @@
 import taskqueue.celery as taskc
 import utils.bisect.boot as bootb
 import utils.bisect.defconfig as defconfigb
+import utils.bisect.test
+
+
+@taskc.app.task(name="trigger-test-bisections")
+def trigger_test_bisections(status, job, branch, kernel, plan):
+    report_id = "-".join([job, branch, kernel, plan])
+    utils.LOG.info("Triggering bisections for '{}'".format(report_id))
+    return utils.bisect.test.trigger_bisections(
+        job, branch, kernel, plan,
+        taskc.app.conf.get("db_options", {}),
+        taskc.app.conf.get("jenkins_options", None))
+
+
+@taskc.app.task(name="update-test-bisect")
+def update_test_bisect(data):
+    """Just a wrapper around the real test bisect update function.
+
+    :param data: Bisection results from the JSON data.
+    :type data: dictionary
+    :return Status code with result of the operation.
+    """
+    return utils.bisect.test.update_results(data, taskc.app.conf.db_options)
 
 
 @taskc.app.task(name="import-boot-bisect")
