@@ -42,7 +42,8 @@ class TestRegressionDocument(modb.BaseDocument):
     """
 
     def __init__(self, job, kernel, git_branch, defconfig_full,
-                 build_environment, device_type, arch, hierarchy):
+                 build_environment, device_type, arch, hierarchy,
+                 test_case_path):
         """A new TestRegressionDocument.
 
         :param job: The job value.
@@ -61,6 +62,8 @@ class TestRegressionDocument(modb.BaseDocument):
         :type arch: string
         :param hierarchy: The test group hierarchy containing the test case.
         :type hierarchy: list of strings
+        :param test_case_path: The path representation of the test case.
+        :type test_case_path: string
         """
         self._created_on = datetime.datetime.now(tz=bson.tz_util.utc)
         self._id = None
@@ -74,6 +77,7 @@ class TestRegressionDocument(modb.BaseDocument):
         self.device_type = device_type
         self.arch = arch
         self.hierarchy = hierarchy
+        self.test_case_path = test_case_path
         self.regressions = []
         self.compiler = None
         self.compiler_version = None
@@ -141,6 +145,7 @@ class TestRegressionDocument(modb.BaseDocument):
             models.DEVICE_TYPE_KEY: self.device_type,
             models.GIT_BRANCH_KEY: self.git_branch,
             models.HIERARCHY_KEY: self.hierarchy,
+            models.TEST_CASE_PATH_KEY: self.test_case_path,
             models.JOB_KEY: self.job,
             models.KERNEL_KEY: self.kernel,
             models.REGRESSIONS_KEY: self.regressions,
@@ -172,10 +177,11 @@ class TestRegressionDocument(modb.BaseDocument):
             device_type = obj.pop(models.DEVICE_TYPE_KEY)
             arch = obj.pop(models.ARCHITECTURE_KEY)
             hierarchy = obj.pop(models.HIERARCHY_KEY)
+            test_case_path = obj.pop(models.TEST_CASE_PATH_KEY)
 
             regr_doc = TestRegressionDocument(
                 job, kernel, git_branch, defconfig_full, build_environment,
-                device_type, arch, hierarchy)
+                device_type, arch, hierarchy, test_case_path)
 
             regr_doc.id = regr_id
 

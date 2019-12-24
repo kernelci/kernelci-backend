@@ -69,6 +69,7 @@ def _check_and_track(test_case, group, last_case, last_group, db, spec,
     regr.update({k: group[k] for k in REGRESSION_EXTRA_KEYS})
     regr[models.HIERARCHY_KEY] = hierarchy
     test_case_path = ".".join(hierarchy)
+    regr[models.TEST_CASE_PATH_KEY] = test_case_path
 
     if last_case[models.STATUS_KEY] == "PASS":
         utils.LOG.info("New regression: {}".format(test_case_path))
