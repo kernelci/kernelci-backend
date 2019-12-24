@@ -792,6 +792,7 @@ SEND_VALID_KEYS = {
             # Bisection keys
             TYPE_KEY,
             ARCHITECTURE_KEY,
+            TEST_CASE_PATH_KEY,
             DEFCONFIG_FULL_KEY,
             BUILD_ENVIRONMENT_KEY,
             DEVICE_TYPE_KEY,
