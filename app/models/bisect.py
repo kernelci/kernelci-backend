@@ -185,3 +185,26 @@ class DefconfigBisectDocument(BisectDocument):
     def __init__(self):
         super(DefconfigBisectDocument, self).__init__()
         self.type = "build"
+
+
+class TestCaseBisectDocument(BisectDocument):
+
+    def __init__(self):
+        super(TestCaseBisectDocument, self).__init__()
+        self.type = "test"
+        self.test_case_path = None
+        self.regression_id = None
+        self.device_type = None
+        self.lab_name = None
+        self.plan_variant = None
+
+    def to_dict(self):
+        d = super(TestCaseBisectDocument, self).to_dict()
+        d.update({
+            models.TEST_CASE_PATH_KEY: self.test_case_path,
+            models.REGRESSION_ID_KEY: self.regression_id,
+            models.DEVICE_TYPE_KEY: self.device_type,
+            models.LAB_NAME_KEY: self.lab_name,
+            models.PLAN_VARIANT_KEY: self.plan_variant,
+        })
+        return d
