@@ -41,7 +41,7 @@ class TestRegressionDocument(modb.BaseDocument):
     Each document is a single test case regression.
     """
 
-    def __init__(self, job, kernel, git_branch, defconfig_full,
+    def __init__(self, job, kernel, git_branch, git_url, defconfig_full,
                  build_environment, device_type, arch, hierarchy,
                  test_case_path):
         """A new TestRegressionDocument.
@@ -51,6 +51,8 @@ class TestRegressionDocument(modb.BaseDocument):
         :param kernel: The kernel value.
         :type kernel: string
         :param git_branch: The git branch mame.
+        :type git_branch: string
+        :param git_url: The git repository URL.
         :type git_branch: string
         :param defconfig_full: The full defconfig name with fragments.
         :type defconfig_full: string
@@ -72,6 +74,7 @@ class TestRegressionDocument(modb.BaseDocument):
         self.job = job
         self.kernel = kernel
         self.git_branch = git_branch
+        self.git_url = git_url
         self.defconfig_full = defconfig_full
         self.build_environment = build_environment
         self.device_type = device_type
@@ -144,6 +147,7 @@ class TestRegressionDocument(modb.BaseDocument):
             models.BUILD_ENVIRONMENT_KEY: self.build_environment,
             models.DEVICE_TYPE_KEY: self.device_type,
             models.GIT_BRANCH_KEY: self.git_branch,
+            models.GIT_URL_KEY: self.git_url,
             models.HIERARCHY_KEY: self.hierarchy,
             models.TEST_CASE_PATH_KEY: self.test_case_path,
             models.JOB_KEY: self.job,
@@ -172,6 +176,7 @@ class TestRegressionDocument(modb.BaseDocument):
             job = obj.pop(models.JOB_KEY)
             kernel = obj.pop(models.KERNEL_KEY)
             git_branch = obj.pop(models.GIT_BRANCH_KEY)
+            git_url = obj.pop(models.GIT_URL_KEY)
             defconfig_full = obj.pop(models.DEFCONFIG_FULL_KEY)
             build_environment = obj.pop(models.BUILD_ENVIRONMENT_KEY)
             device_type = obj.pop(models.DEVICE_TYPE_KEY)
@@ -180,8 +185,9 @@ class TestRegressionDocument(modb.BaseDocument):
             test_case_path = obj.pop(models.TEST_CASE_PATH_KEY)
 
             regr_doc = TestRegressionDocument(
-                job, kernel, git_branch, defconfig_full, build_environment,
-                device_type, arch, hierarchy, test_case_path)
+                job, kernel, git_branch, git_url, defconfig_full,
+                build_environment, device_type, arch, hierarchy,
+                test_case_path)
 
             regr_doc.id = regr_id
 
