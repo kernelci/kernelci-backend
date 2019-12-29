@@ -74,6 +74,7 @@ SPEC_TEST_GROUP = {
     models.GIT_COMMIT_KEY: "git_commit",
     models.LAB_NAME_KEY: "lab_name",
     models.NAME_KEY: "name",
+    models.PLAN_VARIANT_KEY: "plan_variant",
 }
 
 SPEC_TEST_CASE = {

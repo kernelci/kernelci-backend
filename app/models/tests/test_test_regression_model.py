@@ -46,6 +46,9 @@ class TestTestRegressionModel(unittest.TestCase):
             models.STATUS_KEY: "PASS",
             models.KERNEL_KEY: "kernel-001",
             models.GIT_COMMIT_KEY: "1234abcd",
+            models.LAB_NAME_KEY: "secret-lab",
+            models.BUILD_ID_KEY: "build-id",
+            models.PLAN_VARIANT_KEY: "cunning",
         })
 
         expected = {
@@ -71,6 +74,9 @@ class TestTestRegressionModel(unittest.TestCase):
                     "status": "PASS",
                     "kernel": "kernel-001",
                     "git_commit": "1234abcd",
+                    "lab_name": "secret-lab",
+                    "build_id": "build-id",
+                    "plan_variant": "cunning",
                 },
             ],
         }
@@ -111,6 +117,9 @@ class TestTestRegressionModel(unittest.TestCase):
                     "status": "PASS",
                     "kernel": "kernel-001",
                     "git_commit": "1234abcd",
+                    "lab_name": "secret-lab",
+                    "build_id": "some-build-id",
+                    "plan_variant": "cunning",
                 },
                 {
                     "test_case_id": "another-test-case-id",
@@ -118,6 +127,9 @@ class TestTestRegressionModel(unittest.TestCase):
                     "status": "PASS",
                     "kernel": "kernel-002",
                     "git_commit": "1234abce",
+                    "lab_name": "secret-lab",
+                    "build_id": "some-build-id",
+                    "plan_variant": "cunning",
                 },
             ],
         }

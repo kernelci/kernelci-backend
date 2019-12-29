@@ -32,6 +32,9 @@ REGRESSION_KEYS = [
     models.STATUS_KEY,
     models.KERNEL_KEY,
     models.GIT_COMMIT_KEY,
+    models.LAB_NAME_KEY,
+    models.BUILD_ID_KEY,
+    models.PLAN_VARIANT_KEY,
 ]
 
 
