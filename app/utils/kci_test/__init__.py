@@ -115,8 +115,7 @@ def save_or_update(doc, spec_map, collection, database, errors):
         models.ID_KEY,
     ]
 
-    prev_doc = utils.db.find_one2(
-        database[collection], spec, fields=fields)
+    prev_doc = utils.db.find_one2(database[collection], spec, fields=fields)
 
     if prev_doc:
         doc_get = prev_doc.get
@@ -172,7 +171,7 @@ def _check_for_null(test_dict, NON_NULL_KEYS):
     :raise TestValidationError if any of the keys matches the condition.
     """
     for key in NON_NULL_KEYS:
-        val = test_dict.get(key, None)
+        val = test_dict.get(key)
         if (val is None or
             (isinstance(val, basestring) and
                 val.lower() in ('', 'null', 'none'))):
@@ -240,19 +239,18 @@ def _update_test_case_doc_from_json(case_doc, test_dict, errors):
     if seconds == 0.0:
         case_doc.time = _seconds_as_datetime(seconds)
 
-    case_doc.definition_uri = test_dict.get(models.DEFINITION_URI_KEY, None)
-    case_doc.kvm_guest = test_dict.get(models.KVM_GUEST_KEY, None)
-    case_doc.index = test_dict.get(models.INDEX_KEY, None)
-    case_doc.maximum = test_dict.get(models.MAXIMUM_KEY, None)
+    case_doc.definition_uri = test_dict.get(models.DEFINITION_URI_KEY)
+    case_doc.kvm_guest = test_dict.get(models.KVM_GUEST_KEY)
+    case_doc.index = test_dict.get(models.INDEX_KEY)
+    case_doc.maximum = test_dict.get(models.MAXIMUM_KEY)
     case_doc.measurements = test_dict.get(models.MEASUREMENTS_KEY, [])
     case_doc.attachments = test_dict.get(models.ATTACHMENTS_KEY, [])
-    case_doc.metadata = test_dict.get(models.METADATA_KEY, None)
-    case_doc.minimum = test_dict.get(models.MINIMUM_KEY, None)
-    case_doc.samples = test_dict.get(models.SAMPLES_KEY, None)
-    case_doc.samples_sqr_sum = test_dict.get(models.SAMPLES_SQUARE_SUM_KEY,
-                                             None)
-    case_doc.samples_sum = test_dict.get(models.SAMPLES_SUM_KEY, None)
-    case_doc.vcs_commit = test_dict.get(models.VCS_COMMIT_KEY, None)
+    case_doc.metadata = test_dict.get(models.METADATA_KEY)
+    case_doc.minimum = test_dict.get(models.MINIMUM_KEY)
+    case_doc.samples = test_dict.get(models.SAMPLES_KEY)
+    case_doc.samples_sqr_sum = test_dict.get(models.SAMPLES_SQUARE_SUM_KEY)
+    case_doc.samples_sum = test_dict.get(models.SAMPLES_SUM_KEY)
+    case_doc.vcs_commit = test_dict.get(models.VCS_COMMIT_KEY)
     case_doc.version = test_dict.get(models.VERSION_KEY, "1.0")
 
 
@@ -275,8 +273,8 @@ def _update_test_case_doc_ids(ts_name, ts_id, case_doc, database):
                                         [models.ID_KEY])
     # If exists, update the test case
     if test_group_doc:
-        case_doc.test_group_name = test_group_doc.get(models.NAME_KEY, None)
-        case_doc.test_group_id = test_group_doc.get(models.ID_KEY, None)
+        case_doc.test_group_name = test_group_doc.get(models.NAME_KEY)
+        case_doc.test_group_id = test_group_doc.get(models.ID_KEY)
     else:
         utils.LOG.error(
             "No test group document with ID %s found for test case %s",
