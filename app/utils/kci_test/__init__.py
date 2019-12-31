@@ -328,7 +328,7 @@ def _parse_test_case_from_json(group_name, group_doc_id, test_case,
     return test_doc
 
 
-def _update_test_group_doc_from_json(group_doc, test_dict, errors):
+def _update_test_group_doc_from_json(group_doc, group_dict, errors):
     """Update a TestGroupDocument from the provided test dictionary.
 
     This function does not return anything, the TestGroupDocument passed is
@@ -336,13 +336,13 @@ def _update_test_group_doc_from_json(group_doc, test_dict, errors):
 
     :param group_doc: The TestGroupDocument to update.
     :type group_doc: `models.test_group.TestGroupDocument`.
-    :param test_dict: Test group dictionary.
-    :type test_dict: dict
+    :param group_dict: Test group dictionary.
+    :type group_dict: dict
     :param errors: Where errors should be stored.
     :type errors: dict
     """
     try:
-        seconds = _get_test_seconds(test_dict)
+        seconds = _get_test_seconds(group_dict)
     except TestValidationError as ex:
         seconds = 0.0
         err_msg = "Error reading test time data; defaulting to 0"
@@ -362,52 +362,51 @@ def _update_test_group_doc_from_json(group_doc, test_dict, errors):
     if seconds == 0.0:
         group_doc.time = _seconds_as_datetime(seconds)
 
-    group_doc.arch = test_dict.get(models.ARCHITECTURE_KEY, None)
-    group_doc.board = test_dict.get(models.BOARD_KEY, None)
-    group_doc.board_instance = test_dict.get(models.BOARD_INSTANCE_KEY, None)
-    group_doc.boot_log = test_dict.get(models.BOOT_LOG_KEY, None)
-    group_doc.boot_log_html = test_dict.get(models.BOOT_LOG_HTML_KEY, None)
-    group_doc.boot_result_description = test_dict.get(
-        models.BOOT_RESULT_DESC_KEY, None)
-    group_doc.build_environment = test_dict.get(models.BUILD_ENVIRONMENT_KEY)
-    group_doc.dtb = test_dict.get(models.DTB_KEY, None)
-    group_doc.dtb_addr = test_dict.get(models.DTB_ADDR_KEY, None)
-    group_doc.device_type = test_dict.get(models.DEVICE_TYPE_KEY, None)
-    group_doc.defconfig = test_dict.get(models.DEFCONFIG_KEY, None)
-    group_doc.defconfig_full = test_dict.get(models.DEFCONFIG_FULL_KEY, None)
-    group_doc.endian = test_dict.get(models.ENDIANNESS_KEY, None)
-    group_doc.file_server_resource = test_dict.get(
-        models.FILE_SERVER_RESOURCE_KEY, None)
-    group_doc.file_server_url = test_dict.get(models.FILE_SERVER_URL_KEY, None)
-    group_doc.git_branch = test_dict.get(models.GIT_BRANCH_KEY, None)
-    group_doc.git_commit = test_dict.get(models.GIT_COMMIT_KEY, None)
-    group_doc.git_describe = test_dict.get(models.GIT_DESCRIBE_KEY, None)
-    group_doc.git_url = test_dict.get(models.GIT_URL_KEY, None)
-    group_doc.index = test_dict.get(models.INDEX_KEY, None)
-    group_doc.image_type = test_dict.get(models.IMAGE_TYPE_KEY, None)
-    group_doc.initrd = test_dict.get(models.INITRD_KEY, None)
-    group_doc.initrd_addr = test_dict.get(models.INITRD_ADDR_KEY, None)
-    group_doc.initrd_info = test_dict.get(models.INITRD_INFO_KEY, None)
-    group_doc.job = test_dict.get(models.JOB_KEY, None)
-    group_doc.kernel = test_dict.get(models.KERNEL_KEY, None)
-    group_doc.kernel_image = test_dict.get(models.KERNEL_IMAGE_KEY, None)
-    group_doc.kernel_image_size = test_dict.get(
-        models.KERNEL_IMAGE_SIZE_KEY, None)
-    group_doc.load_addr = test_dict.get(models.BOOT_LOAD_ADDR_KEY, None)
-    group_doc.metadata = test_dict.get(models.METADATA_KEY, {})
-    group_doc.plan_variant = test_dict.get(models.PLAN_VARIANT_KEY)
-    group_doc.qemu = test_dict.get(models.QEMU_KEY, None)
-    group_doc.qemu_command = test_dict.get(models.QEMU_COMMAND_KEY, None)
-    group_doc.retries = test_dict.get(models.BOOT_RETRIES_KEY, 0)
-    group_doc.uimage = test_dict.get(models.UIMAGE_KEY, None)
-    group_doc.uimage_addr = test_dict.get(models.UIMAGE_ADDR_KEY, None)
-    group_doc.vcs_commit = test_dict.get(models.VCS_COMMIT_KEY, None)
-    group_doc.version = test_dict.get(models.VERSION_KEY, "1.0")
-    group_doc.warnings = test_dict.get(models.BOOT_WARNINGS_KEY, 0)
+    group_doc.arch = group_dict.get(models.ARCHITECTURE_KEY)
+    group_doc.board = group_dict.get(models.BOARD_KEY)
+    group_doc.board_instance = group_dict.get(models.BOARD_INSTANCE_KEY)
+    group_doc.boot_log = group_dict.get(models.BOOT_LOG_KEY)
+    group_doc.boot_log_html = group_dict.get(models.BOOT_LOG_HTML_KEY)
+    group_doc.boot_result_description = group_dict.get(
+        models.BOOT_RESULT_DESC_KEY)
+    group_doc.build_environment = group_dict.get(models.BUILD_ENVIRONMENT_KEY)
+    group_doc.dtb = group_dict.get(models.DTB_KEY)
+    group_doc.dtb_addr = group_dict.get(models.DTB_ADDR_KEY)
+    group_doc.device_type = group_dict.get(models.DEVICE_TYPE_KEY)
+    group_doc.defconfig = group_dict.get(models.DEFCONFIG_KEY)
+    group_doc.defconfig_full = group_dict.get(models.DEFCONFIG_FULL_KEY)
+    group_doc.endian = group_dict.get(models.ENDIANNESS_KEY)
+    group_doc.file_server_resource = group_dict.get(
+        models.FILE_SERVER_RESOURCE_KEY)
+    group_doc.file_server_url = group_dict.get(models.FILE_SERVER_URL_KEY)
+    group_doc.git_branch = group_dict.get(models.GIT_BRANCH_KEY)
+    group_doc.git_commit = group_dict.get(models.GIT_COMMIT_KEY)
+    group_doc.git_describe = group_dict.get(models.GIT_DESCRIBE_KEY)
+    group_doc.git_url = group_dict.get(models.GIT_URL_KEY)
+    group_doc.index = group_dict.get(models.INDEX_KEY)
+    group_doc.image_type = group_dict.get(models.IMAGE_TYPE_KEY)
+    group_doc.initrd = group_dict.get(models.INITRD_KEY)
+    group_doc.initrd_addr = group_dict.get(models.INITRD_ADDR_KEY)
+    group_doc.initrd_info = group_dict.get(models.INITRD_INFO_KEY)
+    group_doc.job = group_dict.get(models.JOB_KEY)
+    group_doc.kernel = group_dict.get(models.KERNEL_KEY)
+    group_doc.kernel_image = group_dict.get(models.KERNEL_IMAGE_KEY)
+    group_doc.kernel_image_size = group_dict.get(models.KERNEL_IMAGE_SIZE_KEY)
+    group_doc.load_addr = group_dict.get(models.BOOT_LOAD_ADDR_KEY)
+    group_doc.metadata = group_dict.get(models.METADATA_KEY, {})
+    group_doc.plan_variant = group_dict.get(models.PLAN_VARIANT_KEY)
+    group_doc.qemu = group_dict.get(models.QEMU_KEY)
+    group_doc.qemu_command = group_dict.get(models.QEMU_COMMAND_KEY)
+    group_doc.retries = group_dict.get(models.BOOT_RETRIES_KEY, 0)
+    group_doc.uimage = group_dict.get(models.UIMAGE_KEY)
+    group_doc.uimage_addr = group_dict.get(models.UIMAGE_ADDR_KEY)
+    group_doc.vcs_commit = group_dict.get(models.VCS_COMMIT_KEY)
+    group_doc.version = group_dict.get(models.VERSION_KEY, "1.0")
+    group_doc.warnings = group_dict.get(models.BOOT_WARNINGS_KEY, 0)
 
     # mach_alias_key takes precedence if defined
-    group_doc.mach = test_dict.get(
-        models.MACH_ALIAS_KEY, test_dict.get(models.MACH_KEY, None))
+    group_doc.mach = group_dict.get(
+        models.MACH_ALIAS_KEY, group_dict.get(models.MACH_KEY))
 
 
 def _update_test_group_doc_ids(group_doc, database):
@@ -486,30 +485,30 @@ def _update_test_group_doc_ids(group_doc, database):
             job, branch, kernel, defconfig_full, arch)
 
 
-def _parse_test_group_from_json(test_json, database, errors):
+def _parse_test_group_from_json(group_json, database, errors):
     """Parse the test group report from a JSON object.
 
-    :param test_json: The JSON object.
-    :type test_json: dict
+    :param group_json: The JSON object.
+    :type group_json: dict
     :param database: The database connection.
     :param errors: Where to store the errors.
     :type errors: dict
     :return A `models.test_group.TestGroupDocument` instance, or None if
     the JSON cannot be parsed correctly.
     """
-    if not test_json:
+    if not group_json:
         return None
 
     try:
-        _check_for_null(test_json, NON_NULL_KEYS_GROUP)
+        _check_for_null(group_json, NON_NULL_KEYS_GROUP)
     except TestValidationError, ex:
         utils.LOG.exception(ex)
         ERR_ADD(errors, 400, str(ex))
         return None
 
     try:
-        name = test_json[models.NAME_KEY]
-        lab_name = test_json[models.LAB_NAME_KEY]
+        name = group_json[models.NAME_KEY]
+        lab_name = group_json[models.LAB_NAME_KEY]
     except KeyError, ex:
         err_msg = "Missing mandatory key in test group data"
         utils.LOG.exception(ex)
@@ -517,11 +516,11 @@ def _parse_test_group_from_json(test_json, database, errors):
         ERR_ADD(errors, 400, err_msg)
         return None
 
-    test_doc = mtest_group.TestGroupDocument(name, lab_name)
-    test_doc.created_on = datetime.datetime.now(tz=bson.tz_util.utc)
-    _update_test_group_doc_from_json(test_doc, test_json, errors)
-    _update_test_group_doc_ids(test_doc, database)
-    return test_doc
+    group_doc = mtest_group.TestGroupDocument(name, lab_name)
+    group_doc.created_on = datetime.datetime.now(tz=bson.tz_util.utc)
+    _update_test_group_doc_from_json(group_doc, group_json, errors)
+    _update_test_group_doc_ids(group_doc, database)
+    return group_doc
 
 
 def import_and_save_test_cases(group_doc_id, group_name, test_cases,
