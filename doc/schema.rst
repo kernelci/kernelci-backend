@@ -12,7 +12,6 @@ Schema
     schema-build
     schema-build-logs
     schema-build-logs-summary
-    schema-compare
     schema-job
     schema-lab
     schema-report

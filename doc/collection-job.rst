@@ -122,7 +122,7 @@ GET
             {
                 "status": "PASS",
                 "kernel": "v3.16-rc6-1009-g709032a"
-            }, 
+            },
             {
                 "status": "PASS",
                 "kernel": "v3.16-rc6-1014-g716519f"
@@ -234,76 +234,6 @@ GET
             "next-20150826",
             "next-20150825",
             "next-20150824"
-        ]
-    }
-
- .. note::
-    Results shown here do not include the full JSON response.
-
-.. http:get:: /job/compare/(string:id)
-
- Get the executed job comparison with the specified ``id``.
- To execute a job comparison, see the :ref:`POST section <collection_job_post_compare>`.
-
- For more info on the available field in the response, see the :ref:`job-compare schema <schema_compare_get_job>`.
-
- :param id: The ID of the executed job comparison.
- :type id: string
-
- :reqheader Authorization: The token necessary to authorize the request.
- :reqheader Accept-Encoding: Accept the ``gzip`` coding.
-
- :resheader Content-Type: Will be ``application/json; charset=UTF-8``.
-
- :status 200: Results found.
- :status 400: Wrong ``id`` value provided.
- :status 403: Not authorized to perform the operation.
- :status 404: The provided resource has not been found.
- :status 500: Internal server error.
- :status 503: Service maintenance.
-
- **Example Requests**
-
- .. sourcecode:: http
-
-    GET /job/compare/123456789012345678901234/ HTTP/1.1
-    Host: api.kernelci.org
-    Accept: */*
-    Authorization: token
-
- **Example Responses**
-
- .. sourcecode:: http
-
-    HTTP/1.1 200 OK
-    Vary: Accept-Encoding
-    Date: Wed, 2 Sept 2015 11:12:50 GMT
-    Content-Type: application/json; charset=UTF-8
-
-    {
-        "code": 200,
-        "result": [
-            {
-                "_id": {
-                    "$oid": "123456789012345678901234"
-                },
-                "baseline": {
-                    "job": "next",
-                    "kernel": "next-20150826"
-                },
-                "compare_to": [
-                    {
-                        "job": "next",
-                        "kernel": "next-20150825",
-                    }
-                ],
-                "delta_result": [
-                    [
-                        ["allmodconfig", "allmodconfig", "arm"],
-                        [["PASS", {"$oid": "1234567890"}], ["FAIL", {"$oid": "1234567890"}]]
-                    ]
-                ]
-            }
         ]
     }
 
@@ -423,7 +353,7 @@ POST
 
  **Example Requests**
 
- .. sourcecode:: http 
+ .. sourcecode:: http
 
     POST /job HTTP/1.1
     Host: api.kernelci.org
@@ -436,87 +366,6 @@ POST
         "kernel": "next-20140801",
         "git_branch": "master",
         "status": "FAIL"
-    }
-
-.. _collection_job_post_compare:
-
-.. http:post:: /job/compare/
-
- Execute a comparison of a job with one or more other jobs.
-
- The job comparison is done on all the available builds for a given job: it will
- give an overview about all the builds performed.
-
- For more info on all the required JSON request fields, see the :ref:`job-compare schema for POST requests <schema_compare_post_job>`. For the results returned by this resource, see the :ref:`job-compare schema for GET requests <schema_compare_get_job>`.
-
- When successful, the response will contain a ``Location`` header pointing to the saved results URL of the requested comparison.
-
- :reqjson string job: The name of the job.
- :reqjson string kernel: The name of the kernel.
- :reqjson string job_id: The ID of the job.
- :reqjson array compare_to: The list of jobs to compare against.
-
- :reqheader Authorization: The token necessary to authorize the request.
- :reqheader Content-Type: Content type of the transmitted data, must be ``application/json``.
- :reqheader Accept-Encoding: Accept the ``gzip`` coding.
-
- :resheader Content-Type: Will be ``application/json; charset=UTF-8``.
- :resheader Location: Will point to the saved comparison results ID.
-
- :status 200: The request has been processed, saved results are returned.
- :status 201: The request has been processed and created.
- :status 400: JSON data not valid.
- :status 403: Not authorized to perform the operation.
- :status 404: Document not found.
- :status 415: Wrong content type.
- :status 422: No real JSON data provided.
- :status 500: Internal server error.
- :status 503: Service maintenance.
-
- **Example Requests**
-
- .. sourcecode:: http 
-
-    POST /job/compare/ HTTP/1.1
-    Host: api.kernelci.org
-    Content-Type: application/json
-    Accept: */*
-    Authorization: token
-
-    {
-        "job": "next",
-        "kernel": "next-20150826",
-        "compare_to": [
-            {
-                "job": "next",
-                "kernel": "next-20150825"
-            },
-            {
-                "job": "next",
-                "kernel": "next-20150824"
-            }
-        ]
-    }
-
- .. sourcecode:: http 
-
-    POST /job/compare/ HTTP/1.1
-    Host: api.kernelci.org
-    Content-Type: application/json
-    Accept: */*
-    Authorization: token
-
-    {
-        "job_id": "123456789012345678901234"
-        "compare_to": [
-            {
-                "job": "next",
-                "kernel": "next-20150825"
-            },
-            {
-                "job_id": "123456789012345678901234"
-            }
-        ]
     }
 
 DELETE
