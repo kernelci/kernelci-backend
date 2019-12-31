@@ -61,7 +61,6 @@ BOARD_URL = (
 )
 BOOT_SUMMARY_URL = \
     u"{boot_url:s}/{job:s}/branch/{git_branch:s}/kernel/{kernel:s}/"
-BOOT_REGRESSIONS_URL = BOOT_SUMMARY_URL + u"#regressions"
 BUILD_SUMMARY_URL = \
     u"{build_url:s}/{job:s}/branch/{git_branch:s}/kernel/{kernel:s}/"
 

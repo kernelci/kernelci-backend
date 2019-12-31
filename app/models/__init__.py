@@ -51,7 +51,6 @@ BOOT_JOB_URL_KEY = "boot_job_url"
 BOOT_LOAD_ADDR_KEY = "loadaddr"
 BOOT_LOG_HTML_KEY = "boot_log_html"
 BOOT_LOG_KEY = "boot_log"
-BOOT_REGRESSIONS_ID_KEY = "boot_regressions_id"
 BOOT_RESULT_DESC_KEY = "boot_result_description"
 BOOT_RESULT_KEY = "boot_result"
 BOOT_RETRIES_KEY = "boot_retries"
@@ -259,8 +258,6 @@ UNIQUE_KEY = "unique"
 
 # Collection names.
 BOOT_COLLECTION = "boot"
-BOOT_REGRESSIONS_BY_BOOT_COLLECTION = "boot_regressions_by_boot_id"
-BOOT_REGRESSIONS_COLLECTION = "boot_regressions"
 BUILD_COLLECTION = "build"
 COUNT_COLLECTION = "count"
 JOB_COLLECTION = "job"
@@ -987,16 +984,6 @@ STATISTICS_VALID_KEYS = {
         CREATED_KEY,
         ID_KEY,
         VERSION_KEY
-    ]
-}
-
-BOOT_REGRESSIONS_VALID_KEYS = {
-    "GET": [
-        CREATED_KEY,
-        ID_KEY,
-        JOB_ID_KEY,
-        JOB_KEY,
-        KERNEL_KEY
     ]
 }
 

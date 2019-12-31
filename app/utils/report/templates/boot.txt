@@ -28,26 +28,6 @@ See the *baseline results for this kernel revision* on this page:
 {%- if tested_string %}
 {{ tested_string }}
 {% endif %}
-{%- if regressions %}
-{%- for summary in regressions.summary.txt %}
-{{ summary }}
-{%- endfor %}
-{% for arch, arch_data in regressions.data|dictsort %}
-{{ arch }}:
-{% for defconfig, build_env_data in arch_data|dictsort %}
-    {{ defconfig }}:
-{%- for build_env, board_data in build_env_data|dictsort %}
-        {{ build_env }}:
-{%- for board, labs_data in board_data|dictsort %}
-          {{ board }}:
-{%- for lab in labs_data %}
-              {{ lab.txt }}
-{%- endfor %}{# lab #}
-{%- endfor %}{# board #}
-{%- endfor %}{# build_env #}
-{% endfor %}{# defconfig #}
-{%- endfor %}{# arch #}
-{%- endif %}{# regressions #}
 {%- if platforms %}
 {%- if platforms.failed_data %}
 {%- for summary in platforms.failed_data.summary.txt %}

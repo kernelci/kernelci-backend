@@ -72,24 +72,6 @@ INDEX_SPECS = {
         ],
     ],
 
-    models.BOOT_REGRESSIONS_COLLECTION: [
-        [
-            (models.JOB_KEY, pymongo.ASCENDING),
-            (models.KERNEL_KEY, pymongo.DESCENDING),
-            (models.CREATED_KEY, pymongo.DESCENDING),
-        ],
-        [(models.JOB_ID_KEY, pymongo.DESCENDING)],
-    ],
-
-    models.BOOT_REGRESSIONS_BY_BOOT_COLLECTION: [
-        [
-            (models.BOOT_ID_KEY, pymongo.DESCENDING),
-        ],
-        [
-            (models.CREATED_KEY, pymongo.DESCENDING),
-        ],
-    ],
-
     models.BUILD_COLLECTION: [
         [
             (models.CREATED_KEY, pymongo.DESCENDING),
