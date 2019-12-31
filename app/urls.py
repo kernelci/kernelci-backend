@@ -30,7 +30,6 @@ import handlers.boot
 import handlers.boot_trigger
 import handlers.build
 import handlers.build_logs
-import handlers.compare
 import handlers.count
 import handlers.count_distinct
 import handlers.distinct
@@ -70,18 +69,6 @@ _JOB_DISTINCT_URL = tornado.web.url(
     kwargs={"resource": "job"}, name="job-distinct"
 )
 
-_JOB_COMPARE_URL = tornado.web.url(
-    r"/job[s]?/compare/?$",
-    handlers.compare.CompareHandler,
-    kwargs={"resource": "job"}, name="job-compare"
-)
-
-_JOB_COMPARE_ID_URL = tornado.web.url(
-    r"/job[s]?/compare/(?P<id>[A-Za-z0-9]{24})/?$",
-    handlers.compare.CompareHandler,
-    kwargs={"resource": "job"}, name="job-compare-id"
-)
-
 _BUILD_URL = tornado.web.url(
     r"/build[s]?/?$", handlers.build.BuildHandler, name="build")
 
@@ -101,18 +88,6 @@ _BUILD_DISTINCT_URL = tornado.web.url(
     r"/build[s]?/distinct/(?P<field>[A-Za-z0-9_]+)/?$",
     handlers.distinct.DistinctHandler,
     kwargs={"resource": "build"}, name="build-distinct"
-)
-
-_BUILD_COMPARE_URL = tornado.web.url(
-    r"/build[s]?/compare/?$",
-    handlers.compare.CompareHandler,
-    kwargs={"resource": "build"}, name="build-compare"
-)
-
-_BUILD_COMPARE_ID_URL = tornado.web.url(
-    r"/build[s]?/compare/(?P<id>[A-Za-z0-9]{24})/?$",
-    handlers.compare.CompareHandler,
-    kwargs={"resource": "build"}, name="build-compare-id"
 )
 
 _BOOT_URL = tornado.web.url(
@@ -136,18 +111,6 @@ _BOOT_DISTINCT_URL = tornado.web.url(
     r"/boot[s]?/distinct/(?P<field>[A-Za-z0-9_]+)/?$",
     handlers.distinct.DistinctHandler,
     kwargs={"resource": "boot"}, name="boot-distinct"
-)
-
-_BOOT_COMPARE_URL = tornado.web.url(
-    r"/boot[s]?/compare/?$",
-    handlers.compare.CompareHandler,
-    kwargs={"resource": "boot"}, name="boot-compare"
-)
-
-_BOOT_COMPARE_ID_URL = tornado.web.url(
-    r"/boot[s]?/compare/(?P<id>[A-Za-z0-9]{24})/?$",
-    handlers.compare.CompareHandler,
-    kwargs={"resource": "boot"}, name="boot-compare-id"
 )
 
 _COUNT_URL = tornado.web.url(
@@ -229,24 +192,18 @@ _LAVA_CALLBACK_URL = tornado.web.url(
 APP_URLS = [
     _BATCH_URL,
     _BISECT_URL,
-    _BOOT_COMPARE_ID_URL,
-    _BOOT_COMPARE_URL,
     _BOOT_DISTINCT_URL,
     _BOOT_ID_REGRESSIONS_URL,
     _BOOT_ID_URL,
     _BOOT_REGRESSIONS_URL,
     _BOOT_TRIGGER_URL,
     _BOOT_URL,
-    _BUILD_COMPARE_ID_URL,
-    _BUILD_COMPARE_URL,
     _BUILD_DISTINCT_URL,
     _BUILD_ID_LOGS_URL,
     _BUILD_ID_URL,
     _BUILD_LOGS_URL,
     _BUILD_URL,
     _COUNT_URL,
-    _JOB_COMPARE_ID_URL,
-    _JOB_COMPARE_URL,
     _JOB_DISTINCT_URL,
     _JOB_ID_LOGS_URL,
     _JOB_ID_URL,
