@@ -52,22 +52,7 @@ BOOT_SEARCH_FIELDS = [
 
 HREF_STYLE = u"style=\"color: black; text-decoration: none\""
 
-# Regressions strings.
-SINGULAR_FAILURE_HTML = \
-    u"<a href=\"{boot_regressions_url:s}\" " + HREF_STYLE + u">" + \
-    u"failing since <span style=\"color: {red:s}\">{days:d} day</span></a>"
-PLURAL_FAILURE_HTML = \
-    u"<a href=\"{boot_regressions_url:s}\" " + HREF_STYLE + u">" + \
-    u"failing since <span style=\"color: {red:s}\">{days:d} days</span></a>"
-
-SINGULAR_FAILURE_TXT = u"failing since {days:d} day"
-PLURAL_FAILURE_TXT = u"failing since {days:d} days"
-
 BOOT_ID_HTML = u"<a href=\"{boot_id_url:s}\">{lab_name:s}</a>"
-NEW_FAIL_HTML = u"<span style=\"color: {red:s}\">" + \
-    u"<a href=\"{boot_regressions_url:s}\" " + HREF_STYLE + u">" + \
-    u"new failure</a></span>"
-NEW_FAIL_TXT = u"{lab_name:s}: new failure"
 
 LAST_PASS_TXT = u"last pass: {good_kernel:s}"
 LAST_PASS_HTML = \
@@ -80,162 +65,6 @@ FIRST_FAIL_HTML = \
 BASELINE_SUMMARY_URL = u"\
 {base_url:s}/test/job/{job:s}/branch/{git_branch:s}/\
 kernel/{kernel:s}/plan/baseline/"
-
-
-def create_regressions_data(boot_docs, boot_data):
-    """Create the regressions data for the email report.
-
-    Will create the TXT/HTML strings to be used in the report.
-
-    :param boot_docs: The regressions data (the list of boot reports).
-    :type boot_docs: list
-    :param boot_data: Details about the boot results
-    :type boot_data: dict
-    :return dict The regressions strings in a dictionary.
-    """
-    regr_data = {}
-
-    # Make sure the boot reports in the regressions data structure are
-    # correctly sorted by date, so that the oldest document is the PASS one
-    # and the most recent one is the last FAIL-ed.
-    boot_docs.sort(
-        cmp=lambda x, y: cmp(x[models.CREATED_KEY], y[models.CREATED_KEY]))
-
-    last_fail = boot_docs[-1]
-    last_good = boot_docs[0]
-
-    fmt_data = {
-        "boot_id_url": boot_data["boot_id_url"],
-        "red": boot_data["red"],
-        models.LAB_NAME_KEY: last_fail[models.LAB_NAME_KEY],
-        "good_kernel": last_good[models.KERNEL_KEY],
-        "boot_regressions_url": rcommon.BOOT_REGRESSIONS_URL.format(
-            **boot_data),
-    }
-
-    fail_url = BOOT_ID_HTML.format(**fmt_data).format(**last_fail)
-
-    if len(boot_docs) == 2:
-        failure = NEW_FAIL_HTML.format(**fmt_data)
-
-        # Simple case, it's a new failure.
-        regr_data["txt"] = \
-            u"{:s} ({:s})".format(
-                NEW_FAIL_TXT.format(**last_fail),
-                LAST_PASS_TXT.format(**fmt_data))
-        regr_data["html"] = \
-            u"{:s}: {:s} <small>({:s})</small>".format(
-                fail_url,
-                failure,
-                LAST_PASS_HTML.format(**fmt_data).format(**last_good))
-    else:
-        # The first boot report is always a PASS status.
-        first_fail = boot_docs[1]
-        fmt_data["bad_kernel"] = first_fail[models.KERNEL_KEY]
-
-        delta = last_fail[models.CREATED_KEY] - first_fail[models.CREATED_KEY]
-        days = delta.days
-
-        # Default to 1 day.
-        if days == 0:
-            days = 1
-        # Inject the number of days.
-        fmt_data["days"] = days
-
-        failure_txt = P_(
-            SINGULAR_FAILURE_TXT, PLURAL_FAILURE_TXT, days)\
-            .format(**fmt_data)
-
-        failure_html = P_(
-            SINGULAR_FAILURE_HTML, PLURAL_FAILURE_HTML, days)\
-            .format(**fmt_data)
-
-        regr_data["txt"] = \
-            u"{:s}: {:s} ({:s} - {:s})".format(
-                last_fail[models.LAB_NAME_KEY],
-                failure_txt,
-                LAST_PASS_TXT.format(**fmt_data),
-                FIRST_FAIL_TXT.format(**fmt_data))
-        regr_data["html"] = \
-            u"{:s}: {:s} <small>({:s} - {:s})</small>".format(
-                fail_url,
-                failure_html,
-                LAST_PASS_HTML.format(**fmt_data).format(**last_good),
-                FIRST_FAIL_HTML.format(**fmt_data).format(**first_fail))
-
-    return regr_data
-
-
-def parse_regressions(lab_regressions, boot_data, db_options):
-    """Parse the regressions data and create the strings for the report.
-
-    The returned data structure is:
-
-        {
-            "summary": {
-                "txt": ["List of TXT summary strings"],
-                "html: ["List of HTML summary strings"]
-            },
-            "data": {
-                "arch": {
-                    "defconfig": {
-                        "build_environment": {
-                            "board": [
-                                {
-                                    "txt": "string",
-                                    "html": "string"
-                                },
-                            ]
-                        }
-                    }
-                }
-            }
-        }
-
-    :param lab_regressions: The regressions data for each lab.
-    :type lab_regressions: dict
-    :param boot_data: Details about the boot results
-    :type boot_data: dict
-    :return dict The regressions data structure for the report.
-    """
-    regressions = {}
-    regressions_data = None
-    lab_name = boot_data.get("lab_name", None)
-
-    for lab, lab_d in lab_regressions.iteritems():
-        if lab_name and lab != lab_name:
-            continue
-
-        regressions_data = regressions.setdefault("data", {})
-
-        for arch, arch_d in lab_d.iteritems():
-            # Prepare the arch string for visualization.
-            # Same for defconfig and board ones.
-            arch = unicode(arch)
-            regr_arch = regressions_data.setdefault(arch, {})
-
-            for board, board_d in arch_d.iteritems():
-                board = unicode(board)
-                for instance_d in board_d.itervalues():
-                    for defconfig, defconfig_d in instance_d.iteritems():
-                        defconfig = unicode(defconfig)
-                        regr_def = regr_arch.setdefault(defconfig, {})
-                        for build_env, build_env_d in defconfig_d.iteritems():
-                            regr_build_env = regr_def.setdefault(
-                                build_env, {})
-                            for _, boots in build_env_d.iteritems():
-                                regr_board = regr_build_env.setdefault(
-                                    board, [])
-                                regr = create_regressions_data(
-                                    boots, boot_data)
-                                regr_board.append(regr)
-
-    if regressions_data:
-        regressions["summary"] = {}
-        regressions["summary"]["txt"] = ["Boot Regressions Detected:"]
-        regressions["summary"]["html"] = ["Boot Regressions Detected:"]
-
-    return regressions
 
 
 def _update_boot_conflicts(data, spec, database):
@@ -402,18 +231,9 @@ def get_boot_data(db_options, job, branch, kernel, lab_name):
         "boot_id_url": rcommon.BOOT_ID_URL,
         models.JOB_KEY: job,
         models.KERNEL_KEY: kernel,
-        models.LAB_NAME_KEY: lab_name
+        models.LAB_NAME_KEY: lab_name,
+        "regressions": None,
     }
-
-    # Get the regressions
-    regressions_doc = database[models.BOOT_REGRESSIONS_COLLECTION].find_one(
-        {models.JOB_KEY: job, models.KERNEL_KEY: kernel})
-
-    if regressions_doc:
-        data["regressions"] = parse_regressions(
-            regressions_doc[models.REGRESSIONS_KEY], data, db_options)
-    else:
-        data["regressions"] = None
 
     if fail_count > 0:
         _update_boot_conflicts(data, spec, database)
