@@ -36,13 +36,11 @@ from handlers.common.query import (
     get_and_add_date_range,
     get_and_add_gte_lt_keys,
     get_and_add_time_range,
-    get_compared_value,
     get_created_on_date,
     get_query_fields,
     get_query_sort,
     get_query_spec,
     get_skip_and_limit,
-    get_trigger_query_values
 )
 
 
@@ -995,54 +993,3 @@ class TestCommonQuery(unittest.TestCase):
 
         get_and_add_gte_lt_keys(spec, query_args_func, valid_keys)
         self.assertDictEqual(expected, spec)
-
-    def test_get_all_trigger_query_values(self):
-        def query_args_func(key):
-            args = {
-                "skip": 10,
-                "limit": 100,
-            }
-            return args.get(key, [])
-
-        valid_keys = []
-
-        return_value = get_trigger_query_values(query_args_func, valid_keys)
-        self.assertEqual(len(return_value), 6)
-
-    def test_get_compared_key_no_key(self):
-        def query_args_func(key):
-            return None
-        compared = get_compared_value(query_args_func)
-        self.assertFalse(compared)
-
-    def test_get_compared_key_no_key_list(self):
-        def query_args_func(key):
-            return []
-        compared = get_compared_value(query_args_func)
-        self.assertFalse(compared)
-
-    def test_get_compared_key_with_key_list(self):
-        def query_args_func(key):
-            return [1, 2, 0]
-        compared = get_compared_value(query_args_func)
-        self.assertFalse(compared)
-
-    def test_get_compared_key_with_key(self):
-        def query_args_func(key):
-            args = {
-                "compared": 1
-            }
-            return args.get(key, [])
-
-        compared = get_compared_value(query_args_func)
-        self.assertTrue(compared)
-
-    def test_get_compared_key_with_key_string(self):
-        def query_args_func(key):
-            args = {
-                "compared": "1"
-            }
-            return args.get(key, [])
-
-        compared = get_compared_value(query_args_func)
-        self.assertTrue(compared)

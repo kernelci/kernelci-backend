@@ -191,34 +191,6 @@ def get_aggregate_value(query_args_func):
     return aggregate
 
 
-def get_compared_value(query_args_func):
-    """Get the value of the compared key.
-
-    This is used by the trigger API to determine if the results should be
-    returned by comparing what other labs have already done.
-
-    The `compared` key in the query arguments must be an integer, and it will
-    be converted into a boolean. Other value types will be treated as False.
-
-    If a list of `compared` key is retrieved, only the last one will be used.
-
-    :param query_args_func: The function used to get the query arguments.
-    :type query_args_func: function
-    :return The compared value as boolean.
-    """
-    compared = query_args_func(models.COMPARED_KEY)
-    if isinstance(compared, types.ListType):
-        if compared:
-            compared = compared[-1]
-
-    if isinstance(compared, (types.StringTypes, types.IntType)):
-        compared = bool(compared)
-    else:
-        compared = False
-
-    return compared
-
-
 def get_query_spec(query_args_func, valid_keys):
     """Get values from the query string to build a `spec` data structure.
 
@@ -582,35 +554,6 @@ def get_values(query_args_func, valid_keys):
     yield limit
     # Then the aggregate values.
     yield get_aggregate_value(query_args_func)
-
-
-def get_trigger_query_values(query_args_func, valid_keys):
-    """Handy function to get all the query args in a batch for trigger APIs.
-
-    :param query_args_func: A function used to return a list of the query
-    arguments.
-    :type query_args_func: function
-    :param valid_keys: A list containing the valid keys that should be
-    retrieved.
-    :type valid_keys: list
-    :return 6-tuple: spec, fields, skip, limit, compared.
-    """
-    spec = get_query_spec(query_args_func, valid_keys)
-
-    created_on = get_created_on_date(query_args_func)
-    add_created_on_date(spec, created_on)
-
-    get_and_add_date_range(spec, query_args_func, created_on)
-    get_and_add_gte_lt_keys(spec, query_args_func, valid_keys)
-    get_and_add_time_range(spec, query_args_func)
-    utils.update_id_fields(spec)
-
-    sort = get_query_sort(query_args_func)
-    fields = get_query_fields(query_args_func)
-    skip, limit = get_skip_and_limit(query_args_func)
-    compared = get_compared_value(query_args_func)
-
-    return spec, sort, fields, skip, limit, compared
 
 
 def get_all_query_values(query_args_func, valid_keys):
