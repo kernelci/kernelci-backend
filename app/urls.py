@@ -27,7 +27,6 @@ import tornado.web
 import handlers.batch
 import handlers.bisect
 import handlers.boot
-import handlers.boot_trigger
 import handlers.build
 import handlers.build_logs
 import handlers.count
@@ -182,10 +181,6 @@ _TEST_REGRESSION_URL = tornado.web.url(
     r"/test[s]?/regression[s]?/?(?P<id>.*)",
     handlers.test_regression.TestRegressionHandler, name="test-regression")
 
-_BOOT_TRIGGER_URL = tornado.web.url(
-    r"/trigger/boot[s]?/?",
-    handlers.boot_trigger.BootTriggerHandler, name="boot-trigger")
-
 _STATS_URL = tornado.web.url(
     r"/statistics/?", handlers.stats.StatisticsHandler, name="statistics")
 
@@ -201,7 +196,6 @@ APP_URLS = [
     _BOOT_ID_REGRESSIONS_URL,
     _BOOT_ID_URL,
     _BOOT_REGRESSIONS_URL,
-    _BOOT_TRIGGER_URL,
     _BOOT_URL,
     _BUILD_DISTINCT_URL,
     _BUILD_ID_LOGS_URL,
