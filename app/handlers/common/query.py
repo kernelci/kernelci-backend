@@ -283,11 +283,8 @@ def get_query_spec(query_args_func, valid_keys):
     spec = {}
     if valid_keys and isinstance(valid_keys, types.ListType):
         spec = {
-            k: v for k, v in [
-                (key, val)
-                for key, val in _get_spec_values()
-                if _valid_value(val)
-            ]
+            k: None if v == 'null' else v
+            for (k, v) in _get_spec_values() if _valid_value(v)
         }
 
     return spec
