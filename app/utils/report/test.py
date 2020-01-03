@@ -43,7 +43,6 @@ TEST_REPORT_FIELDS = [
     models.CREATED_KEY,
     models.DEFCONFIG_FULL_KEY,
     models.DEFCONFIG_KEY,
-    models.DEFINITION_URI_KEY,
     models.DEVICE_TYPE_KEY,
     models.FILE_SERVER_RESOURCE_KEY,
     models.GIT_BRANCH_KEY,
@@ -57,13 +56,11 @@ TEST_REPORT_FIELDS = [
     models.JOB_KEY,
     models.KERNEL_KEY,
     models.LAB_NAME_KEY,
-    models.METADATA_KEY,
     models.NAME_KEY,
     models.STATUS_KEY,
     models.TEST_CASES_KEY,
     models.SUB_GROUPS_KEY,
     models.TIME_KEY,
-    models.VCS_COMMIT_KEY,
     models.VERSION_KEY,
 ]
 

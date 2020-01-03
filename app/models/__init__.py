@@ -854,7 +854,6 @@ TEST_GROUP_VALID_KEYS = {
             DEVICE_TYPE_KEY,
             BUILD_ID_KEY,
             DEFCONFIG_KEY,
-            DEFINITION_URI_KEY,
             ENDIANNESS_KEY,
             FILE_SERVER_RESOURCE_KEY,
             GIT_COMMIT_KEY,
@@ -869,12 +868,10 @@ TEST_GROUP_VALID_KEYS = {
             LAB_NAME_KEY,
             LOG_KEY,
             MACH_KEY,
-            METADATA_KEY,
             NAME_KEY,
             SUB_GROUPS_KEY,
             TEST_CASES_KEY,
             TIME_KEY,
-            VCS_COMMIT_KEY,
             VERSION_KEY
         ]
     },
@@ -888,15 +885,12 @@ TEST_GROUP_VALID_KEYS = {
         DEFCONFIG_FULL_KEY,
         BUILD_ID_KEY,
         DEFCONFIG_KEY,
-        DEFINITION_URI_KEY,
         GIT_BRANCH_KEY,
         INDEX_KEY,
         JOB_ID_KEY,
         JOB_KEY,
         KERNEL_KEY,
-        METADATA_KEY,
         NAME_KEY,
-        VCS_COMMIT_KEY,
         VERSION_KEY
     ],
     "GET": [
@@ -909,7 +903,6 @@ TEST_GROUP_VALID_KEYS = {
         CREATED_KEY,
         DEFCONFIG_FULL_KEY,
         DEFCONFIG_KEY,
-        DEFINITION_URI_KEY,
         GIT_BRANCH_KEY,
         INDEX_KEY,
         JOB_ID_KEY,
@@ -918,7 +911,6 @@ TEST_GROUP_VALID_KEYS = {
         LAB_NAME_KEY,
         NAME_KEY,
         TIME_KEY,
-        VCS_COMMIT_KEY,
         VERSION_KEY
     ]
 }

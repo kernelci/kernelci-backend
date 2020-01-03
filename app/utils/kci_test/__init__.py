@@ -371,14 +371,12 @@ def _update_test_group_doc_from_json(group_doc, group_dict, errors):
         models.BOOT_RESULT_DESC_KEY)
     group_doc.build_environment = group_dict.get(models.BUILD_ENVIRONMENT_KEY)
     group_doc.dtb = group_dict.get(models.DTB_KEY)
-    group_doc.dtb_addr = group_dict.get(models.DTB_ADDR_KEY)
     group_doc.device_type = group_dict.get(models.DEVICE_TYPE_KEY)
     group_doc.defconfig = group_dict.get(models.DEFCONFIG_KEY)
     group_doc.defconfig_full = group_dict.get(models.DEFCONFIG_FULL_KEY)
     group_doc.endian = group_dict.get(models.ENDIANNESS_KEY)
     group_doc.file_server_resource = group_dict.get(
         models.FILE_SERVER_RESOURCE_KEY)
-    group_doc.file_server_url = group_dict.get(models.FILE_SERVER_URL_KEY)
     group_doc.git_branch = group_dict.get(models.GIT_BRANCH_KEY)
     group_doc.git_commit = group_dict.get(models.GIT_COMMIT_KEY)
     group_doc.git_describe = group_dict.get(models.GIT_DESCRIBE_KEY)
@@ -386,21 +384,11 @@ def _update_test_group_doc_from_json(group_doc, group_dict, errors):
     group_doc.index = group_dict.get(models.INDEX_KEY)
     group_doc.image_type = group_dict.get(models.IMAGE_TYPE_KEY)
     group_doc.initrd = group_dict.get(models.INITRD_KEY)
-    group_doc.initrd_addr = group_dict.get(models.INITRD_ADDR_KEY)
     group_doc.initrd_info = group_dict.get(models.INITRD_INFO_KEY)
     group_doc.job = group_dict.get(models.JOB_KEY)
     group_doc.kernel = group_dict.get(models.KERNEL_KEY)
     group_doc.kernel_image = group_dict.get(models.KERNEL_IMAGE_KEY)
-    group_doc.kernel_image_size = group_dict.get(models.KERNEL_IMAGE_SIZE_KEY)
-    group_doc.load_addr = group_dict.get(models.BOOT_LOAD_ADDR_KEY)
-    group_doc.metadata = group_dict.get(models.METADATA_KEY, {})
     group_doc.plan_variant = group_dict.get(models.PLAN_VARIANT_KEY)
-    group_doc.qemu = group_dict.get(models.QEMU_KEY)
-    group_doc.qemu_command = group_dict.get(models.QEMU_COMMAND_KEY)
-    group_doc.retries = group_dict.get(models.BOOT_RETRIES_KEY, 0)
-    group_doc.uimage = group_dict.get(models.UIMAGE_KEY)
-    group_doc.uimage_addr = group_dict.get(models.UIMAGE_ADDR_KEY)
-    group_doc.vcs_commit = group_dict.get(models.VCS_COMMIT_KEY)
     group_doc.version = group_dict.get(models.VERSION_KEY, "1.0")
     group_doc.warnings = group_dict.get(models.BOOT_WARNINGS_KEY, 0)
 
@@ -477,8 +465,6 @@ def _update_test_group_doc_ids(group_doc, database):
             group_doc.git_describe = doc_get(models.GIT_DESCRIBE_KEY)
         if not group_doc.git_url:
             group_doc.git_url = doc_get(models.GIT_URL_KEY)
-        if not group_doc.vcs_commit:
-            group_doc.vcs_commit = doc_get(models.GIT_COMMIT_KEY)
     else:
         utils.LOG.warn(
             "No build document found for test group %s-%s-%s-%s (%s)",

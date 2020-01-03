@@ -66,13 +66,10 @@ class TestGroupDocument(modb.BaseDocument):
         self.cross_compile = None
         self.defconfig = None
         self.defconfig_full = None
-        self.definition_uri = None
         self.device_type = None
         self.dtb = None
-        self.dtb_addr = None
         self.endian = None
         self.file_server_resource = None
-        self.file_server_url = None
         self.git_branch = None
         self.git_commit = None
         self.git_describe = None
@@ -80,25 +77,17 @@ class TestGroupDocument(modb.BaseDocument):
         self.image_type = None
         self.index = None
         self.initrd = None
-        self.initrd_addr = None
         self.initrd_info = None
         self.job = None
         self.job_id = None
         self.kernel = None
         self.kernel_image = None
-        self.kernel_image_size = None
-        self.load_addr = None
         self.mach = None
-        self.metadata = {}
         self.plan_variant = None
-        self.qemu = None
-        self.qemu_command = None
-        self.retries = 0
         self.test_cases = []
         self.parent_id = None
         self.sub_groups = []
         self.time = -1
-        self.vcs_commit = None
         self.warnings = 0
 
     @property
@@ -180,13 +169,10 @@ class TestGroupDocument(modb.BaseDocument):
             models.CREATED_KEY: self.created_on,
             models.DEFCONFIG_FULL_KEY: self.defconfig_full or self.defconfig,
             models.DEFCONFIG_KEY: self.defconfig,
-            models.DEFINITION_URI_KEY: self.definition_uri,
             models.DEVICE_TYPE_KEY: self.device_type,
             models.DTB_KEY: self.dtb,
-            models.DTB_ADDR_KEY: self.dtb_addr,
             models.ENDIANNESS_KEY: self.endian,
             models.FILE_SERVER_RESOURCE_KEY: self.file_server_resource,
-            models.FILE_SERVER_URL_KEY: self.file_server_url,
             models.GIT_BRANCH_KEY: self.git_branch,
             models.GIT_COMMIT_KEY: self.git_commit,
             models.GIT_DESCRIBE_KEY: self.git_describe,
@@ -194,27 +180,19 @@ class TestGroupDocument(modb.BaseDocument):
             models.IMAGE_TYPE_KEY: self.image_type,
             models.INDEX_KEY: self.index,
             models.INITRD_KEY: self.initrd,
-            models.INITRD_ADDR_KEY: self.initrd_addr,
             models.INITRD_INFO_KEY: self.initrd_info,
             models.JOB_ID_KEY: self.job_id,
             models.JOB_KEY: self.job,
             models.KERNEL_KEY: self.kernel,
             models.KERNEL_IMAGE_KEY: self.kernel_image,
-            models.KERNEL_IMAGE_SIZE_KEY: self.kernel_image_size,
             models.LAB_NAME_KEY: self.lab_name,
-            models.LOAD_ADDR_KEY: self.load_addr,
             models.MACH_KEY: self.mach,
-            models.METADATA_KEY: self.metadata,
-            models.QEMU_KEY: self.qemu,
-            models.QEMU_COMMAND_KEY: self.qemu_command,
-            models.RETRIES_KEY: self.retries,
             models.NAME_KEY: self.name,
             models.PLAN_VARIANT_KEY: self.plan_variant,
             models.TEST_CASES_KEY: self.test_cases,
             models.PARENT_ID_KEY: self.parent_id,
             models.SUB_GROUPS_KEY: self.sub_groups,
             models.TIME_KEY: self.time,
-            models.VCS_COMMIT_KEY: self.vcs_commit,
             models.VERSION_KEY: self.version,
             models.WARNINGS_KEY: self.warnings,
         }

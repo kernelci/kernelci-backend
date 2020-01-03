@@ -50,13 +50,10 @@ class TestTestGroupModel(unittest.TestCase):
         test_group.cross_compile = "cross-compile"
         test_group.defconfig = "defconfig"
         test_group.defconfig_full = "defconfig-full"
-        test_group.definition_uri = "uri"
         test_group.device_type = "device-type"
         test_group.dtb = "dtb"
-        test_group.dtb_addr = "dtb-addr"
         test_group.endian = "big-endian"
         test_group.file_server_resource = "file-resource"
-        test_group.file_server_url = "file-url"
         test_group.git_branch = "git-branch"
         test_group.git_commit = "git-commit"
         test_group.git_describe = "git-describe"
@@ -65,25 +62,17 @@ class TestTestGroupModel(unittest.TestCase):
         test_group.index = 1
         test_group.image_type = "image_type"
         test_group.initrd = "initrd"
-        test_group.initrd_addr = "initrd-addr"
         test_group.initrd_info = "initrd-info"
         test_group.job = "job"
         test_group.job_id = "job_id"
         test_group.kernel = "kernel"
         test_group.kernel_image = "kernel-image"
-        test_group.kernel_image_size = "kernel-image-size"
-        test_group.load_addr = "load-addr"
         test_group.mach = "mach"
-        test_group.metadata = {"foo": "bar"}
         test_group.parent_id = "parent-id"
         test_group.plan_variant = "tother"
-        test_group.qemu = "qemu"
-        test_group.qemu_command = "qemu-command"
-        test_group.retries = 2
         test_group.sub_groups = [True, False]
         test_group.test_cases = ["foo"]
         test_group.time = 10
-        test_group.vcs_commit = "1234"
         test_group.version = "1.1"
         test_group.warnings = 123
 
@@ -104,13 +93,10 @@ class TestTestGroupModel(unittest.TestCase):
             "cross_compile": "cross-compile",
             "defconfig": "defconfig",
             "defconfig_full": "defconfig-full",
-            "definition_uri": "uri",
             "device_type": "device-type",
             "dtb": "dtb",
-            "dtb_addr": "dtb-addr",
             "endian": "big-endian",
             "file_server_resource": "file-resource",
-            "file_server_url": "file-url",
             "git_branch": "git-branch",
             "git_commit": "git-commit",
             "git_describe": "git-describe",
@@ -118,27 +104,19 @@ class TestTestGroupModel(unittest.TestCase):
             "image_type": "image_type",
             "index": 1,
             "initrd": "initrd",
-            "initrd_addr": "initrd-addr",
             "initrd_info": "initrd-info",
             "job": "job",
             "job_id": "job_id",
             "kernel": "kernel",
             "kernel_image": "kernel-image",
-            "kernel_image_size": "kernel-image-size",
             "lab_name": "lab-name",
-            "load_addr": "load-addr",
             "mach": "mach",
-            "metadata": {"foo": "bar"},
             "parent_id": "parent-id",
             "plan_variant": "tother",
             "name": "name",
-            "qemu": "qemu",
-            "qemu_command": "qemu-command",
-            "retries": 2,
             "sub_groups": [True, False],
             "test_cases": ["foo"],
             "time": 10,
-            "vcs_commit": "1234",
             "version": "1.1",
             "warnings": 123,
         }
@@ -176,13 +154,10 @@ class TestTestGroupModel(unittest.TestCase):
             "cross_compile": None,
             "defconfig": "defconfig",
             "defconfig_full": "defconfig",
-            "definition_uri": "uri",
             "device_type": "device-type",
             "dtb": None,
-            "dtb_addr": None,
             "endian": None,
             "file_server_resource": None,
-            "file_server_url": None,
             "git_branch": "git_branch",
             "git_commit": "git_commit",
             "git_describe": "git_describe",
@@ -190,27 +165,19 @@ class TestTestGroupModel(unittest.TestCase):
             "initrd": "initrd",
             "index": 1,
             "image_type": "image_type",
-            "initrd_addr": "initrd_addr",
             "initrd_info": None,
             "job": "job",
             "job_id": "job_id",
             "kernel": "kernel",
             "kernel_image": None,
-            "kernel_image_size": None,
             "lab_name": "lab-name",
-            "load_addr": "load_addr",
             "mach": "mach",
-            "metadata": {"foo": "bar"},
             "name": "name",
             "parent_id": "parent-id",
             "plan_variant": "tother",
-            "qemu": None,
-            "qemu_command": None,
-            "retries": 0,
             "sub_groups": [True, False],
             "test_cases": ["foo"],
             "time": 10,
-            "vcs_commit": "1234",
             "version": "1.0",
             "warnings": 123,
         }
