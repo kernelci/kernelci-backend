@@ -151,6 +151,7 @@ class LavaCallbackHandler(CallbackHandler):
         super(LavaCallbackHandler, self).__init__(*args, **kwargs)
         self._json_obj = None
         self._job_meta = None
+        self._lava_multinode = None
 
     @property
     def json_obj(self):
@@ -159,6 +160,10 @@ class LavaCallbackHandler(CallbackHandler):
     @property
     def job_meta(self):
         return self._job_meta
+
+    @property
+    def lava_multinode(self):
+        return self._lava_multinode
 
     @staticmethod
     def _valid_keys(method):
@@ -191,6 +196,20 @@ class LavaCallbackHandler(CallbackHandler):
             if k not in job_meta_keys:
                 self.log.error("missing mandatory LAVA metadata: {}".format(k))
                 return False, "missing mandatory LAVA metadata: {}".format(k)
+        try:
+            lava_multinode = definition["protocols"].get("lava-multinode")
+            self._lava_multinode = lava_multinode
+            k_multinode = models.LAVA_CALLBACK_MULTINODE_KEYS.get(action, [])
+            mandatory_keys_multinode = k_multinode[models.MANDATORY_KEYS]
+            lava_multinode_keys = lava_multinode.keys()
+            for k in mandatory_keys_multinode:
+                if k not in lava_multinode_keys:
+                    self.log.error(
+                        "missing mandatory LAVA multinode data: {}".format(k))
+                    return False,
+                    "missing mandatory LAVA multinode data: {}".format(k)
+        except KeyError:
+            pass
         return True, ''
 
     def _execute_callback(self, lab_name, **kwargs):
@@ -202,7 +221,8 @@ class LavaCallbackHandler(CallbackHandler):
         if action in ["boot", "test"]:
             tasks = [
                 taskqueue.tasks.callback.lava_test.s(
-                    self.json_obj, self.job_meta, lab_name),
+                    self.json_obj, self.job_meta,
+                    self.lava_multinode, lab_name),
             ]
             if action == "test":
                 tasks.append(taskqueue.tasks.kcidb.push_tests.s())

@@ -119,6 +119,14 @@ META_DATA_MAP_BOOT = {
     models.FILE_SERVER_RESOURCE_KEY: "job.file_server_resource",
 }
 
+MULTINODE_DATA_MAP = {
+    models.LAVA_MULTINODE_KEYS['MULTINODE_GROUP_SIZE_KEY']: "group_size",
+    models.LAVA_MULTINODE_KEYS['MULTINODE_ROLE_KEY']: "role",
+    models.LAVA_MULTINODE_KEYS['MULTINODE_ROLES_KEY']: "roles",
+    models.LAVA_MULTINODE_KEYS['MULTINODE_SUB_ID_KEY']: "sub_id",
+    models.LAVA_MULTINODE_KEYS['MULTINODE_TARGET_GROUP_KEY']: "target_group",
+}
+
 BL_META_MAP = {
     "ramdisk_addr": "initrd_addr",
     "kernel_addr": "loadaddr",
@@ -140,7 +148,7 @@ def _get_job_meta(meta, job_data):
     meta[models.BOARD_INSTANCE_KEY] = job_data["actual_device_id"]
 
 
-def _get_definition_meta(meta, job_meta, meta_data_map):
+def _get_definition_data(meta, job_meta, meta_data_map):
     """Parse the job definition meta-data from LAVA
 
     Parse the meta-data from the LAVA v2 job definition sent with the callback
@@ -159,7 +167,7 @@ def _get_definition_meta(meta, job_meta, meta_data_map):
         try:
             meta.update({x: job_meta[y]})
         except (KeyError) as ex:
-            utils.LOG.warn("Metadata field {} missing in the job"
+            utils.LOG.warn("Job data field {} missing in the job"
                            " result.".format(ex))
 
 
@@ -292,7 +300,14 @@ def _add_test_log(meta, job_log, suite):
     dir_path = meta[models.DIRECTORY_PATH]
 
     utils.LOG.info("Generating {} log files in {}".format(suite, dir_path))
-    file_name = "-".join([suite, meta[models.BOARD_KEY]])
+    lava_multinode = meta.get(models.LAVA_MULTINODE_KEY)
+    if lava_multinode:
+        file_name = "-".join([
+            suite,
+            lava_multinode[models.LAVA_MULTINODE_KEYS['MULTINODE_ROLE_KEY']],
+            meta[models.BOARD_KEY]])
+    else:
+        file_name = "-".join([suite, meta[models.BOARD_KEY]])
     files = tuple(".".join([file_name, ext]) for ext in ["txt", "html"])
     meta[models.BOOT_LOG_KEY], meta[models.BOOT_LOG_HTML_KEY] = files
     txt_path, html_path = (os.path.join(dir_path, f) for f in files)
@@ -322,7 +337,14 @@ def _store_lava_json(job_data, meta, base_path=utils.BASE_PATH):
     :type base_path: string
     """
 
-    file_name = "-".join(["lava-json", meta[models.BOARD_KEY]])
+    lava_multinode = meta.get(models.LAVA_MULTINODE_KEY)
+    if lava_multinode:
+        file_name = "-".join([
+            "lava-json",
+            lava_multinode[models.LAVA_MULTINODE_KEYS['MULTINODE_ROLE_KEY']],
+            meta[models.BOARD_KEY]])
+    else:
+        file_name = "-".join(["lava-json", meta[models.BOARD_KEY]])
     file_name = ".".join([file_name, "json"])
 
     dir_path = meta[models.DIRECTORY_PATH]
@@ -393,7 +415,7 @@ def add_boot(job_data, job_meta, lab_name, db_options,
 
     try:
         _get_job_meta(meta, job_data)
-        _get_definition_meta(meta, job_meta, META_DATA_MAP_BOOT)
+        _get_definition_data(meta, job_meta, META_DATA_MAP_BOOT)
         _get_directory_path(meta, base_path)
         _get_lava_meta(meta, job_data)
         _store_lava_json(job_data, meta)
@@ -520,6 +542,16 @@ def _add_test_results(group, suite_results, suite_name):
                 models.TIME_KEY,
             ]
         })
+        if group.get(models.LAVA_MULTINODE_KEY):
+            sub_group.update({
+                k: group[k] for k in [
+                    models.LAVA_MULTINODE_KEYS['MULTINODE_GROUP_SIZE_KEY'],
+                    models.LAVA_MULTINODE_KEYS['MULTINODE_ROLE_KEY'],
+                    models.LAVA_MULTINODE_KEYS['MULTINODE_ROLES_KEY'],
+                    models.LAVA_MULTINODE_KEYS['MULTINODE_SUB_ID_KEY'],
+                    models.LAVA_MULTINODE_KEYS['MULTINODE_TARGET_GROUP_KEY'],
+                ]
+            })
         sub_groups.append(sub_group)
 
     group.update({
@@ -571,7 +603,7 @@ def _add_rootfs_info(group, base_path, file_name="build_info.json"):
         utils.LOG.warn("ValueError: {}".format(e))
 
 
-def add_tests(job_data, job_meta, lab_name, db_options,
+def add_tests(job_data, job_meta, lava_multinode, lab_name, db_options,
               base_path=utils.BASE_PATH):
     """Entry point to be used as an external task.
 
@@ -612,7 +644,11 @@ def add_tests(job_data, job_meta, lab_name, db_options,
 
     try:
         _get_job_meta(meta, job_data)
-        _get_definition_meta(meta, job_meta, META_DATA_MAP_TEST)
+        _get_definition_data(meta, job_meta, META_DATA_MAP_TEST)
+        if lava_multinode:
+            meta[models.LAVA_MULTINODE_KEY] = {}
+            _get_definition_data(meta[models.LAVA_MULTINODE_KEY],
+                                 lava_multinode, MULTINODE_DATA_MAP)
         _get_directory_path(meta, base_path)
         _get_lava_meta(meta, job_data)
         plan_name = meta[models.PLAN_KEY]

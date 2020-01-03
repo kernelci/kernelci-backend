@@ -100,6 +100,7 @@ class TestGroupDocument(modb.BaseDocument):
         self.time = -1
         self.vcs_commit = None
         self.warnings = 0
+        self.lava_multinode = {}
 
     @property
     def collection(self):
@@ -217,6 +218,7 @@ class TestGroupDocument(modb.BaseDocument):
             models.VCS_COMMIT_KEY: self.vcs_commit,
             models.VERSION_KEY: self.version,
             models.WARNINGS_KEY: self.warnings,
+            models.LAVA_MULTINODE_KEY: self.lava_multinode,
         }
 
         if self.id:

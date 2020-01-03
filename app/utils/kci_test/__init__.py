@@ -403,6 +403,7 @@ def _update_test_group_doc_from_json(group_doc, test_dict, errors):
     group_doc.vcs_commit = test_dict.get(models.VCS_COMMIT_KEY, None)
     group_doc.version = test_dict.get(models.VERSION_KEY, "1.0")
     group_doc.warnings = test_dict.get(models.BOOT_WARNINGS_KEY, 0)
+    group_doc.lava_multinode = test_dict.get(models.LAVA_MULTINODE_KEY, {})
 
     # mach_alias_key takes precedence if defined
     group_doc.mach = test_dict.get(

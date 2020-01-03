@@ -140,6 +140,7 @@ KERNEL_VERSION_KEY = "kernel_version"
 KVM_GUEST_KEY = "kvm_guest"
 LAB_ID_KEY = "lab_id"
 LAB_NAME_KEY = "lab_name"
+LAVA_MULTINODE_KEY = "lava_multinode"
 LIMIT_KEY = "limit"
 LOAD_ADDR_KEY = "load_addr"
 LOG_KEY = 'log'
@@ -1114,6 +1115,35 @@ LAVA_CALLBACK_VALID_KEYS = {
         LAVA_DEVICE_ID_KEY,
         LAVA_LOG_KEY,
     ]
+}
+
+LAVA_MULTINODE_KEYS = {
+    "MULTINODE_GROUP_SIZE_KEY": "group_size",
+    "MULTINODE_ROLE_KEY": "role",
+    "MULTINODE_ROLES_KEY": "roles",
+    "MULTINODE_SUB_ID_KEY": "sub_id",
+    "MULTINODE_TARGET_GROUP_KEY": "target_group"
+}
+
+LAVA_CALLBACK_MULTINODE_KEYS = {
+    "boot": {
+        MANDATORY_KEYS: [
+            "group_size",
+            "role",
+            "roles",
+            "sub_id",
+            "target_group",
+        ],
+    },
+    "test": {
+        MANDATORY_KEYS: [
+            "group_size",
+            "role",
+            "roles",
+            "sub_id",
+            "target_group",
+        ],
+    },
 }
 
 LAVA_CALLBACK_VALID_METADATA_KEYS = {
