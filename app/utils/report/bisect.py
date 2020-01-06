@@ -80,8 +80,6 @@ def create_bisect_report(data, email_options, db_options,
     report_hashable_str = "-".join(str(x) for x in [
         doc[models.BISECT_FOUND_SUMMARY_KEY],
         doc[models.KERNEL_KEY],
-        email_options["to"],
-        email_options["cc"],
     ])
     report_hash = hashlib.sha1(report_hashable_str).hexdigest()
     redisdb_conn = redisdb.get_db_connection(db_options)
