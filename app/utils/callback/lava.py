@@ -62,6 +62,11 @@ TEST_CASE_MAP = {
     models.STATUS_KEY: "result",
 }
 
+TEST_CASE_GROUP_KEYS = [
+    models.JOB_KEY,
+    models.KERNEL_KEY,
+]
+
 TEST_CASE_NAME_EXTRA = {
     "http-download": ["label"],
     "git-repo-action": ["commit", "path"],
@@ -427,10 +432,10 @@ def _add_login_case(meta, results, cases, name):
         models.VERSION_KEY: "1.1",
         models.TIME_KEY: "0.0",
         models.INDEX_KEY: len(cases) + 1,
-        models.KERNEL_KEY: meta[models.KERNEL_KEY],
         models.NAME_KEY: "login",
         models.STATUS_KEY: login["result"],
     }
+    test_case.update({k: meta[k] for k in TEST_CASE_GROUP_KEYS})
     cases.append(test_case)
 
 
@@ -456,7 +461,7 @@ def _add_test_results(group, results):
             models.TIME_KEY: "0.0",
         }
         test_case.update({k: test[v] for k, v in TEST_CASE_MAP.iteritems()})
-        test_case[models.KERNEL_KEY] = group[models.KERNEL_KEY]
+        test_case.update({k: group[k] for k in TEST_CASE_GROUP_KEYS})
         measurement = test.get("measurement")
         if measurement and measurement != 'None':
             test_case[models.MEASUREMENTS_KEY] = [{
