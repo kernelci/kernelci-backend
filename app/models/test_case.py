@@ -58,6 +58,7 @@ class TestCaseDocument(mbase.BaseDocument):
         self._status = None
         self._test_group_id = None
 
+        self.git_branch = None
         self.job = None
         self.kernel = None
         self.regression_id = None
@@ -185,6 +186,7 @@ class TestCaseDocument(mbase.BaseDocument):
     def to_dict(self):
         test_case = {
             models.CREATED_KEY: self.created_on,
+            models.GIT_BRANCH_KEY: self.git_branch,
             models.INDEX_KEY: self.index,
             models.JOB_KEY: self.job,
             models.KERNEL_KEY: self.kernel,

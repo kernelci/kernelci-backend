@@ -38,6 +38,7 @@ class TestTestCaseModel(unittest.TestCase):
 
         test_case.id = "id"
         test_case.created_on = "now"
+        test_case.git_branch = "branch"
         test_case.index = 1
         test_case.job = "this-job"
         test_case.kernel = "v123.45"
@@ -51,6 +52,7 @@ class TestTestCaseModel(unittest.TestCase):
         expected = {
             "_id": "id",
             "created_on": "now",
+            "git_branch": "branch",
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
@@ -70,6 +72,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case = mtcase.TestCaseDocument("name", "1.1")
 
         test_case.created_on = "now"
+        test_case.git_branch = "branch"
         test_case.index = 1
         test_case.job = "this-job"
         test_case.kernel = "v123.45"
@@ -82,6 +85,7 @@ class TestTestCaseModel(unittest.TestCase):
 
         expected = {
             "created_on": "now",
+            "git_branch": "branch",
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
@@ -113,6 +117,7 @@ class TestTestCaseModel(unittest.TestCase):
         case_json = {
             "_id": "id",
             "created_on": "now",
+            "git_branch": "branch",
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
