@@ -57,6 +57,8 @@ class TestCaseDocument(mbase.BaseDocument):
         self._measurements = []
         self._status = None
         self._test_group_id = None
+
+        self.test_case_path = None
         self.time = -1
 
     @property
@@ -184,6 +186,7 @@ class TestCaseDocument(mbase.BaseDocument):
             models.MEASUREMENTS_KEY: self.measurements,
             models.NAME_KEY: self.name,
             models.STATUS_KEY: self.status,
+            models.TEST_CASE_PATH_KEY: self.test_case_path,
             models.TEST_GROUP_ID_KEY: self.test_group_id,
             models.TIME_KEY: self.time,
             models.VERSION_KEY: self.version,

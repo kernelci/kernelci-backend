@@ -41,6 +41,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.index = 1
         test_case.measurements = [{"foo": 1}]
         test_case.status = "FAIL"
+        test_case.test_case_path = "test.case.path"
         test_case.test_group_id = "another_id"
         test_case.time = 10
 
@@ -51,6 +52,7 @@ class TestTestCaseModel(unittest.TestCase):
             "measurements": [{"foo": 1}],
             "name": "name",
             "status": "FAIL",
+            "test_case_path": "test.case.path",
             "test_group_id": "another_id",
             "time": 10,
             "version": "1.1"
@@ -65,6 +67,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.index = 1
         test_case.measurements = [{"foo": 1}]
         test_case.status = "FAIL"
+        test_case.test_case_path = "test.case.path"
         test_case.test_group_id = "another_id"
         test_case.time = 10
 
@@ -74,6 +77,7 @@ class TestTestCaseModel(unittest.TestCase):
             "measurements": [{"foo": 1}],
             "name": "name",
             "status": "FAIL",
+            "test_case_path": "test.case.path",
             "test_group_id": "another_id",
             "time": 10,
             "version": "1.1"
@@ -101,6 +105,7 @@ class TestTestCaseModel(unittest.TestCase):
             "measurements": [{"foo": 1}],
             "name": "name",
             "status": "FAIL",
+            "test_case_path": "test.case.path",
             "test_group_id": "another_id",
             "time": 10,
             "version": "1.1"
