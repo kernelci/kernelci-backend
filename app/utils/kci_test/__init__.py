@@ -272,7 +272,7 @@ def _update_test_case_doc_ids(ts_name, ts_id, case_doc, database):
 
 
 def _parse_test_case_from_json(group_name, group_doc_id, test_case,
-                               database, errors):
+                               database, errors, path):
     """Parse the test case report from a JSON object.
 
     :param group_name: The test group name.
@@ -305,6 +305,7 @@ def _parse_test_case_from_json(group_name, group_doc_id, test_case,
 
     test_doc = mtest_case.TestCaseDocument(name)
     test_doc.created_on = datetime.datetime.now(tz=bson.tz_util.utc)
+    test_doc.test_case_path = '.'.join(path + [test_doc.name])
     _update_test_case_doc_from_json(test_doc, test_case, errors)
     _update_test_case_doc_ids(group_name, group_doc_id, test_doc, database)
     return test_doc
@@ -529,7 +530,7 @@ def update_test_group_add_test_case_id(
 
 
 def import_and_save_test_cases(group_doc_id, group_name, test_cases,
-                               database, errors):
+                               database, errors, path):
     """Import the tests cases from a JSON object into a group.
 
     Parse the test_cases JSON data into a list of test cases, add them to the
@@ -556,7 +557,7 @@ def import_and_save_test_cases(group_doc_id, group_name, test_cases,
 
     for test_case in test_cases:
         tc_doc = _parse_test_case_from_json(group_name, group_doc_id,
-                                            test_case, database, errors)
+                                            test_case, database, errors, path)
         if tc_doc:
             ret_code, tc_doc_id = save_or_update(
                 tc_doc, SPEC_TEST_CASE, models.TEST_CASE_COLLECTION,
@@ -619,7 +620,7 @@ def update_test_group_add_sub_group_id(
     return ret_val, errors
 
 
-def import_and_save_test_group(group, parent_id, database, errors):
+def import_and_save_test_group(group, parent_id, database, errors, path=None):
     """Import a test group from a JSON object
 
     Parse the group JSON data into a TestGroupDocument object.
@@ -643,6 +644,9 @@ def import_and_save_test_group(group, parent_id, database, errors):
         utils.LOG.warn("Failed to parse test group JSON data")
         return None
 
+    path = list(path) if path else list()
+    path.append(group_doc.name)
+
     group_doc.parent_id = parent_id
 
     ret_code, group_doc_id = save_or_update(
@@ -652,13 +656,13 @@ def import_and_save_test_group(group, parent_id, database, errors):
     test_cases = group.get(models.TEST_CASES_KEY)
     if test_cases:
         ret_code = import_and_save_test_cases(
-            group_doc_id, group_doc.name, test_cases, database, errors)
+            group_doc_id, group_doc.name, test_cases, database, errors, path)
 
     sub_groups = group.get(models.SUB_GROUPS_KEY)
     if sub_groups:
         for sub_group in sub_groups:
             sub_group_doc_id = import_and_save_test_group(
-                sub_group, group_doc_id, database, errors)
+                sub_group, group_doc_id, database, errors, path)
             if not sub_group_doc_id:
                 utils.LOG.warn("Failed to parse sub-group")
                 return None
