@@ -39,6 +39,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.id = "id"
         test_case.created_on = "now"
         test_case.index = 1
+        test_case.job = "this-job"
         test_case.kernel = "v123.45"
         test_case.measurements = [{"foo": 1}]
         test_case.regression_id = 1234
@@ -51,6 +52,7 @@ class TestTestCaseModel(unittest.TestCase):
             "_id": "id",
             "created_on": "now",
             "index": 1,
+            "job": "this-job",
             "kernel": "v123.45",
             "measurements": [{"foo": 1}],
             "name": "name",
@@ -69,6 +71,7 @@ class TestTestCaseModel(unittest.TestCase):
 
         test_case.created_on = "now"
         test_case.index = 1
+        test_case.job = "this-job"
         test_case.kernel = "v123.45"
         test_case.measurements = [{"foo": 1}]
         test_case.regression_id = 1234
@@ -80,6 +83,7 @@ class TestTestCaseModel(unittest.TestCase):
         expected = {
             "created_on": "now",
             "index": 1,
+            "job": "this-job",
             "kernel": "v123.45",
             "measurements": [{"foo": 1}],
             "name": "name",
@@ -110,6 +114,7 @@ class TestTestCaseModel(unittest.TestCase):
             "_id": "id",
             "created_on": "now",
             "index": 1,
+            "job": "this-job",
             "kernel": "v123.45",
             "measurements": [{"foo": 1}],
             "name": "name",
