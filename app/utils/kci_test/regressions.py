@@ -148,6 +148,10 @@ def _add_test_group_regressions(group, last_group, db, spec, hierarchy=None,
                 test_case, group, last_case, last_group, db, spec, hierarchy)
             if doc_id:
                 ids.append(doc_id)
+                data = dict(test_case)
+                data[models.REGRESSION_ID_KEY] = doc_id
+                test_doc = models.test_case.TestCaseDocument.from_json(data)
+                utils.db.save(db, test_doc)
 
     sub_groups = _get_sub_groups_dict(group)
     last_sub_groups = _get_sub_groups_dict(last_group) if last_group else {}
