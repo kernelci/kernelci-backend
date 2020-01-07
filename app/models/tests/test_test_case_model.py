@@ -40,6 +40,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.created_on = "now"
         test_case.index = 1
         test_case.measurements = [{"foo": 1}]
+        test_case.regression_id = 1234
         test_case.status = "FAIL"
         test_case.test_case_path = "test.case.path"
         test_case.test_group_id = "another_id"
@@ -51,6 +52,7 @@ class TestTestCaseModel(unittest.TestCase):
             "index": 1,
             "measurements": [{"foo": 1}],
             "name": "name",
+            "regression_id": 1234,
             "status": "FAIL",
             "test_case_path": "test.case.path",
             "test_group_id": "another_id",
@@ -66,6 +68,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.created_on = "now"
         test_case.index = 1
         test_case.measurements = [{"foo": 1}]
+        test_case.regression_id = 1234
         test_case.status = "FAIL"
         test_case.test_case_path = "test.case.path"
         test_case.test_group_id = "another_id"
@@ -76,6 +79,7 @@ class TestTestCaseModel(unittest.TestCase):
             "index": 1,
             "measurements": [{"foo": 1}],
             "name": "name",
+            "regression_id": 1234,
             "status": "FAIL",
             "test_case_path": "test.case.path",
             "test_group_id": "another_id",
@@ -104,6 +108,7 @@ class TestTestCaseModel(unittest.TestCase):
             "index": 1,
             "measurements": [{"foo": 1}],
             "name": "name",
+            "regression_id": 1234,
             "status": "FAIL",
             "test_case_path": "test.case.path",
             "test_group_id": "another_id",
