@@ -10,7 +10,7 @@
   when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
   set_fact:
    redis_service_name: "redis-server"
-   mongodb_service_name: "mongodb"
+   mongodb_service_name: "mongod"
 
 - name: Make sure celery run directory exists
   file: path=/var/run/celery
