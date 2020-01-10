@@ -416,8 +416,9 @@ def add_boot(job_data, job_meta, lab_name, db_options,
     return doc_id
 
 
-def _add_login_case(cases, suite_results, name):
-    tests = yaml.load(suite_results, Loader=yaml.CLoader)
+def _add_login_case(meta, results, cases, name):
+    # ToDo: consolidate with _add_test_results
+    tests = yaml.load(results, Loader=yaml.CLoader)
     tests_by_name = {t['name']: t for t in tests}
     login = tests_by_name.get(name)
     if not login:
@@ -426,13 +427,14 @@ def _add_login_case(cases, suite_results, name):
         models.VERSION_KEY: "1.1",
         models.TIME_KEY: "0.0",
         models.INDEX_KEY: len(cases) + 1,
+        models.KERNEL_KEY: meta[models.KERNEL_KEY],
         models.NAME_KEY: "login",
         models.STATUS_KEY: login["result"],
     }
     cases.append(test_case)
 
 
-def _add_test_results(group, suite_results):
+def _add_test_results(group, results):
     """Add test results from test suite data to a group.
 
     Import test results from a LAVA test suite into a group dictionary with the
@@ -441,10 +443,10 @@ def _add_test_results(group, suite_results):
 
     :param group: Test group data.
     :type group: dict
-    :param suite_results: Results for the test suite from the callback.
-    :type suite_results: dict
+    :param results: Test results from the callback.
+    :type results: dict
     """
-    tests = yaml.load(suite_results, Loader=yaml.CLoader)
+    tests = yaml.load(results, Loader=yaml.CLoader)
     test_cases = []
     test_sets = OrderedDict()
 
@@ -454,6 +456,7 @@ def _add_test_results(group, suite_results):
             models.TIME_KEY: "0.0",
         }
         test_case.update({k: test[v] for k, v in TEST_CASE_MAP.iteritems()})
+        test_case[models.KERNEL_KEY] = group[models.KERNEL_KEY]
         measurement = test.get("measurement")
         if measurement and measurement != 'None':
             test_case[models.MEASUREMENTS_KEY] = [{
@@ -600,14 +603,14 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         groups = []
         cases = []
 
-        for suite_name, suite_results in job_data["results"].iteritems():
+        for suite_name, results in job_data["results"].iteritems():
             if suite_name == "lava":
-                _add_login_case(cases, suite_results, 'auto-login-action')
+                _add_login_case(meta, results, cases, 'auto-login-action')
             else:
                 suite_name = suite_name.partition("_")[2]
                 group = dict(meta)
                 group[models.NAME_KEY] = suite_name
-                _add_test_results(group, suite_results)
+                _add_test_results(group, results)
                 groups.append(group)
 
         if (len(groups) == 1) and (groups[0][models.NAME_KEY] == plan_name):

@@ -58,6 +58,7 @@ class TestCaseDocument(mbase.BaseDocument):
         self._status = None
         self._test_group_id = None
 
+        self.kernel = None
         self.regression_id = None
         self.test_case_path = None
         self.time = -1
@@ -184,6 +185,7 @@ class TestCaseDocument(mbase.BaseDocument):
         test_case = {
             models.CREATED_KEY: self.created_on,
             models.INDEX_KEY: self.index,
+            models.KERNEL_KEY: self.kernel,
             models.MEASUREMENTS_KEY: self.measurements,
             models.NAME_KEY: self.name,
             models.REGRESSION_ID_KEY: self.regression_id,
