@@ -417,26 +417,6 @@ def add_boot(job_data, job_meta, lab_name, db_options,
     return doc_id
 
 
-def _parse_lava_test_data(test_case, test_meta):
-    """Parse the test job meta-data for the lava step
-
-    :param test_case: The parsed test case data to be stored in the database.
-    :type test_case: dict
-    :param test_meta: The test meta-data from the callback.
-    :type test_meta: dict
-    """
-    test_case_name = test_case[models.NAME_KEY]
-    extra = TEST_CASE_NAME_EXTRA.get(test_case_name)
-    if extra:
-        extra_name = [test_case_name]
-        for m in test_meta["extra"]:
-            for n in extra:
-                value = m.get(n)
-                if value:
-                    extra_name.append(value)
-        test_case[models.NAME_KEY] = "-".join(extra_name)
-
-
 def _add_login_case(cases, suite_results, name):
     tests = yaml.load(suite_results, Loader=yaml.CLoader)
     tests_by_name = {t['name']: t for t in tests}
@@ -453,7 +433,7 @@ def _add_login_case(cases, suite_results, name):
     cases.append(test_case)
 
 
-def _add_test_results(group, suite_results, suite_name):
+def _add_test_results(group, suite_results):
     """Add test results from test suite data to a group.
 
     Import test results from a LAVA test suite into a group dictionary with the
@@ -464,8 +444,6 @@ def _add_test_results(group, suite_results, suite_name):
     :type group: dict
     :param suite_results: Results for the test suite from the callback.
     :type suite_results: dict
-    :param suite_name: Name of the test suite being parsed.
-    :type suite_name: string
     """
     tests = yaml.load(suite_results, Loader=yaml.CLoader)
     test_cases = []
@@ -484,8 +462,6 @@ def _add_test_results(group, suite_results, suite_name):
                 "unit": test["unit"],
             }]
         test_meta = test["metadata"]
-        if suite_name == "lava":
-            _parse_lava_test_data(test_case, test_meta)
         reference = test_meta.get("reference")
         if reference:
             test_case[models.ATTACHMENTS_KEY] = [reference]
@@ -632,7 +608,7 @@ def add_tests(job_data, job_meta, lab_name, db_options,
                 suite_name = suite_name.partition("_")[2]
                 group = dict(meta)
                 group[models.NAME_KEY] = suite_name
-                _add_test_results(group, suite_results, suite_name)
+                _add_test_results(group, suite_results)
                 groups.append(group)
 
         if (len(groups) == 1) and (groups[0][models.NAME_KEY] == plan_name):
