@@ -77,8 +77,9 @@ SPEC_TEST_GROUP = {
 }
 
 SPEC_TEST_CASE = {
-    models.TEST_GROUP_ID_KEY: "test_group_id",
+    models.KERNEL_KEY: "kernel",
     models.NAME_KEY: "name",
+    models.TEST_GROUP_ID_KEY: "test_group_id",
 }
 
 # Local error function.
@@ -240,6 +241,7 @@ def _update_test_case_doc_from_json(case_doc, test_case, errors):
         case_doc.time = _seconds_as_datetime(seconds)
 
     case_doc.index = test_case.get(models.INDEX_KEY)
+    case_doc.kernel = test_case.get(models.KERNEL_KEY)
     case_doc.measurements = test_case.get(models.MEASUREMENTS_KEY, [])
     case_doc.status = test_case[models.STATUS_KEY].upper()
 
