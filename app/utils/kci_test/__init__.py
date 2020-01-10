@@ -445,7 +445,7 @@ def _update_test_group_doc_ids(group_doc, database):
     build_doc = utils.db.find_one2(database[models.BUILD_COLLECTION], spec)
 
     if job_doc:
-        group_doc.job_id = job_doc.get(models.ID_KEY, None)
+        group_doc.job_id = job_doc.get(models.ID_KEY)
     else:
         utils.LOG.warn(
             "No job document found for test group %s-%s-%s-%s (%s)",
@@ -453,32 +453,32 @@ def _update_test_group_doc_ids(group_doc, database):
 
     if build_doc:
         doc_get = build_doc.get
-        group_doc.build_id = doc_get(models.ID_KEY, None)
+        group_doc.build_id = doc_get(models.ID_KEY)
 
         # In case we do not have the job_id key with the previous search.
-        if all([not group_doc.job_id, doc_get(models.JOB_ID_KEY, None)]):
-            group_doc.job_id = doc_get(models.JOB_ID_KEY, None)
+        if all([not group_doc.job_id, doc_get(models.JOB_ID_KEY)]):
+            group_doc.job_id = doc_get(models.JOB_ID_KEY)
         # Get also git information if we do not have them already,
         if not group_doc.compiler:
-            group_doc.compiler = doc_get(models.COMPILER_KEY, None)
+            group_doc.compiler = doc_get(models.COMPILER_KEY)
         if not group_doc.compiler_version:
             group_doc.compiler_version = \
-                doc_get(models.COMPILER_VERSION_KEY, None)
+                doc_get(models.COMPILER_VERSION_KEY)
         if not group_doc.compiler_version_full:
             group_doc.compiler_version_full = \
-                doc_get(models.COMPILER_VERSION_FULL_KEY, None)
+                doc_get(models.COMPILER_VERSION_FULL_KEY)
         if not group_doc.cross_compile:
-            group_doc.cross_compile = doc_get(models.CROSS_COMPILE_KEY, None)
+            group_doc.cross_compile = doc_get(models.CROSS_COMPILE_KEY)
         if not group_doc.git_branch:
-            group_doc.git_branch = doc_get(models.GIT_BRANCH_KEY, None)
+            group_doc.git_branch = doc_get(models.GIT_BRANCH_KEY)
         if not group_doc.git_commit:
-            group_doc.git_commit = doc_get(models.GIT_COMMIT_KEY, None)
+            group_doc.git_commit = doc_get(models.GIT_COMMIT_KEY)
         if not group_doc.git_describe:
-            group_doc.git_describe = doc_get(models.GIT_DESCRIBE_KEY, None)
+            group_doc.git_describe = doc_get(models.GIT_DESCRIBE_KEY)
         if not group_doc.git_url:
-            group_doc.git_url = doc_get(models.GIT_URL_KEY, None)
+            group_doc.git_url = doc_get(models.GIT_URL_KEY)
         if not group_doc.vcs_commit:
-            group_doc.vcs_commit = doc_get(models.GIT_COMMIT_KEY, None)
+            group_doc.vcs_commit = doc_get(models.GIT_COMMIT_KEY)
     else:
         utils.LOG.warn(
             "No build document found for test group %s-%s-%s-%s (%s)",
