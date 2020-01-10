@@ -76,7 +76,6 @@ def test_modules():
         "utils.tests.test_base",
         "utils.tests.test_emails",
         "utils.tests.test_log_parser",
-        "utils.tests.test_tests_import",
         "utils.tests.test_upload",
         "utils.tests.test_validator"
     ]

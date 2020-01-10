@@ -39,7 +39,6 @@ import taskqueue.celery as taskc
 import utils
 import utils.db
 import utils.errors
-import utils.tests_import as tests_import
 
 try:  # Py3K compat
     basestring
@@ -524,6 +523,43 @@ def _parse_test_group_from_json(test_json, database, errors):
     return test_doc
 
 
+def update_test_group_add_test_case_id(
+        case_id, group_id, group_name, database):
+    """Add the test case ID to the list of a test group and save it.
+
+    :param case_id: The ID of the test case.
+    :type case_id: bson.objectid.ObjectId
+    :param group_id: The ID of the group.
+    :type group_id: bson.objectid.ObjectId
+    :param group_name: The name of the test group.
+    :type group_name: str
+    :param database: The database connection.
+    :type database: Database connection object.
+    :return 200 if OK, 500 in case of errors; a dictionary with errors or an
+    empty one.
+    """
+
+    ret_val = 200
+    errors = {}
+
+    utils.LOG.debug(
+        "Updating test group '%s' (%s) with test case ID",
+        group_name, str(group_id))
+
+    ret_val = utils.db.update(
+        database[models.TEST_GROUP_COLLECTION],
+        {models.ID_KEY: group_id},
+        {models.TEST_CASES_KEY: case_id}, operation='$push')
+    if ret_val != 200:
+        ADD_ERR(
+            errors,
+            ret_val,
+            "Error updating test group '%s' with test case references" %
+            (str(group_id))
+        )
+    return ret_val, errors
+
+
 def import_and_save_test_cases(group_doc_id, group_name, test_cases,
                                database, errors):
     """Import the tests cases from a JSON object into a group.
@@ -572,10 +608,47 @@ def import_and_save_test_cases(group_doc_id, group_name, test_cases,
             return ret_code
         else:
             # Test case imported successfully update test group
-            ret_code, errors = tests_import.update_test_group_add_test_case_id(
+            ret_code, errors = update_test_group_add_test_case_id(
                 tc_doc_id, group_doc_id, group_name, database)
 
     return ret_code
+
+
+def update_test_group_add_sub_group_id(
+        group_id, group_name, sub_group_id, database):
+    """Add sub-group ID to the list in a parent test group and save it.
+
+    :param group_id: The ID of the test group.
+    :type case_id: bson.objectid.ObjectId
+    :param group_name: The name of the test group.
+    :type group_name: str
+    :param sub_group_id: The ID of the sub-group.
+    :type sub_group_id: bson.objectid.ObjectId
+    :param database: The database connection.
+    :type database: Database connection object.
+    :return 200 if OK, 500 in case of errors; a dictionary with errors or an
+    empty one.
+    """
+
+    ret_val = 200
+    errors = {}
+
+    utils.LOG.debug(
+        "Updating test group '{}' ({}) with sub-group ID {}".format(
+            group_name, str(group_id), sub_group_id))
+
+    ret_val = utils.db.update(
+        database[models.TEST_GROUP_COLLECTION],
+        {models.ID_KEY: group_id},
+        {models.SUB_GROUPS_KEY: sub_group_id}, operation='$push')
+    if ret_val != 200:
+        ADD_ERR(
+            errors,
+            ret_val,
+            "Error updating test group '%s' with test group references" %
+            (str(group_id))
+        )
+    return ret_val, errors
 
 
 def import_and_save_test_group(group, parent_id, database, errors):
@@ -621,7 +694,7 @@ def import_and_save_test_group(group, parent_id, database, errors):
             if not sub_group_doc_id:
                 utils.LOG.warn("Failed to parse sub-group")
                 return None
-            tests_import.update_test_group_add_sub_group_id(
+            update_test_group_add_sub_group_id(
                 group_doc_id, group_doc.name, sub_group_doc_id, database)
 
     return group_doc_id

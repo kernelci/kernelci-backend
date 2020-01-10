@@ -1,6 +1,7 @@
-# Copyright (C) Collabora Limited 2017,2018
+# Copyright (C) Collabora Limited 2017, 2018, 2019, 2020
 # Author: Guillaume Tucker <guillaume.tucker@collabora.com>
 # Author: Ana Guerrero Lopez <ana.guerrero@collabora.com>
+# Author: Michal Galka <michal.galka@collabora.com>
 #
 # Copyright (C) Linaro Limited 2015,2016
 # Author: Milo Casagrande <milo.casagrande@linaro.org>
@@ -21,13 +22,8 @@
 
 """The RequestHandler for /test/case URLs."""
 
-import bson
-
-import handlers.response as hresponse
 import handlers.test_base as htbase
 import models
-import utils.db
-import utils.tests_import as tests_import
 
 
 # pylint: disable=too-many-public-methods
