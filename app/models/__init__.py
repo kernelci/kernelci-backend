@@ -414,6 +414,7 @@ COUNT_VALID_KEYS = {
         MACH_KEY,
         MODULES_DIR_KEY,
         MODULES_KEY,
+        PARENT_ID_KEY,
         NAME_KEY,
         PRIVATE_KEY,
         REGRESSION_ID_KEY,
@@ -899,6 +900,7 @@ TEST_GROUP_VALID_KEYS = {
         KERNEL_KEY,
         LAB_NAME_KEY,
         NAME_KEY,
+        PARENT_ID_KEY,
         TIME_KEY,
         VERSION_KEY
     ]
