@@ -180,10 +180,10 @@ def _check_for_null(test_dict, NON_NULL_KEYS):
                     key, val))
 
 
-def _get_test_seconds(test_dict):
+def _get_test_seconds(data):
     """Returns test time in seconds"""
     try:
-        test_time_raw = test_dict[models.TIME_KEY]
+        test_time_raw = data[models.TIME_KEY]
     except KeyError:
         raise TestValidationError("Test time missing")
     try:
@@ -204,7 +204,7 @@ def _seconds_as_datetime(seconds):
     return datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=seconds)
 
 
-def _update_test_case_doc_from_json(case_doc, test_dict, errors):
+def _update_test_case_doc_from_json(case_doc, test_case, errors):
     """Update a TestCaseDocument from the provided test dictionary.
 
     This function does not return anything, the TestCaseDocument passed is
@@ -212,14 +212,14 @@ def _update_test_case_doc_from_json(case_doc, test_dict, errors):
 
     :param case_doc: The TestCaseDocument to update.
     :type case_doc: `models.test_case.TestCaseDocument`.
-    :param test_dict: Test case dictionary.
-    :type test_dict: dict
+    :param test_case: Test case dictionary.
+    :type test_case: dict
     :param errors: Where errors should be stored.
     :type errors: dict
     """
 
     try:
-        seconds = _get_test_seconds(test_dict)
+        seconds = _get_test_seconds(test_case)
     except TestValidationError as ex:
         seconds = 0.0
         err_msg = "Error reading test time data; defaulting to 0"
@@ -239,19 +239,9 @@ def _update_test_case_doc_from_json(case_doc, test_dict, errors):
     if seconds == 0.0:
         case_doc.time = _seconds_as_datetime(seconds)
 
-    case_doc.definition_uri = test_dict.get(models.DEFINITION_URI_KEY)
-    case_doc.kvm_guest = test_dict.get(models.KVM_GUEST_KEY)
-    case_doc.index = test_dict.get(models.INDEX_KEY)
-    case_doc.maximum = test_dict.get(models.MAXIMUM_KEY)
-    case_doc.measurements = test_dict.get(models.MEASUREMENTS_KEY, [])
-    case_doc.attachments = test_dict.get(models.ATTACHMENTS_KEY, [])
-    case_doc.metadata = test_dict.get(models.METADATA_KEY)
-    case_doc.minimum = test_dict.get(models.MINIMUM_KEY)
-    case_doc.samples = test_dict.get(models.SAMPLES_KEY)
-    case_doc.samples_sqr_sum = test_dict.get(models.SAMPLES_SQUARE_SUM_KEY)
-    case_doc.samples_sum = test_dict.get(models.SAMPLES_SUM_KEY)
-    case_doc.vcs_commit = test_dict.get(models.VCS_COMMIT_KEY)
-    case_doc.version = test_dict.get(models.VERSION_KEY, "1.0")
+    case_doc.index = test_case.get(models.INDEX_KEY)
+    case_doc.measurements = test_case.get(models.MEASUREMENTS_KEY, [])
+    case_doc.status = test_case[models.STATUS_KEY].upper()
 
 
 def _update_test_case_doc_ids(ts_name, ts_id, case_doc, database):
@@ -273,7 +263,6 @@ def _update_test_case_doc_ids(ts_name, ts_id, case_doc, database):
                                         [models.ID_KEY])
     # If exists, update the test case
     if test_group_doc:
-        case_doc.test_group_name = test_group_doc.get(models.NAME_KEY)
         case_doc.test_group_id = test_group_doc.get(models.ID_KEY)
     else:
         utils.LOG.error(
@@ -307,7 +296,6 @@ def _parse_test_case_from_json(group_name, group_doc_id, test_case,
 
     try:
         name = test_case[models.NAME_KEY]
-        status = test_case[models.STATUS_KEY].upper()
     except KeyError, ex:
         err_msg = "Missing mandatory key in test case data"
         utils.LOG.exception(ex)
@@ -315,11 +303,8 @@ def _parse_test_case_from_json(group_name, group_doc_id, test_case,
         ERR_ADD(errors, 400, err_msg)
         return None
 
-    test_doc = mtest_case.TestCaseDocument(
-        name=name,
-        status=status)
-    test_doc.created_on = datetime.datetime.now(
-        tz=bson.tz_util.utc)
+    test_doc = mtest_case.TestCaseDocument(name)
+    test_doc.created_on = datetime.datetime.now(tz=bson.tz_util.utc)
     _update_test_case_doc_from_json(test_doc, test_case, errors)
     _update_test_case_doc_ids(group_name, group_doc_id, test_doc, database)
     return test_doc

@@ -1,14 +1,14 @@
-# Copyright (C) Baylibre -0700,2017,2019
+# Copyright (C) Baylibre 2017, 2019
 # Author: Khouloud Touil <ktouil@baylibre.com>
 # Author: Kevin Hilman <khilman@baylibre.com>
 # Author: lollivier <lollivier@baylibre.com>
 #
-# Copyright (C) Collabora Limited -0700,2017,2018,2019
+# Copyright (C) Collabora Limited 2017, 2018, 2019, 2020
 # Author: Michal Galka <michal.galka@collabora.com>
 # Author: Guillaume Tucker <guillaume.tucker@collabora.com>
 # Author: Ana Guerrero Lopez <ana.guerrero@collabora.com>
 #
-# Copyright (C) Linaro Limited 2014,2015,2016,2017,2018,2019
+# Copyright (C) Linaro Limited 2014, 2015, 2016, 2017, 2018, 2019
 # Author: Matt Hart <matthew.hart@linaro.org>
 # Author: Milo Casagrande <milo.casagrande@linaro.org>
 #
@@ -39,7 +39,6 @@ ACCEPTED_KEYS = "accepted"
 ADDRESS_KEY = "address"
 AGGREGATE_KEY = "aggregate"
 ARCHITECTURE_KEY = "arch"
-ATTACHMENTS_KEY = "attachments"
 BASELINE_KEY = "baseline"
 BOARD_INSTANCE_KEY = "board_instance"
 BOARD_KEY = "board"
@@ -137,7 +136,6 @@ KERNEL_IMAGE_KEY = "kernel_image"
 KERNEL_IMAGE_SIZE_KEY = "kernel_image_size"
 KERNEL_KEY = "kernel"
 KERNEL_VERSION_KEY = "kernel_version"
-KVM_GUEST_KEY = "kvm_guest"
 LAB_ID_KEY = "lab_id"
 LAB_NAME_KEY = "lab_name"
 LIMIT_KEY = "limit"
@@ -147,10 +145,8 @@ LT_KEY = "lt"
 MACH_ALIAS_KEY = "mach_alias"
 MACH_KEY = "mach"
 MANDATORY_KEYS = "mandatory"
-MAXIMUM_KEY = "maximum"
 MEASUREMENTS_KEY = "measurements"
 METADATA_KEY = "metadata"
-MINIMUM_KEY = "minimum"
 MISMATCHES_COUNT_KEY = "mismatches_count"
 MISMATCHES_KEY = "mismatches"
 MODULES_DIR_KEY = "modules_dir"
@@ -158,7 +154,6 @@ MODULES_KEY = "modules"
 MODULES_SIZE_KEY = "modules_size"
 NAME_KEY = "name"
 NOT_FIELD_KEY = "nfield"
-PARAMETERS_KEY = "parameters"
 PARENT_ID_KEY = "parent_id"
 PLAN_KEY = "plan"
 PLAN_VARIANT_KEY = "plan_variant"
@@ -168,9 +163,6 @@ QEMU_COMMAND_KEY = "qemu_command"
 QEMU_KEY = "qemu"
 RESULT_KEY = "result"
 RETRIES_KEY = "retries"
-SAMPLES_KEY = "samples"
-SAMPLES_SQUARE_SUM_KEY = "samples_sqr_sum"
-SAMPLES_SUM_KEY = "samples_sum"
 SKIP_KEY = "skip"
 SORT_KEY = "sort"
 SORT_ORDER_KEY = "sort_order"
@@ -188,7 +180,6 @@ TEST_JOB_ID_KEY = "test_job_id"
 TEST_JOB_PATH_KEY = "test_job_path"
 TEST_JOB_URL_KEY = "test_job_url"
 TEST_GROUP_ID_KEY = "test_group_id"
-TEST_GROUP_NAME_KEY = "test_group_name"
 TEXT_OFFSET_KEY = "text_offset"
 TIME_KEY = "time"
 TIME_RANGE_KEY = "time_range"
@@ -201,7 +192,6 @@ UPDATED_KEY = "updated_on"
 USERNAME_KEY = "username"
 REGRESSION_ID_KEY = "regression_id"
 REGRESSIONS_KEY = "regressions"
-VCS_COMMIT_KEY = "vcs_commit"
 VERSION_FULL_KEY = "full_version"
 VERSION_KEY = "version"
 VMLINUX_BSS_SIZE_KEY = "vmlinux_bss_size"
@@ -432,11 +422,9 @@ COUNT_VALID_KEYS = {
         TEST_JOB_ID_KEY,
         TEST_JOB_URL_KEY,
         TEST_GROUP_ID_KEY,
-        TEST_GROUP_NAME_KEY,
         TEXT_OFFSET_KEY,
         TIME_KEY,
         TIME_KEY,
-        VCS_COMMIT_KEY,
         VERSION_KEY,
         WARNINGS_KEY,
     ]
@@ -922,64 +910,34 @@ TEST_CASE_VALID_KEYS = {
             TEST_GROUP_ID_KEY
         ],
         ACCEPTED_KEYS: [
-            ATTACHMENTS_KEY,
             CREATED_KEY,
             DEFINITION_URI_KEY,
-            KVM_GUEST_KEY,
             INDEX_KEY,
-            MAXIMUM_KEY,
             MEASUREMENTS_KEY,
-            METADATA_KEY,
-            MINIMUM_KEY,
             NAME_KEY,
-            PARAMETERS_KEY,
-            SAMPLES_KEY,
-            SAMPLES_SQUARE_SUM_KEY,
-            SAMPLES_SUM_KEY,
             STATUS_KEY,
             TEST_GROUP_ID_KEY,
-            TEST_GROUP_NAME_KEY,
             TIME_KEY,
-            VCS_COMMIT_KEY,
             VERSION_KEY
         ]
     },
     "PUT": [
-        ATTACHMENTS_KEY,
         CREATED_KEY,
-        DEFINITION_URI_KEY,
-        KVM_GUEST_KEY,
         INDEX_KEY,
-        MAXIMUM_KEY,
         MEASUREMENTS_KEY,
-        METADATA_KEY,
-        MINIMUM_KEY,
         NAME_KEY,
-        PARAMETERS_KEY,
-        SAMPLES_KEY,
-        SAMPLES_SQUARE_SUM_KEY,
-        SAMPLES_SUM_KEY,
         STATUS_KEY,
         TEST_GROUP_ID_KEY,
-        TEST_GROUP_NAME_KEY,
         TIME_KEY,
-        VCS_COMMIT_KEY,
         VERSION_KEY
     ],
     "GET": [
         CREATED_KEY,
-        DEFINITION_URI_KEY,
-        KVM_GUEST_KEY,
         INDEX_KEY,
-        MAXIMUM_KEY,
-        MINIMUM_KEY,
         NAME_KEY,
-        SAMPLES_KEY,
         STATUS_KEY,
         TEST_GROUP_ID_KEY,
-        TEST_GROUP_NAME_KEY,
         TIME_KEY,
-        VCS_COMMIT_KEY,
         VERSION_KEY
     ]
 }
@@ -1082,7 +1040,6 @@ DISTINCT_VALID_FIELDS = {
     ],
     TEST_CASE_COLLECTION: [
         TEST_GROUP_ID_KEY,
-        TEST_GROUP_NAME_KEY,
     ]
 }
 
