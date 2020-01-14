@@ -334,7 +334,7 @@ class TokenHandler(hbase.BaseHandler):
                 self.log.info(
                     "Token (%s) deletion from IP '%s'",
                     doc_id, self.request.remote_ip)
-                ret_val = utils.db.delete(self.collection, token_oid)
+                ret_val = utils.db.delete_by_id(self.collection, token_oid)
                 response.status_code = ret_val
 
                 if ret_val == 200:
