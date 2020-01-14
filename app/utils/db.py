@@ -23,6 +23,7 @@
 
 """Collection of mongodb database operations."""
 
+import bson
 import pymongo
 import pymongo.errors
 import types
@@ -503,23 +504,34 @@ def find_and_update(collection, query, document, operation="$set"):
     return ret_val
 
 
-def delete(collection, spec_or_id):
-    """Remove a document or multiple documents from the collection.
+def delete_by_id(collection, oid):
+    """Remove document by _id from the collection.
 
     Use with care: the removed documents cannot be recovered!
 
     :param collection: The collection where the documents should be removed.
-    :param spec_or_id: The `_id` of the document to remove, or a dictionary
-        with the ID to remove.
+    :param oid: An _id that matches the document to remove.
+    :return 200 if the deletion has success, 500 in case of an error.
+    """
+    return delete(collection, {models.ID_KEY: oid})
+
+
+def delete(collection, query):
+    """Remove document(s) matching the given filter from the collection.
+
+    Use with care: the removed documents cannot be recovered!
+
+    :param collection: The collection where the documents should be removed.
+    :param query: A dictionary (query) that matches documents to remove.
     :return 200 if the deletion has success, 500 in case of an error.
     """
     ret_val = 200
 
     try:
-        collection.remove(spec_or_id)
+        collection.delete_many(query)
     except pymongo.errors.OperationFailure, ex:
         utils.LOG.error(
-            "Error removing the following document: %s", str(spec_or_id))
+            "Error removing the following document: %s", str(query))
         utils.LOG.exception(str(ex))
         ret_val = 500
 

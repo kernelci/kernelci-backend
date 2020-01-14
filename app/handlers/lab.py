@@ -150,17 +150,17 @@ class LabHandler(handlers.base.BaseHandler):
 
         return response
 
-    def _delete(self, spec_or_id, **kwargs):
+    def _delete(self, oid, **kwargs):
         response = hresponse.HandlerResponse(200)
         ret_val = 200
 
         token_id = kwargs.get("token_id", None)
 
-        ret_val = utils.db.delete(self.collection, spec_or_id)
+        ret_val = utils.db.delete_by_id(self.collection, oid)
         if all([ret_val != 500, token_id]):
-            token_ret_val = utils.db.delete(
+            token_ret_val = utils.db.delete_by_id(
                 self.db[models.TOKEN_COLLECTION],
-                {models.ID_KEY: token_id})
+                token_id)
             if token_ret_val == 500:
                 response.errors = "Error deleting/disabling associated token"
 
