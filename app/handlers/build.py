@@ -54,12 +54,3 @@ class BuildHandler(hbase.BaseHandler):
             link_error=taskqueue.tasks.error_handler.s())
 
         return response
-
-    def _delete(self, defconf_id, **kwargs):
-        response = hresponse.HandlerResponse()
-        response.status_code = utils.db.delete(self.collection, defconf_id)
-
-        if response.status_code == 200:
-            response.reason = "Resource '%s' deleted" % defconf_id
-
-        return response

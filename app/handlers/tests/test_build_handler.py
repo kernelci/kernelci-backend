@@ -150,27 +150,3 @@ class TestBuildHandler(TestHandlerBase):
         self.assertEqual(response.code, 202)
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
-
-    def test_delete(self):
-        self.database["build"].insert_one(dict(_id=self.doc_id, job_id="job"))
-
-        headers = {"Authorization": "foo"}
-
-        response = self.fetch(
-            "/build/" + self.doc_id, method="DELETE", headers=headers)
-
-        self.assertEqual(response.code, 200)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-
-    @mock.patch("utils.db.delete")
-    def test_delete_not_found(self, mock_delete):
-        mock_delete.return_value = 404
-        headers = {"Authorization": "foo"}
-
-        response = self.fetch(
-            "/build/" + self.doc_id, method="DELETE", headers=headers)
-
-        self.assertEqual(response.code, 404)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
