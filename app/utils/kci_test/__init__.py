@@ -456,7 +456,7 @@ def _update_test_group_doc_ids(group_doc, database):
         group_doc.build_id = doc_get(models.ID_KEY)
 
         # In case we do not have the job_id key with the previous search.
-        if all([not group_doc.job_id, doc_get(models.JOB_ID_KEY)]):
+        if not group_doc.job_id:
             group_doc.job_id = doc_get(models.JOB_ID_KEY)
         # Get also git information if we do not have them already,
         if not group_doc.compiler:
