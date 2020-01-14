@@ -122,51 +122,6 @@ class BootHandler(hbase.BaseHandler):
 
         return valid_lab, error
 
-    def execute_delete(self, *args, **kwargs):
-        response = None
-        valid_token, token = self.validate_req_token("DELETE")
-
-        if valid_token:
-            if kwargs and kwargs.get("id", None):
-                try:
-                    doc_id = kwargs["id"]
-                    obj_id = bson.objectid.ObjectId(doc_id)
-
-                    boot_doc = utils.db.find_one2(self.collection, obj_id)
-                    if boot_doc:
-                        if self._valid_boot_delete_token(token, boot_doc):
-                            response = self._delete(obj_id)
-                            if response.status_code == 200:
-                                response.reason = (
-                                    "Resource '%s' deleted" % doc_id)
-                        else:
-                            response = hresponse.HandlerResponse(403)
-                    else:
-                        response = hresponse.HandlerResponse(404)
-                        response.reason = "Resource '%s' not found" % doc_id
-                except bson.errors.InvalidId, ex:
-                    self.log.exception(ex)
-                    self.log.error(
-                        "Wrong ID '%s' value passed as object ID", doc_id)
-                    response = hresponse.HandlerResponse(400)
-                    response.reason = "Wrong ID value passed as object ID"
-            else:
-                spec = handlers.common.query.get_query_spec(
-                    self.get_query_arguments, self._valid_keys("DELETE"))
-                if spec:
-                    response = self._delete(spec)
-                    if response.status_code == 200:
-                        response.reason = (
-                            "Resources identified with '%s' deleted" % spec)
-                else:
-                    response = hresponse.HandlerResponse(400)
-                    response.reason = (
-                        "No valid data provided to execute a DELETE")
-        else:
-            response = hresponse.HandlerResponse(403)
-
-        return response
-
     def _valid_boot_delete_token(self, token, boot_doc):
         """Make sure the token is an actual delete token.
 
@@ -198,10 +153,3 @@ class BootHandler(hbase.BaseHandler):
                     valid_token = True
 
         return valid_token
-
-    def _delete(self, spec_or_id, **kwargs):
-        response = hresponse.HandlerResponse(200)
-        response.status_code = utils.db.delete(self.collection, spec_or_id)
-        response.reason = self._get_status_message(response.status_code)
-
-        return response
