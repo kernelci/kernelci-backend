@@ -226,7 +226,7 @@ def ensure_indexes(database):
     :param database: The database connection.
     """
     for collection, index_specs in INDEX_SPECS.iteritems():
-        db_collection = database[models.BUILD_COLLECTION]
+        db_collection = database[collection]
         db_indexes = db_collection.index_information()
 
         for index in index_specs:
