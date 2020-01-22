@@ -169,6 +169,24 @@ INDEX_SPECS = {
         [
             (models.TEST_GROUP_ID_KEY, pymongo.ASCENDING),
         ],
+        [
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.ASCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+        ],
+        [
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.ASCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+            (models.STATUS_KEY, pymongo.ASCENDING),
+        ],
+        [
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.ASCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+            (models.STATUS_KEY, pymongo.ASCENDING),
+            (models.REGRESSION_ID_KEY, pymongo.ASCENDING),
+        ],
     ],
 
     models.TEST_GROUP_COLLECTION: [
@@ -187,20 +205,8 @@ INDEX_SPECS = {
     models.TEST_REGRESSION_COLLECTION: [
         [
             (models.JOB_KEY, pymongo.ASCENDING),
-            (models.KERNEL_KEY, pymongo.DESCENDING),
+            (models.KERNEL_KEY, pymongo.ASCENDING),
             (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
-            (models.DEFCONFIG_FULL_KEY, pymongo.ASCENDING),
-            (models.DEVICE_TYPE_KEY, pymongo.ASCENDING),
-            (models.ARCHITECTURE_KEY, pymongo.ASCENDING),
-            (models.HIERARCHY_KEY, pymongo.ASCENDING),
-        ],
-        [
-            (models.JOB_KEY, pymongo.ASCENDING),
-            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
-            (models.DEFCONFIG_FULL_KEY, pymongo.ASCENDING),
-            (models.DEVICE_TYPE_KEY, pymongo.ASCENDING),
-            (models.ARCHITECTURE_KEY, pymongo.ASCENDING),
-            (models.HIERARCHY_KEY, pymongo.ASCENDING),
         ],
     ],
 
