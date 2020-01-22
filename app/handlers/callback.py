@@ -199,22 +199,17 @@ class LavaCallbackHandler(CallbackHandler):
         response.status_code = 202
         response.reason = "Request accepted and being processed"
 
-        if action in ["boot", "test"]:
+        if action == "test":
             tasks = [
                 taskqueue.tasks.callback.lava_test.s(
                     self.json_obj, self.job_meta, lab_name),
+                taskqueue.tasks.kcidb.push_tests.s(),
+                taskqueue.tasks.test.find_regression.s(),
             ]
-            if action == "test":
-                tasks.append(taskqueue.tasks.kcidb.push_tests.s())
-                tasks.append(taskqueue.tasks.test.find_regression.s())
             celery.chain(tasks).apply_async(
                 link_error=taskqueue.tasks.error_handler.s())
-        else:
-            response.status_code = 404
-            response.reason = "Unsupported LAVA action: {}".format(action)
-
-        # Also run the legacy boot callback to generate boot entries
-        if action == "boot":
+        # Legacy boot callback to generate boot entries
+        elif action == "boot":
             tasks = [
                 taskqueue.tasks.callback.lava_boot.s(
                     self.json_obj, self.job_meta, lab_name),
@@ -222,5 +217,8 @@ class LavaCallbackHandler(CallbackHandler):
             ]
             celery.chain(tasks).apply_async(
                 link_error=taskqueue.tasks.error_handler.s())
+        else:
+            response.status_code = 404
+            response.reason = "Unsupported LAVA action: {}".format(action)
 
         return response
