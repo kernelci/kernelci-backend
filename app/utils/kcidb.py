@@ -136,6 +136,12 @@ def push_build(build_id, first, bq_options, db_options={}, db=None):
             build[models.FILE_SERVER_RESOURCE_KEY],
             utils.BUILD_LOG_FILE
         ]),
+        'config_name': build[models.DEFCONFIG_FULL_KEY],
+        'config_url': '/'.join([
+            STORAGE_URL,
+            build[models.FILE_SERVER_RESOURCE_KEY],
+            build[models.KERNEL_CONFIG_KEY],
+        ]),
         'misc': {
             'defconfig': build[models.DEFCONFIG_FULL_KEY],
         },
