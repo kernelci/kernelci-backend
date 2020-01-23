@@ -61,6 +61,7 @@ class TestCaseDocument(mbase.BaseDocument):
         self.git_branch = None
         self.job = None
         self.kernel = None
+        self.plan = None
         self.regression_id = None
         self.test_case_path = None
         self.time = -1
@@ -192,6 +193,7 @@ class TestCaseDocument(mbase.BaseDocument):
             models.KERNEL_KEY: self.kernel,
             models.MEASUREMENTS_KEY: self.measurements,
             models.NAME_KEY: self.name,
+            models.PLAN_KEY: self.plan,
             models.REGRESSION_ID_KEY: self.regression_id,
             models.STATUS_KEY: self.status,
             models.TEST_CASE_PATH_KEY: self.test_case_path,

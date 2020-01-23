@@ -310,6 +310,7 @@ def _parse_test_case_from_json(group_name, group_doc_id, test_case,
     test_doc = mtest_case.TestCaseDocument(name)
     test_doc.created_on = datetime.datetime.now(tz=bson.tz_util.utc)
     test_doc.test_case_path = '.'.join(path + [test_doc.name])
+    test_doc.plan = path[0]
     _update_test_case_doc_from_json(test_doc, test_case, errors)
     _update_test_case_doc_ids(group_name, group_doc_id, test_doc, database)
     return test_doc
