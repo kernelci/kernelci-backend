@@ -415,6 +415,7 @@ COUNT_VALID_KEYS = {
         MACH_KEY,
         MODULES_DIR_KEY,
         MODULES_KEY,
+        PLAN_KEY,
         PARENT_ID_KEY,
         NAME_KEY,
         PRIVATE_KEY,
