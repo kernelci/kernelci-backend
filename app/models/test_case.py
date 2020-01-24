@@ -59,6 +59,7 @@ class TestCaseDocument(mbase.BaseDocument):
         self._test_group_id = None
 
         self.git_branch = None
+        self.git_commit = None
         self.job = None
         self.kernel = None
         self.device_type = None
@@ -191,6 +192,7 @@ class TestCaseDocument(mbase.BaseDocument):
             models.CREATED_KEY: self.created_on,
             models.DEVICE_TYPE_KEY: self.device_type,
             models.GIT_BRANCH_KEY: self.git_branch,
+            models.GIT_COMMIT_KEY: self.git_commit,
             models.INDEX_KEY: self.index,
             models.JOB_KEY: self.job,
             models.KERNEL_KEY: self.kernel,

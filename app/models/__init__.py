@@ -938,13 +938,19 @@ TEST_CASE_VALID_KEYS = {
     ],
     "GET": [
         CREATED_KEY,
+        GIT_BRANCH_KEY,
+        DEVICE_TYPE_KEY,
         INDEX_KEY,
+        JOB_KEY,
+        KERNEL_KEY,
+        MACH_KEY,
         NAME_KEY,
+        PLAN_KEY,
         REGRESSION_ID_KEY,
         STATUS_KEY,
         TEST_GROUP_ID_KEY,
         TIME_KEY,
-        VERSION_KEY
+        VERSION_KEY,
     ]
 }
 
@@ -1048,6 +1054,7 @@ DISTINCT_VALID_FIELDS = {
         TEST_GROUP_ID_KEY,
         MACH_KEY,
         DEVICE_TYPE_KEY,
+        JOB_KEY,
     ]
 }
 

@@ -64,6 +64,7 @@ TEST_CASE_MAP = {
 
 TEST_CASE_GROUP_KEYS = [
     models.GIT_BRANCH_KEY,
+    models.GIT_COMMIT_KEY,
     models.JOB_KEY,
     models.KERNEL_KEY,
     models.MACH_KEY,
