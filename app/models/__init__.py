@@ -1046,6 +1046,7 @@ DISTINCT_VALID_FIELDS = {
     ],
     TEST_CASE_COLLECTION: [
         TEST_GROUP_ID_KEY,
+        MACH_KEY,
     ]
 }
 
