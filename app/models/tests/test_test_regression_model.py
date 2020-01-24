@@ -27,14 +27,14 @@ class TestTestRegressionModel(unittest.TestCase):
     def test_regression_doc_valid_instance(self):
         test_regr = mtregr.TestRegressionDocument(
             "job", "kernel", "git_branch", "git_url", "defconfig_full", "benv",
-            "device_type", "arch", ["hierarchy"], "plan", "hierarchy")
+            "device_type", "arch", "mach", ["hierarchy"], "plan", "hierarchy")
         self.assertIsInstance(test_regr, mbase.BaseDocument)
 
     def test_regression_doc_to_dict(self):
         test_regr = mtregr.TestRegressionDocument(
             "steady", "kernel-123", "a-branch", "a-url", "defconfig_full+abc",
-            "concrete", "imaginary-device", "farm", ["hier", "ar", "chy"],
-            "hier", "hier.ar.chy")
+            "concrete", "imaginary-device", "gothic", "computer",
+            ["hier", "ar", "chy"], "hier", "hier.ar.chy")
 
         test_regr.id = "id"
         test_regr.version = "version"
@@ -62,7 +62,8 @@ class TestTestRegressionModel(unittest.TestCase):
             "defconfig_full": "defconfig_full+abc",
             "build_environment": "concrete",
             "device_type": "imaginary-device",
-            "arch": "farm",
+            "arch": "gothic",
+            "mach": "computer",
             "hierarchy": ["hier", "ar", "chy"],
             "plan": "hier",
             "test_case_path": "hier.ar.chy",
@@ -107,6 +108,7 @@ class TestTestRegressionModel(unittest.TestCase):
             "build_environment": "concrete",
             "device_type": "dev-board",
             "arch": "bips",
+            "mach": "robot",
             "hierarchy": ["suite", "group", "case"],
             "plan": "suite",
             "test_case_path": "suite.group.case",
