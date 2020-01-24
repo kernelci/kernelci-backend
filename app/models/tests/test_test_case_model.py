@@ -39,6 +39,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.id = "id"
         test_case.created_on = "now"
         test_case.git_branch = "branch"
+        test_case.git_commit = "1234abc"
         test_case.index = 1
         test_case.job = "this-job"
         test_case.kernel = "v123.45"
@@ -56,6 +57,7 @@ class TestTestCaseModel(unittest.TestCase):
             "_id": "id",
             "created_on": "now",
             "git_branch": "branch",
+            "git_commit": "1234abc",
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
@@ -79,6 +81,7 @@ class TestTestCaseModel(unittest.TestCase):
 
         test_case.created_on = "now"
         test_case.git_branch = "branch"
+        test_case.git_commit = "1234abc"
         test_case.index = 1
         test_case.job = "this-job"
         test_case.kernel = "v123.45"
@@ -95,6 +98,7 @@ class TestTestCaseModel(unittest.TestCase):
         expected = {
             "created_on": "now",
             "git_branch": "branch",
+            "git_commit": "1234abc",
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
@@ -130,6 +134,7 @@ class TestTestCaseModel(unittest.TestCase):
             "_id": "id",
             "created_on": "now",
             "git_branch": "branch",
+            "git_commit": "1234abc",
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
