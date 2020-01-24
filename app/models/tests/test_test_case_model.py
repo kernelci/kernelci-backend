@@ -42,6 +42,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.index = 1
         test_case.job = "this-job"
         test_case.kernel = "v123.45"
+        test_case.mach = "batmobile"
         test_case.measurements = [{"foo": 1}]
         test_case.plan = "cunning"
         test_case.regression_id = 1234
@@ -57,6 +58,7 @@ class TestTestCaseModel(unittest.TestCase):
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
+            "mach": "batmobile",
             "measurements": [{"foo": 1}],
             "name": "name",
             "plan": "cunning",
@@ -78,6 +80,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.index = 1
         test_case.job = "this-job"
         test_case.kernel = "v123.45"
+        test_case.mach = "raspberry"
         test_case.measurements = [{"foo": 1}]
         test_case.plan = "cunning"
         test_case.regression_id = 1234
@@ -92,6 +95,7 @@ class TestTestCaseModel(unittest.TestCase):
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
+            "mach": "raspberry",
             "measurements": [{"foo": 1}],
             "name": "name",
             "plan": "cunning",
@@ -125,6 +129,7 @@ class TestTestCaseModel(unittest.TestCase):
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
+            "mach": "laptop",
             "measurements": [{"foo": 1}],
             "name": "name",
             "plan": "cunning",
