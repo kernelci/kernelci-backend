@@ -240,6 +240,7 @@ def _update_test_case_doc_from_json(case_doc, test_case, errors):
     if seconds == 0.0:
         case_doc.time = _seconds_as_datetime(seconds)
 
+    case_doc.device_type = test_case.get(models.DEVICE_TYPE_KEY)
     case_doc.git_branch = test_case.get(models.GIT_BRANCH_KEY)
     case_doc.index = test_case.get(models.INDEX_KEY)
     case_doc.job = test_case.get(models.JOB_KEY)

@@ -67,6 +67,7 @@ TEST_CASE_GROUP_KEYS = [
     models.JOB_KEY,
     models.KERNEL_KEY,
     models.MACH_KEY,
+    models.DEVICE_TYPE_KEY,
 ]
 
 TEST_CASE_NAME_EXTRA = {
