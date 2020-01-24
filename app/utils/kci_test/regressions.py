@@ -39,6 +39,7 @@ REGRESSION_EXTRA_KEYS = [
     models.COMPILER_KEY,
     models.COMPILER_VERSION_KEY,
     models.GIT_URL_KEY,
+    models.MACH_KEY,
 ]
 
 TEST_GROUP_SPEC_KEYS = [

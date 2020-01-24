@@ -45,7 +45,7 @@ class TestRegressionDocument(modb.BaseDocument):
     """
 
     def __init__(self, job, kernel, git_branch, git_url, defconfig_full,
-                 build_environment, device_type, arch, hierarchy, plan,
+                 build_environment, device_type, arch, mach, hierarchy, plan,
                  test_case_path):
         """A new TestRegressionDocument.
 
@@ -82,6 +82,7 @@ class TestRegressionDocument(modb.BaseDocument):
         self.build_environment = build_environment
         self.device_type = device_type
         self.arch = arch
+        self.mach = mach
         self.hierarchy = hierarchy
         self.plan = plan
         self.test_case_path = test_case_path
@@ -153,6 +154,7 @@ class TestRegressionDocument(modb.BaseDocument):
             models.GIT_BRANCH_KEY: self.git_branch,
             models.GIT_URL_KEY: self.git_url,
             models.HIERARCHY_KEY: self.hierarchy,
+            models.MACH_KEY: self.mach,
             models.PLAN_KEY: self.plan,
             models.TEST_CASE_PATH_KEY: self.test_case_path,
             models.JOB_KEY: self.job,
@@ -186,13 +188,14 @@ class TestRegressionDocument(modb.BaseDocument):
             build_environment = obj.pop(models.BUILD_ENVIRONMENT_KEY)
             device_type = obj.pop(models.DEVICE_TYPE_KEY)
             arch = obj.pop(models.ARCHITECTURE_KEY)
+            mach = obj.pop(models.MACH_KEY)
             hierarchy = obj.pop(models.HIERARCHY_KEY)
             plan = obj.pop(models.PLAN_KEY)
             test_case_path = obj.pop(models.TEST_CASE_PATH_KEY)
 
             regr_doc = TestRegressionDocument(
                 job, kernel, git_branch, git_url, defconfig_full,
-                build_environment, device_type, arch, hierarchy, plan,
+                build_environment, device_type, arch, mach, hierarchy, plan,
                 test_case_path)
 
             regr_doc.id = regr_id
