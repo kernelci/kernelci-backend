@@ -170,6 +170,9 @@ INDEX_SPECS = {
             (models.TEST_GROUP_ID_KEY, pymongo.ASCENDING),
         ],
         [
+            (models.MACH_KEY, pymongo.ASCENDING),
+        ],
+        [
             (models.JOB_KEY, pymongo.ASCENDING),
             (models.KERNEL_KEY, pymongo.ASCENDING),
             (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
