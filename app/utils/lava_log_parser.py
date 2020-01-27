@@ -48,6 +48,7 @@ HTML_HEAD = """\
   a:link {{text-decoration: none }}
   a:visited {{text-decoration: none }}
   a:active {{text-decoration: none }}
+  :target {{ background-color: #000080; }}
   a:hover {{text-decoration: bold; color: red; }}
   ul.results {{
     list-style-type: none;
@@ -122,27 +123,34 @@ def run(log, boot, txt, html):
 
     start_ts = None
     log_buffer = []
+    lineno = 0
 
     for line in log:
+        lineno = lineno + 1
         dt, level, msg = (line.get(k) for k in ["dt", "lvl", "msg"])
         raw_ts = DT_RE.match(dt).groups()[1]
         timestamp = "<span class=\"timestamp\">{}  </span>".format(raw_ts)
+        sl = "<span id=L%d>" % lineno
+        el = "</span>\n"
 
         if isinstance(msg, list):
             msg = ' '.join(msg)
 
         fmt = formats.get(level)
         if fmt:
-            log_buffer.append(timestamp + fmt.format(cgi.escape(msg)))
+            log_buffer .append(
+                ''.join([sl, timestamp, fmt.format(cgi.escape(msg)), el]))
             numbers[level] += 1
         elif level == "target":
             kernel_level = re.match(r'^\<([0-7])\>', msg)
             if kernel_level:
                 fmt = kernel_log_levels[kernel_level.group(1)]
-                log_buffer.append(timestamp + fmt.format(cgi.escape(msg)))
+                log_buffer.append(''.join(
+                        [sl, timestamp, fmt.format(cgi.escape(msg)), el]))
                 kernel_numbers[kernel_level.group(1)] += 1
             else:
-                log_buffer.append(timestamp + cgi.escape(msg) + "\n")
+                log_buffer.append(
+                    ''.join([sl, timestamp, cgi.escape(msg), el]))
             txt.write(msg)
             txt.write("\n")
         elif level == "info" and msg.startswith("Start time: "):
