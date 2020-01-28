@@ -57,6 +57,7 @@ class TestCaseDocument(mbase.BaseDocument):
         self._measurements = []
         self._status = None
         self._test_group_id = None
+        self._test_case_log_line = None
 
         self.arch = None
         self.build_environment = None
@@ -159,6 +160,19 @@ class TestCaseDocument(mbase.BaseDocument):
                 "Measurement must be non-empty dictionary-like object")
 
     @property
+    def test_case_log_line(self):
+        """The log line of the associated test case."""
+        return self._test_case_log_line
+
+    @test_case_log_line.setter
+    def test_case_log_line(self, value):
+        """Set the associated test case log line number.
+
+        :param value: The log line number.
+        """
+        self._test_case_log_line = value
+
+    @property
     def status(self):
         """The status of this test case."""
         return self._status
@@ -210,6 +224,7 @@ class TestCaseDocument(mbase.BaseDocument):
             models.PLAN_KEY: self.plan,
             models.REGRESSION_ID_KEY: self.regression_id,
             models.STATUS_KEY: self.status,
+            models.TEST_CASE_LOG_LINE_KEY: self.test_case_log_line,
             models.TEST_CASE_PATH_KEY: self.test_case_path,
             models.TEST_GROUP_ID_KEY: self.test_group_id,
             models.TIME_KEY: self.time,

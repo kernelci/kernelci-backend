@@ -251,6 +251,7 @@ def _update_test_case_doc_from_json(case_doc, test_case, errors):
     case_doc.kernel = test_case.get(models.KERNEL_KEY)
     case_doc.lab_name = test_case.get(models.LAB_NAME_KEY)
     case_doc.mach = test_case.get(models.MACH_KEY)
+    case_doc.test_case_log_line = test_case.get(models.TEST_CASE_LOG_LINE_KEY)
     case_doc.measurements = test_case.get(models.MEASUREMENTS_KEY, [])
     case_doc.status = test_case[models.STATUS_KEY].upper()
 
