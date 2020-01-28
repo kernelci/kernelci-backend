@@ -896,6 +896,8 @@ TEST_GROUP_VALID_KEYS = {
         DEFCONFIG_FULL_KEY,
         DEFCONFIG_KEY,
         GIT_BRANCH_KEY,
+        GIT_COMMIT_KEY,
+        GIT_URL_KEY,
         INDEX_KEY,
         JOB_ID_KEY,
         JOB_KEY,
