@@ -187,6 +187,19 @@ INDEX_SPECS = {
             (models.JOB_KEY, pymongo.ASCENDING),
             (models.KERNEL_KEY, pymongo.ASCENDING),
             (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+            (models.PLAN_KEY, pymongo.ASCENDING),
+        ],
+        [
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.ASCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+            (models.STATUS_KEY, pymongo.ASCENDING),
+            (models.PLAN_KEY, pymongo.ASCENDING),
+        ],
+        [
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.ASCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
             (models.STATUS_KEY, pymongo.ASCENDING),
             (models.REGRESSION_ID_KEY, pymongo.ASCENDING),
         ],
@@ -210,6 +223,12 @@ INDEX_SPECS = {
             (models.JOB_KEY, pymongo.ASCENDING),
             (models.KERNEL_KEY, pymongo.ASCENDING),
             (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+        ],
+        [
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.ASCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+            (models.PLAN_KEY, pymongo.ASCENDING),
         ],
     ],
 
