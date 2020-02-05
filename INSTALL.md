@@ -22,7 +22,7 @@ Two machines:
 
 * The target machine where the KernelCI infrastructure (front and back end) will be deployed
 	* Target configuration prerequisites
-		* Supported OS: Debian (Stretch and after), CentOS >= 7
+		* Supported OS: Debian Buster, CentOS >= 7
 		* ssh root access, at least for the host machine from where you'll be running ansible
 		* Python >= 2.7.12
 
