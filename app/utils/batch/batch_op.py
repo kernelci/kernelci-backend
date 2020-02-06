@@ -277,6 +277,14 @@ class BatchTestGroupOperation(BatchOperation):
         self.valid_keys = models.TEST_GROUP_VALID_KEYS
 
 
+class BatchTestRegressionOperation(BatchOperation):
+    """A batch operation for test regressions."""
+
+    def __init__(self):
+        super(BatchTestRegressionOperation, self).__init__()
+        self.valid_keys = models.TEST_REGRESSION_VALID_KEYS
+
+
 class BatchDistinctOperation(BatchOperation):
     """A batch operation to retrieve distinct values for a resource."""
 
