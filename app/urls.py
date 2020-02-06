@@ -42,6 +42,7 @@ import handlers.send
 import handlers.stats
 import handlers.test_case
 import handlers.test_group
+import handlers.test_regression
 import handlers.token
 import handlers.upload
 import handlers.version
@@ -177,6 +178,10 @@ _TEST_CASE_COUNT_DISTINCT_URL = tornado.web.url(
     kwargs={"resource": "test_case"}, name="test-case-count-distinct"
 )
 
+_TEST_REGRESSION_URL = tornado.web.url(
+    r"/test[s]?/regression[s]?/?(?P<id>.*)",
+    handlers.test_regression.TestRegressionHandler, name="test-regression")
+
 _BOOT_TRIGGER_URL = tornado.web.url(
     r"/trigger/boot[s]?/?",
     handlers.boot_trigger.BootTriggerHandler, name="boot-trigger")
@@ -220,6 +225,7 @@ APP_URLS = [
     _TEST_GROUP_COUNT_DISTINCT_URL,
     _TEST_GROUP_DISTINCT_URL,
     _TEST_GROUP_URL,
+    _TEST_REGRESSION_URL,
     _TEST_RESULT_URL,
     _TOKEN_URL,
     _UPLOAD_URL,

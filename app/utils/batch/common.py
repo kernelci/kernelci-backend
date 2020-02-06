@@ -118,6 +118,8 @@ def create_batch_operation(json_obj, db_options):
                     batch_op = batchop.BatchTestCaseOperation()
                 elif resource == models.TEST_GROUP_COLLECTION:
                     batch_op = batchop.BatchTestGroupOperation()
+                elif resource == models.TEST_REGRESSION_COLLECTION:
+                    batch_op = batchop.BatchTestRegressionOperation()
 
             _complete_batch_op()
 

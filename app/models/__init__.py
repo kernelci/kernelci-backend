@@ -373,7 +373,8 @@ COLLECTIONS = [
     DAILY_STATS_COLLECTION,
     JOB_COLLECTION,
     TEST_CASE_COLLECTION,
-    TEST_GROUP_COLLECTION
+    TEST_GROUP_COLLECTION,
+    TEST_REGRESSION_COLLECTION,
 ]
 
 # Slightly different then above: this is used only for the /count API.
@@ -955,6 +956,18 @@ TEST_CASE_VALID_KEYS = {
         TIME_KEY,
         VERSION_KEY,
     ]
+}
+
+TEST_REGRESSION_VALID_KEYS = {
+    "GET": [
+        JOB_KEY,
+        GIT_BRANCH_KEY,
+        KERNEL_KEY,
+        PLAN_KEY,
+        DEVICE_TYPE_KEY,
+        BUILD_ENVIRONMENT_KEY,
+        DEFCONFIG_FULL_KEY,
+    ],
 }
 
 STATISTICS_VALID_KEYS = {
