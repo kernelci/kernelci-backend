@@ -1,2 +1,2 @@
-__version__ = "2020.1.1"
+__version__ = "2020.2.0"
 __versionfull__ = __version__
