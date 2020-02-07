@@ -1,0 +1,5 @@
+hostname: api.staging.kernelci.org
+role: production
+certname: api.staging.kernelci.org
+storage_certname: storage.staging.kernelci.org
+kci_storage_fqdn: storage.staging.kernelci.org

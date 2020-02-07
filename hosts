@@ -2,7 +2,7 @@
 kernel-ci-backend
 
 [dev]
-staging-api.kernelci.org
+api.staging.kernelci.org
 
 [prod]
 api.kernelci.org
