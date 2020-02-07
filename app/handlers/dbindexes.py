@@ -230,6 +230,15 @@ INDEX_SPECS = {
             (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
             (models.PLAN_KEY, pymongo.ASCENDING),
         ],
+        [
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.ASCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+            (models.PLAN_KEY, pymongo.ASCENDING),
+            (models.DEVICE_TYPE_KEY, pymongo.ASCENDING),
+            (models.BUILD_ENVIRONMENT_KEY, pymongo.ASCENDING),
+            (models.DEFCONFIG_FULL_KEY, pymongo.ASCENDING),
+        ],
     ],
 
     models.TOKEN_COLLECTION: [
