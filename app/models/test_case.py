@@ -62,6 +62,7 @@ class TestCaseDocument(mbase.BaseDocument):
         self.git_commit = None
         self.job = None
         self.kernel = None
+        self.lab_name = None
         self.device_type = None
         self.mach = None
         self.plan = None
@@ -196,6 +197,7 @@ class TestCaseDocument(mbase.BaseDocument):
             models.INDEX_KEY: self.index,
             models.JOB_KEY: self.job,
             models.KERNEL_KEY: self.kernel,
+            models.LAB_NAME_KEY: self.lab_name,
             models.MACH_KEY: self.mach,
             models.MEASUREMENTS_KEY: self.measurements,
             models.NAME_KEY: self.name,

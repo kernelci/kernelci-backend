@@ -43,6 +43,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.index = 1
         test_case.job = "this-job"
         test_case.kernel = "v123.45"
+        test_case.lab_name = "secret"
         test_case.device_type = "supercar"
         test_case.mach = "batmobile"
         test_case.measurements = [{"foo": 1}]
@@ -61,6 +62,7 @@ class TestTestCaseModel(unittest.TestCase):
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
+            "lab_name": "secret",
             "device_type": "supercar",
             "mach": "batmobile",
             "measurements": [{"foo": 1}],
@@ -84,6 +86,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.git_commit = "1234abc"
         test_case.index = 1
         test_case.job = "this-job"
+        test_case.lab_name = "area51"
         test_case.kernel = "v123.45"
         test_case.device_type = "pi"
         test_case.mach = "raspberry"
@@ -101,6 +104,7 @@ class TestTestCaseModel(unittest.TestCase):
             "git_commit": "1234abc",
             "index": 1,
             "job": "this-job",
+            "lab_name": "area51",
             "kernel": "v123.45",
             "device_type": "pi",
             "mach": "raspberry",
@@ -138,6 +142,7 @@ class TestTestCaseModel(unittest.TestCase):
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
+            "lab_name": "spaghetti",
             "device_type": "pi",
             "mach": "laptop",
             "measurements": [{"foo": 1}],
