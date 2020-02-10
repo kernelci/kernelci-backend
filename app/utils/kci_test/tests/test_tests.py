@@ -48,6 +48,7 @@ class TestTests(unittest.TestCase):
             models.NAME_KEY: name,
             models.STATUS_KEY: status,
             models.TIME_KEY: 123456789.0,  # ToDo: make optional
+            models.LAB_NAME_KEY: "unit-test-lab",
         } for name, status in test_series)
         group_data = {
             models.NAME_KEY: "dummy",

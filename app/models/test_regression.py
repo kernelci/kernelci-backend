@@ -45,8 +45,8 @@ class TestRegressionDocument(modb.BaseDocument):
     """
 
     def __init__(self, job, kernel, git_branch, git_url, defconfig_full,
-                 build_environment, device_type, arch, mach, hierarchy, plan,
-                 test_case_path):
+                 build_environment, device_type, lab_name, arch, mach,
+                 hierarchy, plan, test_case_path):
         """A new TestRegressionDocument.
 
         :param job: The job value.
@@ -63,6 +63,8 @@ class TestRegressionDocument(modb.BaseDocument):
         :type build_environment: string
         :param device_type: The name of the device type.
         :type device_type: string
+        :param lab_name: The name of the test lab.
+        :type lab_name: string
         :param arch: The name of the CPU architecture.
         :type arch: string
         :param hierarchy: The test group hierarchy containing the test case.
@@ -81,6 +83,7 @@ class TestRegressionDocument(modb.BaseDocument):
         self.defconfig_full = defconfig_full
         self.build_environment = build_environment
         self.device_type = device_type
+        self.lab_name = lab_name
         self.arch = arch
         self.mach = mach
         self.hierarchy = hierarchy
@@ -108,7 +111,7 @@ class TestRegressionDocument(modb.BaseDocument):
 
     @property
     def created_on(self):
-        """When this lab object was created."""
+        """When this regression object was created."""
         return self._created_on
 
     @property
@@ -151,6 +154,7 @@ class TestRegressionDocument(modb.BaseDocument):
             models.DEFCONFIG_FULL_KEY: self.defconfig_full,
             models.BUILD_ENVIRONMENT_KEY: self.build_environment,
             models.DEVICE_TYPE_KEY: self.device_type,
+            models.LAB_NAME_KEY: self.lab_name,
             models.GIT_BRANCH_KEY: self.git_branch,
             models.GIT_URL_KEY: self.git_url,
             models.HIERARCHY_KEY: self.hierarchy,
@@ -187,6 +191,7 @@ class TestRegressionDocument(modb.BaseDocument):
             defconfig_full = obj.pop(models.DEFCONFIG_FULL_KEY)
             build_environment = obj.pop(models.BUILD_ENVIRONMENT_KEY)
             device_type = obj.pop(models.DEVICE_TYPE_KEY)
+            lab_name = obj.pop(models.LAB_NAME_KEY)
             arch = obj.pop(models.ARCHITECTURE_KEY)
             mach = obj.pop(models.MACH_KEY)
             hierarchy = obj.pop(models.HIERARCHY_KEY)
@@ -195,8 +200,8 @@ class TestRegressionDocument(modb.BaseDocument):
 
             regr_doc = TestRegressionDocument(
                 job, kernel, git_branch, git_url, defconfig_full,
-                build_environment, device_type, arch, mach, hierarchy, plan,
-                test_case_path)
+                build_environment, device_type, lab_name, arch, mach,
+                hierarchy, plan, test_case_path)
 
             regr_doc.id = regr_id
 
