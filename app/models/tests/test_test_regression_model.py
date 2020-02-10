@@ -27,13 +27,14 @@ class TestTestRegressionModel(unittest.TestCase):
     def test_regression_doc_valid_instance(self):
         test_regr = mtregr.TestRegressionDocument(
             "job", "kernel", "git_branch", "git_url", "defconfig_full", "benv",
-            "device_type", "arch", "mach", ["hierarchy"], "plan", "hierarchy")
+            "device_type", "lab", "arch", "mach", ["hierarchy"],
+            "plan", "hierarchy")
         self.assertIsInstance(test_regr, mbase.BaseDocument)
 
     def test_regression_doc_to_dict(self):
         test_regr = mtregr.TestRegressionDocument(
             "steady", "kernel-123", "a-branch", "a-url", "defconfig_full+abc",
-            "concrete", "imaginary-device", "gothic", "computer",
+            "concrete", "imaginary-device", "secret", "gothic", "computer",
             ["hier", "ar", "chy"], "hier", "hier.ar.chy")
 
         test_regr.id = "id"
@@ -62,6 +63,7 @@ class TestTestRegressionModel(unittest.TestCase):
             "defconfig_full": "defconfig_full+abc",
             "build_environment": "concrete",
             "device_type": "imaginary-device",
+            "lab_name": "secret",
             "arch": "gothic",
             "mach": "computer",
             "hierarchy": ["hier", "ar", "chy"],
@@ -107,6 +109,7 @@ class TestTestRegressionModel(unittest.TestCase):
             "defconfig_full": "allnoconfig+random",
             "build_environment": "concrete",
             "device_type": "dev-board",
+            "lab_name": "area51",
             "arch": "bips",
             "mach": "robot",
             "hierarchy": ["suite", "group", "case"],

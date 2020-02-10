@@ -31,6 +31,7 @@ REGRESSION_SPEC_KEYS = [
     models.GIT_BRANCH_KEY,
     models.ARCHITECTURE_KEY,
     models.DEVICE_TYPE_KEY,
+    models.LAB_NAME_KEY,
     models.DEFCONFIG_FULL_KEY,
     models.BUILD_ENVIRONMENT_KEY,
 ]
@@ -47,6 +48,7 @@ TEST_GROUP_SPEC_KEYS = [
     models.GIT_BRANCH_KEY,
     models.ARCHITECTURE_KEY,
     models.DEVICE_TYPE_KEY,
+    models.LAB_NAME_KEY,
     models.DEFCONFIG_FULL_KEY,
     models.NAME_KEY,
     models.KERNEL_KEY,
@@ -95,6 +97,7 @@ def _check_and_track(test_case, group, last_case, last_group, db, spec,
             for case, group in [(last_case, last_group), (test_case, group)]
         ]
         regr[models.KERNEL_KEY] = spec[models.KERNEL_KEY]
+        regr[models.LAB_NAME_KEY] = test_case[models.LAB_NAME_KEY]
         doc = models.test_regression.TestRegressionDocument.from_json(regr)
         return utils.db.save(db, doc) if doc else (500, None)
 
