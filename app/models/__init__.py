@@ -947,6 +947,7 @@ TEST_CASE_VALID_KEYS = {
         INDEX_KEY,
         JOB_KEY,
         KERNEL_KEY,
+        LAB_NAME_KEY,
         MACH_KEY,
         NAME_KEY,
         PLAN_KEY,

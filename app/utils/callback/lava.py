@@ -67,6 +67,7 @@ TEST_CASE_GROUP_KEYS = [
     models.GIT_COMMIT_KEY,
     models.JOB_KEY,
     models.KERNEL_KEY,
+    models.LAB_NAME_KEY,
     models.MACH_KEY,
     models.DEVICE_TYPE_KEY,
 ]
