@@ -22,6 +22,7 @@
 """Common functions for batch operations."""
 
 import types
+import urllib
 
 import models
 import utils.batch.batch_op as batchop
@@ -56,13 +57,11 @@ def get_batch_query_args(query):
                 arg = arg.split("=")
                 # Can't have query with just one element, they have to be
                 # key=value.
-                if len(arg) > 1:
-                    try:
-                        args[arg[0]].append(arg[1])
-                        args[arg[0]] = list(set(args[arg[0]]))
-                    except KeyError:
-                        args[arg[0]] = []
-                        args[arg[0]].append(arg[1])
+                if len(arg) == 2:
+                    name, value = arg
+                    value = urllib.unquote(value)
+                    values = args.setdefault(name, list())
+                    values.append(value)
 
     return args
 
