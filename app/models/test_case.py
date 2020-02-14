@@ -54,6 +54,7 @@ class TestCaseDocument(mbase.BaseDocument):
         self._created_on = None
         self._id = None
         self._index = None
+        self._log_lines = []
         self._measurements = []
         self._status = None
         self._test_group_id = None
@@ -122,6 +123,41 @@ class TestCaseDocument(mbase.BaseDocument):
         if self._index:
             raise AttributeError("index already set")
         self._index = value
+
+    @property
+    def log_lines(self):
+        """The log lines stored for the test case."""
+        return self._log_lines
+
+    @log_lines.setter
+    def log_lines(self, value):
+        """Set the log lines associated with the test case.
+
+        :param value: The list of log lines to store.
+        :type value: list
+        """
+        if not value:
+            value = []
+        if not isinstance(value, types.ListType):
+            raise ValueError("Log lines must be passed as a list")
+        self._log_lines = value
+
+    def add_log_lines(self, log_line):
+        """Add a single log line to the test case.
+
+        A log_line should be a non-empty dictionary-like data structure.
+        Empty values will not be stored in this data structure. Typically it'll
+        have a 'dt' and 'msg' keys which are respectively the timestamp
+        and the message.
+
+        :param log_line: A log_line to store
+        :type log_line: dict
+        """
+        if all([log_line, isinstance(log_line, types.DictionaryType)]):
+            self._log_lines.append(log_line)
+        else:
+            raise ValueError(
+                "Log line must be non-empty dictionary-like object")
 
     @property
     def measurements(self):
@@ -204,6 +240,7 @@ class TestCaseDocument(mbase.BaseDocument):
             models.JOB_KEY: self.job,
             models.KERNEL_KEY: self.kernel,
             models.LAB_NAME_KEY: self.lab_name,
+            models.LOG_LINES_KEY: self.log_lines,
             models.MACH_KEY: self.mach,
             models.MEASUREMENTS_KEY: self.measurements,
             models.NAME_KEY: self.name,

@@ -21,6 +21,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 import unittest
+from datetime import datetime
 
 import models.base as mbase
 import models.test_case as mtcase
@@ -48,6 +49,10 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.job = "this-job"
         test_case.kernel = "v123.45"
         test_case.lab_name = "secret"
+        test_case.log_lines = [{
+            'dt': datetime(1970, 1, 1, 0, 0, 0),
+            'msg': 'foo'}]
+        test_case.device_type = "supercar"
         test_case.mach = "batmobile"
         test_case.measurements = [{"foo": 1}]
         test_case.plan = "cunning"
@@ -70,6 +75,9 @@ class TestTestCaseModel(unittest.TestCase):
             "job": "this-job",
             "kernel": "v123.45",
             "lab_name": "secret",
+            "log_lines": [{
+               'dt': datetime(1970, 1, 1, 0, 0, 0),
+               'msg': 'foo'}],
             "mach": "batmobile",
             "measurements": [{"foo": 1}],
             "name": "name",
@@ -98,6 +106,9 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.job = "this-job"
         test_case.kernel = "v123.45"
         test_case.lab_name = "area51"
+        test_case.log_lines = [{
+            'dt': datetime(1970, 1, 1, 0, 0, 0),
+            'msg': 'foo'}]
         test_case.mach = "raspberry"
         test_case.measurements = [{"foo": 1}]
         test_case.plan = "cunning"
@@ -119,6 +130,10 @@ class TestTestCaseModel(unittest.TestCase):
             "job": "this-job",
             "kernel": "v123.45",
             "lab_name": "area51",
+            "log_lines": [{
+                'dt': datetime(1970, 1, 1, 0, 0, 0),
+                'msg': 'foo'}],
+            "device_type": "pi",
             "mach": "raspberry",
             "measurements": [{"foo": 1}],
             "name": "name",
@@ -159,6 +174,9 @@ class TestTestCaseModel(unittest.TestCase):
             "job": "this-job",
             "kernel": "v123.45",
             "lab_name": "spaghetti",
+            "log_lines": [{
+                'dt': datetime(1970, 1, 1, 0, 0, 0),
+                'msg': 'foo'}],
             "mach": "laptop",
             "measurements": [{"foo": 1}],
             "name": "name",

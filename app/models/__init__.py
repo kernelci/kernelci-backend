@@ -141,6 +141,7 @@ LAB_NAME_KEY = "lab_name"
 LIMIT_KEY = "limit"
 LOAD_ADDR_KEY = "load_addr"
 LOG_KEY = 'log'
+LOG_LINES_KEY = "log_lines"
 LT_KEY = "lt"
 MACH_ALIAS_KEY = "mach_alias"
 MACH_KEY = "mach"

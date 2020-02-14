@@ -27,9 +27,11 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 import codecs
+import dateutil.parser as dparser
 import errno
 import models
 import os
+import re
 import yaml
 import json
 import urllib2
@@ -136,6 +138,10 @@ BL_META_MAP = {
     "kernel_addr": "loadaddr",
     "dtb_addr": "dtb_addr",
 }
+
+LOGIN_CASE_END_PATTERN = re.compile(r'end:.*auto-login-action.*')
+TEST_CASE_SIGNAL_PATTERN = re.compile(
+    r'\<LAVA_SIGNAL_TESTCASE TEST_CASE_ID.+>')
 
 
 def _get_job_meta(meta, job_data):
@@ -321,6 +327,59 @@ def _add_test_log(meta, job_log, suite):
             utils.lava_log_parser.run(log, meta, txt, html)
 
 
+def add_log_fragments(groups, log, end_lines_map, start_log_line):
+    lines_map = _prepare_lines_map(end_lines_map, start_log_line)
+    for path, tc in _test_case_iter(groups):
+        try:
+            lines_range = lines_map[path]
+            tc[models.LOG_LINES_KEY] = _get_log_lines(log, *lines_range)
+        except KeyError:
+            utils.LOG.warn(
+                'No log lines specified for path: {} test_case {}'.format(
+                    path, tc.get('name')))
+
+
+def _test_case_iter(groups):
+    for group in groups:
+        stack = [group]
+        path = [group.get('name')]
+        while stack:
+            node = stack.pop()
+            if node is not group:
+                path.append(node.get('name'))
+            for test_case in node.get('test_cases', []):
+                path.append(test_case.get('name'))
+                yield tuple(path), test_case
+                path.pop()
+            if node is not group:
+                path.pop()
+            for sub_group in node.get('sub_groups', []):
+                stack.append(sub_group)
+
+
+def _prepare_lines_map(end_lines_map, start_log_line):
+    lines_map = OrderedDict(sorted(end_lines_map.items(),
+                                   key=lambda i: i[1]))
+    start_line = start_log_line
+    for path, end_line in lines_map.items():
+        lines_map[path] = (start_line, end_line)
+        start_line = end_line + 1
+    return lines_map
+
+
+def _get_log_lines(log, start_line, end_line):
+    lines = [
+        {
+            'dt': dparser.parse(l['dt']),
+            'msg': l['msg']
+        }
+        for l in log[start_line:end_line]
+        if (l['lvl'] == 'target' and
+            not TEST_CASE_SIGNAL_PATTERN.match(l['msg']))
+    ]
+    return lines
+
+
 def _store_lava_json(job_data, meta, base_path=utils.BASE_PATH):
     """ Save the json LAVA v2 callback object
 
@@ -447,7 +506,14 @@ def _add_login_case(meta, results, cases, name):
     cases.append(test_case)
 
 
-def _add_test_results(group, results):
+def _get_log_line_number(log, pattern):
+    for line_number, line in enumerate(log):
+        msg = line.get('msg', '')
+        if pattern.match(unicode(msg)) is not None:
+            return line_number
+
+
+def _add_test_results(group, results, log_line_data):
     """Add test results from test suite data to a group.
 
     Import test results from a LAVA test suite into a group dictionary with the
@@ -458,6 +524,8 @@ def _add_test_results(group, results):
     :type group: dict
     :param results: Test results from the callback.
     :type results: dict
+    :param log_line_data: dict of {test_case_path: log_end_line}
+    :type log_line_data: dict
     """
     tests = yaml.load(results, Loader=yaml.CLoader)
     test_cases = []
@@ -468,6 +536,7 @@ def _add_test_results(group, results):
             models.VERSION_KEY: "1.1",
             models.TIME_KEY: "0.0",
         }
+        path = [group.get('name')]
         test_case.update({k: test[v] for k, v in TEST_CASE_MAP.iteritems()})
         test_case.update({k: group[k] for k in TEST_CASE_GROUP_KEYS})
         measurement = test.get("measurement")
@@ -482,9 +551,12 @@ def _add_test_results(group, results):
             test_case[models.ATTACHMENTS_KEY] = [reference]
         test_set_name = test_meta.get("set")
         if test_set_name:
+            path.append(test_set_name)
             test_case_list = test_sets.setdefault(test_set_name, [])
         else:
             test_case_list = test_cases
+        path.append(test_case[models.NAME_KEY])
+        log_line_data[tuple(path)] = int(test["log_end_line"])
         test_case[models.INDEX_KEY] = len(test_case_list) + 1
         test_case_list.append(test_case)
 
@@ -618,16 +690,24 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         _store_lava_json(job_data, meta)
         groups = []
         cases = []
-
+        start_log_line = 0
+        log = yaml.load(job_data["log"], Loader=yaml.CLoader)
+        end_lines_map = {}
         for suite_name, results in job_data["results"].iteritems():
             if suite_name == "lava":
                 _add_login_case(meta, results, cases, 'auto-login-action')
+                login_line_num = _get_log_line_number(log,
+                                                      LOGIN_CASE_END_PATTERN)
+                start_log_line = 0 if login_line_num is None \
+                    else login_line_num
             else:
                 suite_name = suite_name.partition("_")[2]
                 group = dict(meta)
                 group[models.NAME_KEY] = suite_name
-                _add_test_results(group, results)
+                _add_test_results(group, results,
+                                  end_lines_map)
                 groups.append(group)
+        add_log_fragments(groups, log, end_lines_map, start_log_line)
 
         if (len(groups) == 1) and (groups[0][models.NAME_KEY] == plan_name):
             # Only one group with same name as test plan
