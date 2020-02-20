@@ -78,25 +78,25 @@ def run(log, boot, txt, html):
         boot_result_html = "<span class=\"warn\">{}</span>".format(boot_result)
 
     formats = {
-        "emerg": u"<span class=\"alert\">{}</span>\n",
-        "alert": u"<span class=\"alert\">{}</span>\n",
-        "crit": u"<span class=\"alert\">{}</span>\n",
-        "error": u"<span class=\"err\">{}</span>\n",
-        "warning": u"<span class=\"warn\">{}</span>\n",
-        "notice": u"<span class=\"info\">{}</span>\n",
-        "info": u"<span class=\"lavainfo\">{}</span>\n",
-        "debug": u"<span class=\"lavainfo\">{}</span>\n"
+        "emerg": u"<span class=\"alert\">{}</span>",
+        "alert": u"<span class=\"alert\">{}</span>",
+        "crit": u"<span class=\"alert\">{}</span>",
+        "error": u"<span class=\"err\">{}</span>",
+        "warning": u"<span class=\"warn\">{}</span>",
+        "notice": u"<span class=\"info\">{}</span>",
+        "info": u"<span class=\"lavainfo\">{}</span>",
+        "debug": u"<span class=\"lavainfo\">{}</span>"
     }
 
     kernel_log_levels = {
-        "0": u"<span class=\"alert\">{}</span>\n",
-        "1": u"<span class=\"alert\">{}</span>\n",
-        "2": u"<span class=\"alert\">{}</span>\n",
-        "3": u"<span class=\"err\">{}</span>\n",
-        "4": u"<span class=\"warn\">{}</span>\n",
-        "5": u"<span class=\"info\">{}</span>\n",
-        "6": u"<span class=\"info\">{}</span>\n",
-        "7": u"<span class=\"debug\">{}</span>\n",
+        "0": u"<span class=\"alert\">{}</span>",
+        "1": u"<span class=\"alert\">{}</span>",
+        "2": u"<span class=\"alert\">{}</span>",
+        "3": u"<span class=\"err\">{}</span>",
+        "4": u"<span class=\"warn\">{}</span>",
+        "5": u"<span class=\"info\">{}</span>",
+        "6": u"<span class=\"info\">{}</span>",
+        "7": u"<span class=\"debug\">{}</span>",
     }
 
     numbers = {
