@@ -211,6 +211,27 @@ INDEX_SPECS = {
             (models.PLAN_KEY, pymongo.ASCENDING),
             (models.LAB_NAME_KEY, pymongo.ASCENDING),
         ],
+        [
+            (models.ARCHITECTURE_KEY, pymongo.ASCENDING),
+            (models.BUILD_ENVIRONMENT_KEY, pymongo.ASCENDING),
+            (models.DEFCONFIG_FULL_KEY, pymongo.ASCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.ASCENDING),
+            (models.LAB_NAME_KEY, pymongo.ASCENDING),
+            (models.PLAN_KEY, pymongo.ASCENDING),
+            (models.STATUS_KEY, pymongo.ASCENDING),
+        ],
+        [
+            (models.ARCHITECTURE_KEY, pymongo.ASCENDING),
+            (models.BUILD_ENVIRONMENT_KEY, pymongo.ASCENDING),
+            (models.DEFCONFIG_FULL_KEY, pymongo.ASCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.ASCENDING),
+            (models.LAB_NAME_KEY, pymongo.ASCENDING),
+            (models.PLAN_KEY, pymongo.ASCENDING),
+        ],
     ],
 
     models.TEST_GROUP_COLLECTION: [
