@@ -37,14 +37,17 @@ class TestTestCaseModel(unittest.TestCase):
         test_case = mtcase.TestCaseDocument("name", "1.1")
 
         test_case.id = "id"
+        test_case.arch = "gothic"
         test_case.created_on = "now"
+        test_case.build_environment = "tcc-0.9"
+        test_case.defconfig_full = "defconfig+SOMETHING=y"
+        test_case.device_type = "supercar"
         test_case.git_branch = "branch"
         test_case.git_commit = "1234abc"
         test_case.index = 1
         test_case.job = "this-job"
         test_case.kernel = "v123.45"
         test_case.lab_name = "secret"
-        test_case.device_type = "supercar"
         test_case.mach = "batmobile"
         test_case.measurements = [{"foo": 1}]
         test_case.plan = "cunning"
@@ -56,14 +59,17 @@ class TestTestCaseModel(unittest.TestCase):
 
         expected = {
             "_id": "id",
+            "arch": "gothic",
+            "build_environment": "tcc-0.9",
             "created_on": "now",
+            "defconfig_full": "defconfig+SOMETHING=y",
+            "device_type": "supercar",
             "git_branch": "branch",
             "git_commit": "1234abc",
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
             "lab_name": "secret",
-            "device_type": "supercar",
             "mach": "batmobile",
             "measurements": [{"foo": 1}],
             "name": "name",
@@ -81,14 +87,17 @@ class TestTestCaseModel(unittest.TestCase):
     def test_case_doc_to_dict_no_id(self):
         test_case = mtcase.TestCaseDocument("name", "1.1")
 
+        test_case.arch = "gothic"
+        test_case.build_environment = "tcc-0.9"
         test_case.created_on = "now"
+        test_case.defconfig_full = "defconfig+SOMETHING=y"
+        test_case.device_type = "pi"
         test_case.git_branch = "branch"
         test_case.git_commit = "1234abc"
         test_case.index = 1
         test_case.job = "this-job"
-        test_case.lab_name = "area51"
         test_case.kernel = "v123.45"
-        test_case.device_type = "pi"
+        test_case.lab_name = "area51"
         test_case.mach = "raspberry"
         test_case.measurements = [{"foo": 1}]
         test_case.plan = "cunning"
@@ -99,14 +108,17 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.time = 10
 
         expected = {
+            "arch": "gothic",
+            "build_environment": "tcc-0.9",
             "created_on": "now",
+            "defconfig_full": "defconfig+SOMETHING=y",
+            "device_type": "pi",
             "git_branch": "branch",
             "git_commit": "1234abc",
             "index": 1,
             "job": "this-job",
-            "lab_name": "area51",
             "kernel": "v123.45",
-            "device_type": "pi",
+            "lab_name": "area51",
             "mach": "raspberry",
             "measurements": [{"foo": 1}],
             "name": "name",
@@ -136,14 +148,17 @@ class TestTestCaseModel(unittest.TestCase):
     def test_case_doc_from_json(self):
         case_json = {
             "_id": "id",
+            "arch": "gothic",
+            "build_environment": "tcc-0.9",
             "created_on": "now",
+            "defconfig_full": "defconfig+SOMETHING=y",
+            "device_type": "pi",
             "git_branch": "branch",
             "git_commit": "1234abc",
             "index": 1,
             "job": "this-job",
             "kernel": "v123.45",
             "lab_name": "spaghetti",
-            "device_type": "pi",
             "mach": "laptop",
             "measurements": [{"foo": 1}],
             "name": "name",

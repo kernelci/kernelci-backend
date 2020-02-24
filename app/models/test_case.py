@@ -58,12 +58,15 @@ class TestCaseDocument(mbase.BaseDocument):
         self._status = None
         self._test_group_id = None
 
+        self.arch = None
+        self.build_environment = None
+        self.defconfig_full = None
+        self.device_type = None
         self.git_branch = None
         self.git_commit = None
         self.job = None
         self.kernel = None
         self.lab_name = None
-        self.device_type = None
         self.mach = None
         self.plan = None
         self.regression_id = None
@@ -190,7 +193,10 @@ class TestCaseDocument(mbase.BaseDocument):
 
     def to_dict(self):
         test_case = {
+            models.ARCHITECTURE_KEY: self.arch,
+            models.BUILD_ENVIRONMENT_KEY: self.build_environment,
             models.CREATED_KEY: self.created_on,
+            models.DEFCONFIG_FULL_KEY: self.defconfig_full,
             models.DEVICE_TYPE_KEY: self.device_type,
             models.GIT_BRANCH_KEY: self.git_branch,
             models.GIT_COMMIT_KEY: self.git_commit,
