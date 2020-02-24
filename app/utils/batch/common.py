@@ -60,10 +60,10 @@ def get_batch_query_args(query):
                 if len(arg) == 2:
                     name, value = arg
                     value = urllib.unquote(value)
-                    values = args.setdefault(name, list())
-                    values.append(value)
+                    values = args.setdefault(name, set())
+                    values.add(value)
 
-    return args
+    return {k: list(v) for k, v in args.iteritems()}
 
 
 def create_batch_operation(json_obj, db_options):
