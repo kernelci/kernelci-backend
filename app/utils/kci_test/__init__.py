@@ -380,6 +380,7 @@ def _update_test_group_doc_from_json(group_doc, group_dict, errors):
     group_doc.image_type = group_dict.get(models.IMAGE_TYPE_KEY)
     group_doc.initrd = group_dict.get(models.INITRD_KEY)
     group_doc.initrd_info = group_dict.get(models.INITRD_INFO_KEY)
+    group_doc.test_runner_url = group_dict.get(models.TEST_RUNNER_URL_KEY)
     group_doc.job = group_dict.get(models.JOB_KEY)
     group_doc.kernel = group_dict.get(models.KERNEL_KEY)
     group_doc.kernel_image = group_dict.get(models.KERNEL_IMAGE_KEY)

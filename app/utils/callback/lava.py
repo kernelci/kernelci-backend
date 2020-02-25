@@ -96,6 +96,7 @@ META_DATA_MAP_TEST = {
     models.GIT_DESCRIBE_KEY: "git.describe",
     models.GIT_URL_KEY: "git.url",
     models.INITRD_KEY: "job.initrd_url",
+    models.TEST_RUNNER_URL_KEY: "test_runner.url",
     models.JOB_KEY: "kernel.tree",
     models.KERNEL_KEY: "kernel.version",
     models.KERNEL_IMAGE_KEY: "job.kernel_image",

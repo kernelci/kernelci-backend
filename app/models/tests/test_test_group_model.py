@@ -72,6 +72,7 @@ class TestTestGroupModel(unittest.TestCase):
         test_group.plan_variant = "tother"
         test_group.sub_groups = [True, False]
         test_group.test_cases = ["foo"]
+        test_group.test_runner_url = "link"
         test_group.time = 10
         test_group.version = "1.1"
         test_group.warnings = 123
@@ -116,6 +117,7 @@ class TestTestGroupModel(unittest.TestCase):
             "name": "name",
             "sub_groups": [True, False],
             "test_cases": ["foo"],
+            "test_runner_url": "link",
             "time": 10,
             "version": "1.1",
             "warnings": 123,
@@ -176,6 +178,7 @@ class TestTestGroupModel(unittest.TestCase):
             "parent_id": "parent-id",
             "plan_variant": "tother",
             "sub_groups": [True, False],
+            "test_runner_url": "link",
             "test_cases": ["foo"],
             "time": 10,
             "version": "1.0",

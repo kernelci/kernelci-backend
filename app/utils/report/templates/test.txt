@@ -45,6 +45,9 @@ Test Failures
     {%- if group.initrd %}
   Rootfs:      {{ group.initrd }}
     {%- endif %}
+    {%- if group.test_runner_url %}
+  Test runner URL: {{ group.test_runner_url }}
+    {%- endif %}
     {%- if not test_suites and group.initrd_info.tests_suites %} {# suites_info #}
 
   Test suite revisions:
