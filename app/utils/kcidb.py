@@ -113,6 +113,7 @@ def push_build(build_id, first, bq_options, db_options={}, db=None):
         bq_revision = {
             'origin': origin,
             'origin_id': revision_id,
+            'valid': True,
         }
         bq_revision.update({
             bq_key: build[build_key]
@@ -209,6 +210,7 @@ def push_tests(group_id, bq_options, db_options={}, db=None):
                 'path': test['path'],
                 'description': test_description,
                 'status': test['status'],
+                'waived': False,
                 'start_time': test['start_time'],
                 'output_files': output_files,
                 'misc': misc,
