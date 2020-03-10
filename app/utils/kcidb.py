@@ -114,6 +114,7 @@ def push_build(build_id, first, bq_options, db_options={}, db=None):
             'origin': origin,
             'origin_id': revision_id,
             'valid': True,
+            'discovery_time': build[models.CREATED_KEY].isoformat(),
         }
         bq_revision.update({
             bq_key: build[build_key]
