@@ -21,6 +21,7 @@ import hashlib
 import json
 import redis
 import os
+import urlparse
 
 import models
 import utils
@@ -124,9 +125,10 @@ def create_bisect_report(data, email_options, db_options,
     # bad_details_url = '/'.join([
     #   rcommon.DEFAULT_BASE_URL, "boot", "id", str(boot_data["FAIL"]["_id"])])
 
-    log_url_txt, log_url_html = ('/'.join([
-        rcommon.DEFAULT_STORAGE_URL, rel_path, test_group[k]])
-        for k in [models.BOOT_LOG_KEY, models.BOOT_LOG_HTML_KEY])
+    log_url_txt, log_url_html = (urlparse.urljoin(
+        rcommon.DEFAULT_STORAGE_URL, '/'.join([rel_path, test_group[k]]))
+        for k in [models.BOOT_LOG_KEY, models.BOOT_LOG_HTML_KEY]
+    )
 
     cc = doc[models.COMPILER_KEY]
     cc_ver = doc[models.COMPILER_VERSION_KEY]
