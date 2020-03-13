@@ -20,6 +20,7 @@
 import json
 import os
 import subprocess
+import urlparse
 
 import models
 import utils
@@ -147,17 +148,21 @@ def push_build(build_id, first, bq_options, db_options={}, db=None):
         'duration': build[models.BUILD_TIME_KEY],
         'architecture': build[models.ARCHITECTURE_KEY],
         'compiler': build[models.COMPILER_VERSION_FULL_KEY],
-        'log_url': '/'.join([
+        'log_url': urlparse.urljoin(
             STORAGE_URL,
-            build[models.FILE_SERVER_RESOURCE_KEY],
-            utils.BUILD_LOG_FILE
-        ]),
+            '/'.join([
+                build[models.FILE_SERVER_RESOURCE_KEY],
+                utils.BUILD_LOG_FILE,
+            ])
+        ),
         'config_name': build[models.DEFCONFIG_FULL_KEY],
-        'config_url': '/'.join([
+        'config_url': urlparse.urljoin(
             STORAGE_URL,
-            build[models.FILE_SERVER_RESOURCE_KEY],
-            build[models.KERNEL_CONFIG_KEY],
-        ]),
+            '/'.join([
+                build[models.FILE_SERVER_RESOURCE_KEY],
+                build[models.KERNEL_CONFIG_KEY],
+            ])
+        ),
         'output_files': output_files,
         'misc': {
             'kernel_image_size': build[models.KERNEL_IMAGE_SIZE_KEY],
@@ -213,11 +218,14 @@ def push_tests(group_id, bq_options, db_options={}, db=None):
 
     output_files = []
     for name, file in files.iteritems():
-        url = "/".join([
+        url = urlparse.urljoin(
             STORAGE_URL,
-            build[models.FILE_SERVER_RESOURCE_KEY],
-            group[models.LAB_NAME_KEY],
-            file])
+            '/'.join([
+                build[models.FILE_SERVER_RESOURCE_KEY],
+                group[models.LAB_NAME_KEY],
+                file,
+            ])
+        )
         output_files.append({"name": name, "url": url})
 
     bq_data = {
