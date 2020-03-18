@@ -83,6 +83,7 @@ class TestGroupDocument(modb.BaseDocument):
         self.kernel = None
         self.kernel_image = None
         self.mach = None
+        self.modules = None
         self.plan_variant = None
         self.test_cases = []
         self.parent_id = None
@@ -187,6 +188,7 @@ class TestGroupDocument(modb.BaseDocument):
             models.KERNEL_IMAGE_KEY: self.kernel_image,
             models.LAB_NAME_KEY: self.lab_name,
             models.MACH_KEY: self.mach,
+            models.MODULES_KEY: self.modules,
             models.NAME_KEY: self.name,
             models.PLAN_VARIANT_KEY: self.plan_variant,
             models.TEST_CASES_KEY: self.test_cases,

@@ -441,7 +441,6 @@ def _update_test_group_doc_ids(group_doc, database):
         # In case we do not have the job_id key with the previous search.
         if not group_doc.job_id:
             group_doc.job_id = doc_get(models.JOB_ID_KEY)
-        # Get also git information if we do not have them already,
         if not group_doc.compiler:
             group_doc.compiler = doc_get(models.COMPILER_KEY)
         if not group_doc.compiler_version:
@@ -452,6 +451,9 @@ def _update_test_group_doc_ids(group_doc, database):
                 doc_get(models.COMPILER_VERSION_FULL_KEY)
         if not group_doc.cross_compile:
             group_doc.cross_compile = doc_get(models.CROSS_COMPILE_KEY)
+        if not group_doc.modules:
+            group_doc.modules = doc_get(models.MODULES_KEY)
+        # Get also git information if we do not have them already,
         if not group_doc.git_branch:
             group_doc.git_branch = doc_get(models.GIT_BRANCH_KEY)
         if not group_doc.git_commit:
