@@ -907,6 +907,7 @@ TEST_GROUP_VALID_KEYS = {
         KERNEL_KEY,
         LAB_NAME_KEY,
         MACH_KEY,
+        MODULES_KEY,
         NAME_KEY,
         PARENT_ID_KEY,
         TIME_KEY,
