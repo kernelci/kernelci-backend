@@ -68,6 +68,8 @@ class TestTestGroupModel(unittest.TestCase):
         test_group.kernel = "kernel"
         test_group.kernel_image = "kernel-image"
         test_group.mach = "mach"
+        test_group.modules = "moduli"
+        test_group.modules_dir = "moduli-dir"
         test_group.parent_id = "parent-id"
         test_group.plan_variant = "tother"
         test_group.sub_groups = [True, False]
@@ -111,6 +113,8 @@ class TestTestGroupModel(unittest.TestCase):
             "kernel_image": "kernel-image",
             "lab_name": "lab-name",
             "mach": "mach",
+            "modules": "moduli",
+            "modules_dir": "moduli-dir",
             "parent_id": "parent-id",
             "plan_variant": "tother",
             "name": "name",
@@ -172,6 +176,8 @@ class TestTestGroupModel(unittest.TestCase):
             "kernel_image": None,
             "lab_name": "lab-name",
             "mach": "mach",
+            "modules": "modules",
+            "modules_dir": "modules_dir",
             "name": "name",
             "parent_id": "parent-id",
             "plan_variant": "tother",
