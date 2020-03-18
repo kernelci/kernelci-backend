@@ -122,6 +122,20 @@ def push_build(build_id, first, bq_options, db_options={}, db=None):
         })
         bq_data['revisions'] = [bq_revision]
 
+    files = {
+        'kernel_image': build[models.KERNEL_IMAGE_KEY],
+        'modules': build[models.MODULES_KEY],
+        'System.map': build[models.SYSTEM_MAP_KEY],
+    }
+    output_files = []
+    for name, file in files.iteritems():
+        if file:
+            url = "/".join([
+                STORAGE_URL,
+                build[models.FILE_SERVER_RESOURCE_KEY],
+                file])
+            output_files.append({"name": name, "url": url})
+
     bq_build = {
         'revision_origin': origin,
         'revision_origin_id': revision_id,
@@ -144,8 +158,12 @@ def push_build(build_id, first, bq_options, db_options={}, db=None):
             build[models.FILE_SERVER_RESOURCE_KEY],
             build[models.KERNEL_CONFIG_KEY],
         ]),
+        'output_files': output_files,
         'misc': {
-            'defconfig': build[models.DEFCONFIG_FULL_KEY],
+            'kernel_image_size': build[models.KERNEL_IMAGE_SIZE_KEY],
+            'vmlinux_bss_size': build[models.VMLINUX_BSS_SIZE_KEY],
+            'vmlinux_data_size': build[models.VMLINUX_DATA_SIZE_KEY],
+            'build_platform': build[models.BUILD_PLATFORM_KEY],
         },
     }
     bq_data['builds'] = [bq_build]
