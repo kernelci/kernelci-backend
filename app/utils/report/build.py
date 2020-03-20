@@ -96,8 +96,6 @@ def _get_errors_count(results):
     parsed_data = {}
     total_errors = total_warnings = 0
 
-    arch_keys = parsed_data.viewkeys()
-
     for result in results:
         res_get = result.get
 
@@ -109,22 +107,14 @@ def _get_errors_count(results):
         res_warnings = res_get(models.WARNINGS_COUNT_KEY, 0)
         res_id = res_get(models.ID_KEY)
 
-        if defconfig_full is None:
-            defconfig_full = defconfig
-
-        err_struct = {}
-
-        if res_errors is not None and res_errors != 0:
+        if res_errors:
             total_errors += res_errors
 
-        if res_warnings is not None and res_warnings != 0:
+        if res_warnings:
             total_warnings += res_warnings
 
-        warnings = res_get('warnings_count', 0)
-        errors = res_get('errors_count', 0)
-
         struct = (
-            defconfig,
+            defconfig_full or defconfig,
             environment,
             res_get(models.STATUS_KEY),
             res_id,
@@ -132,11 +122,8 @@ def _get_errors_count(results):
             res_errors
         )
 
-        if arch in arch_keys:
-            parsed_data[arch].append(struct)
-        else:
-            parsed_data[arch] = []
-            parsed_data[arch].append(struct)
+        arch_data = parsed_data.setdefault(arch, list())
+        arch_data.append(struct)
 
     return parsed_data, total_errors, total_warnings
 
@@ -616,6 +603,7 @@ def create_build_report(
         models.GIT_BRANCH_KEY: branch,
         models.KERNEL_KEY: kernel
     }
+
     errors_summary = utils.db.find_one2(
         database[models.ERRORS_SUMMARY_COLLECTION],
         errors_spec,
@@ -631,10 +619,8 @@ def create_build_report(
         spec=errors_spec,
         sort=[(models.DEFCONFIG_FULL_KEY, 1)]
     )
-    error_details = [d for d in error_details.clone()]
-
-    err_data, errors_count, warnings_count = _get_errors_count(
-        error_details)
+    error_details = list(d for d in error_details)
+    err_data, errors_count, warnings_count = _get_errors_count(error_details)
 
     kwargs = {
         "base_url": rcommon.DEFAULT_BASE_URL,
