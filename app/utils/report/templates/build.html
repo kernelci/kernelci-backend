@@ -133,6 +133,61 @@
             </table>
         {%- endif %}{# end mismatches #}
         {%- endif %}{# and errors summary #}
+        {%- if error_details %}
+        <p style="padding-bottom: 5px;"><strong>Detailed per-defconfig build reports:</strong></p>
+        {%- for d in error_details %}
+        {%- set errs = P_("{:d} error", "{:d} errors", d.errors_count).format(d.errors_count) %}
+        {%- set warns = P_("{:d} warning", "{:d} warnings", d.warnings_count).format(d.warnings_count) %}
+        {%- set mism = P_("{:d} section mismatch", "{:d} section mismatches", d.mismatches_count).format(d.mismatches_count) %}
+        <p>
+    {{ "<strong>{}</strong> ({}, {}) &mdash; {}, {}, {}, {}".format(d.defconfig_full, d.arch, d.build_environment, d.status, errs, warns, mism) }}
+        </p>
+        {%- if d.errors %}
+        <table style="border: none; padding-bottom: 5px; padding-top: 3px; padding-left: 15px;">
+            <thead>
+                <tr>
+                    <th style="padding-bottom: 10px;" align="left">Errors:</th>
+                </tr>
+            </thead>
+            <tbody>
+            {%- for line in d.errors %}
+                <tr><td style="padding-left: 15px;">{{ line }}</td></tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+        {%- endif %}{# end error lines #}
+        {%- if d.warnings %}
+        <table style="border: none; padding-bottom: 5px; padding-top: 3px; padding-left: 15px;">
+            <thead>
+                <tr>
+                    <th style="padding-bottom: 10px;" align="left">Warnings:</th>
+                </tr>
+            </thead>
+            <tbody>
+            {%- for line in d.warnings %}
+                <tr><td style="padding-left: 15px;">{{ line }}</td></tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+        {%- endif %}{# end warning lines #}
+        {%- if d.mismatches %}
+        <table style="border: none; padding-bottom: 5px; padding-top: 3px; padding-left: 15px;">
+            <thead>
+                <tr>
+                    <th style="padding-bottom: 10px;" align="left">
+                        Section mismatches:
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            {%- for line in d.mismatches %}
+                <tr><td style="padding-left: 15px;">{{ line }}</td></tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+        {%- endif %}{# end mismatch lines #}
+        {%- endfor %}
+        {%- endif %}{# end error_details #}
         {%- if info_email %}
         <footer>
             <p style="padding-top: 10px;">
