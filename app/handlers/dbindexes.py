@@ -232,6 +232,12 @@ INDEX_SPECS = {
             (models.LAB_NAME_KEY, pymongo.ASCENDING),
             (models.PLAN_KEY, pymongo.ASCENDING),
         ],
+        [
+            (models.JOB_KEY, pymongo.ASCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+            (models.CREATED_KEY, pymongo.DESCENDING),
+            (models.STATUS_KEY, pymongo.ASCENDING),
+        ],
     ],
 
     models.TEST_GROUP_COLLECTION: [
