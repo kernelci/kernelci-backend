@@ -1,4 +1,4 @@
-# Copyright (C) Collabora Limited 2019
+# Copyright (C) Collabora Limited 2019, 2020
 # Author: Guillaume Tucker <guillaume.tucker@collabora.com>
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -80,48 +80,51 @@ def _get_test_cases(group, db, hierarchy, ns):
     return tests
 
 
-def _submit(data, bq_options):
+def _submit(data, kcidb_options):
     json_data = json.dumps(data, indent=2)
-    if bq_options.get("debug"):
+    if kcidb_options.get("debug"):
         utils.LOG.info("Submitting with kcidb:")
         utils.LOG.info(json_data)
     local_env = dict(os.environ)
-    local_env["GOOGLE_APPLICATION_CREDENTIALS"] = bq_options["credentials"]
-    kcidb_path = bq_options.get("kcidb_path", "")
+    local_env["GOOGLE_APPLICATION_CREDENTIALS"] = kcidb_options["credentials"]
+    kcidb_path = kcidb_options.get("kcidb_path", "")
     kcidb_submit = os.path.join(kcidb_path, "kcidb-submit")
-    p = subprocess.Popen([kcidb_submit, "-d", bq_options["dataset"]],
-                         stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+    p = subprocess.Popen([kcidb_submit,
+                          "-p", kcidb_options["project"],
+                          "-t", kcidb_options["topic"]],
+                         stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE,
                          env=local_env)
     p.communicate(input=json_data)
     if p.returncode:
-        utils.LOG.warn("Failed to push data to BigQuery")
+        utils.LOG.warn("Failed to push data  kcidb")
 
 
-def push_build(build_id, first, bq_options, db_options={}, db=None):
+def push_build(build_id, first, kcidb_options, db_options={}, db=None):
     if db is None:
         db = utils.db.get_db_connection(db_options)
-    origin = bq_options.get("origin", "kernelci")
-    ns = bq_options.get("namespace", "kernelci.org")
+    origin = kcidb_options.get("origin", "kernelci")
+    ns = kcidb_options.get("namespace", "kernelci.org")
     build = utils.db.find_one2(db[models.BUILD_COLLECTION], build_id)
     build_id = _make_id(build[models.ID_KEY], ns)
     revision_id = _make_id(build[models.KERNEL_KEY], ns)
 
-    bq_data = {
+    kcidb_data = {
         'version': '1',
     }
 
     if first:
-        bq_revision = {
+        kcidb_revision = {
             'origin': origin,
             'origin_id': revision_id,
             'valid': True,
             'discovery_time': build[models.CREATED_KEY].isoformat(),
         }
-        bq_revision.update({
-            bq_key: build[build_key]
-            for bq_key, build_key in BUILD_REV_KEY_MAP.iteritems()
+        kcidb_revision.update({
+            kcidb_key: build[build_key]
+            for kcidb_key, build_key in BUILD_REV_KEY_MAP.iteritems()
         })
-        bq_data['revisions'] = [bq_revision]
+        kcidb_data['revisions'] = [kcidb_revision]
 
     files = {
         'kernel_image': build[models.KERNEL_IMAGE_KEY],
@@ -137,7 +140,7 @@ def push_build(build_id, first, bq_options, db_options={}, db=None):
                 file])
             output_files.append({"name": name, "url": url})
 
-    bq_build = {
+    kcidb_build = {
         'revision_origin': origin,
         'revision_origin_id': revision_id,
         'origin': origin,
@@ -171,18 +174,18 @@ def push_build(build_id, first, bq_options, db_options={}, db=None):
             'build_platform': build[models.BUILD_PLATFORM_KEY],
         },
     }
-    bq_data['builds'] = [bq_build]
+    kcidb_data['builds'] = [kcidb_build]
 
-    _submit(bq_data, bq_options)
+    _submit(kcidb_data, kcidb_options)
 
 
-def push_tests(group_id, bq_options, db_options={}, db=None):
+def push_tests(group_id, kcidb_options, db_options={}, db=None):
     if db is None:
         db = utils.db.get_db_connection(db_options)
     collection = db[models.TEST_GROUP_COLLECTION]
     group = utils.db.find_one2(collection, group_id)
-    origin = bq_options.get("origin", "kernelci")
-    ns = bq_options.get("namespace", "kernelci.org")
+    origin = kcidb_options.get("origin", "kernelci")
+    ns = kcidb_options.get("namespace", "kernelci.org")
     test_cases = _get_test_cases(group, db, [], ns)
     build = _get_build_doc(group, db)
     if not build:
@@ -228,7 +231,7 @@ def push_tests(group_id, bq_options, db_options={}, db=None):
         )
         output_files.append({"name": name, "url": url})
 
-    bq_data = {
+    kcidb_data = {
         'version': '1',
         "tests": [
             {
@@ -251,4 +254,4 @@ def push_tests(group_id, bq_options, db_options={}, db=None):
             for test in test_cases
         ],
     }
-    _submit(bq_data, bq_options)
+    _submit(kcidb_data, kcidb_options)
