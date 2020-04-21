@@ -25,16 +25,17 @@ import utils.kcidb
 @taskc.app.task(name="kcidb-build")
 def push_build(args):
     build_id, job_id, first = args
-    bq_options = taskc.app.conf.get("BigQuery_options")
-    if bq_options:
-        utils.kcidb.push_build(build_id, first, bq_options,
+    kcidb_options = taskc.app.conf.get("kcidb_options")
+    if kcidb_options:
+        utils.kcidb.push_build(build_id, first, kcidb_options,
                                taskc.app.conf.db_options)
     return build_id, job_id
 
 
 @taskc.app.task(name="kcidb-tests")
 def push_tests(group_id):
-    bq_options = taskc.app.conf.get("BigQuery_options")
-    if bq_options:
-        utils.kcidb.push_tests(group_id, bq_options, taskc.app.conf.db_options)
+    kcidb_options = taskc.app.conf.get("kcidb_options")
+    if kcidb_options:
+        utils.kcidb.push_tests(group_id, kcidb_options,
+                               taskc.app.conf.db_options)
     return group_id
