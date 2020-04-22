@@ -26,16 +26,26 @@ import utils.kcidb
 def push_build(args):
     build_id, job_id, first = args
     kcidb_options = taskc.app.conf.get("kcidb_options")
+
     if kcidb_options:
-        utils.kcidb.push_build(build_id, first, kcidb_options,
-                               taskc.app.conf.db_options)
+        try:
+            utils.kcidb.push_build(build_id, first, kcidb_options,
+                                   taskc.app.conf.db_options)
+        except Exception, e:
+            utils.LOG.exception(e)
+
     return build_id, job_id
 
 
 @taskc.app.task(name="kcidb-tests")
 def push_tests(group_id):
     kcidb_options = taskc.app.conf.get("kcidb_options")
+
     if kcidb_options:
-        utils.kcidb.push_tests(group_id, kcidb_options,
-                               taskc.app.conf.db_options)
+        try:
+            utils.kcidb.push_tests(group_id, kcidb_options,
+                                   taskc.app.conf.db_options)
+        except Exception, e:
+            utils.LOG.exception(e)
+
     return group_id
