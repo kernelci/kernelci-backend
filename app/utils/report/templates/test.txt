@@ -66,6 +66,15 @@ Test Regressions
       {{measurement.value}} {{measurement.unit}}
       {%- endfor -%}
     {%- endif %}
+    {%- if tc.log_lines_short %}
+
+    {% for log_line in tc.log_lines_short -%}
+      {{ log_line.dt }}  {{ log_line.msg }}
+    {% endfor -%} {# log_lines_short #}
+    {%- if tc.log_lines_removed -%}
+      ... ({{ tc.log_lines_removed }} line(s) more)
+    {% endif -%} {# log_lines_removed #}
+    {%- endif %} {# log_lines_short #}
   {%- endfor %}
 {%- endfor %} {# test_groups #}
 {%-endif %} {# total fail #}
