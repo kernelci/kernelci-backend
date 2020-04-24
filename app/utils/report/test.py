@@ -114,6 +114,11 @@ def _add_test_group_data(group, db, spec, hierarchy=[], regressions=None):
             if regr:
                 regr_count += 1
                 test_case["regression"] = regr
+                test_case["log_lines_short"] = test_case[
+                                                   models.LOG_LINES_KEY][:10]
+                log_lines_count = (len(test_case[models.LOG_LINES_KEY]) - len(
+                    test_case["log_lines_short"]))
+                test_case["log_lines_removed"] = log_lines_count
                 regressions.append(test_case)
         test_cases.append(test_case)
 
