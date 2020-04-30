@@ -181,6 +181,7 @@ TEST_JOB_ID_KEY = "test_job_id"
 TEST_JOB_PATH_KEY = "test_job_path"
 TEST_JOB_URL_KEY = "test_job_url"
 TEST_GROUP_ID_KEY = "test_group_id"
+TEST_RUNNER_URL_KEY = "test_runner_url"
 TEXT_OFFSET_KEY = "text_offset"
 TIME_KEY = "time"
 TIME_RANGE_KEY = "time_range"
@@ -867,6 +868,7 @@ TEST_GROUP_VALID_KEYS = {
             NAME_KEY,
             SUB_GROUPS_KEY,
             TEST_CASES_KEY,
+            TEST_RUNNER_URL_KEY,
             TIME_KEY,
             VERSION_KEY
         ]
@@ -887,6 +889,7 @@ TEST_GROUP_VALID_KEYS = {
         JOB_KEY,
         KERNEL_KEY,
         NAME_KEY,
+        TEST_RUNNER_URL_KEY,
         VERSION_KEY
     ],
     "GET": [
@@ -914,6 +917,7 @@ TEST_GROUP_VALID_KEYS = {
         MODULES_KEY,
         NAME_KEY,
         PARENT_ID_KEY,
+        TEST_RUNNER_URL_KEY,
         TIME_KEY,
         VERSION_KEY
     ]
@@ -1164,6 +1168,7 @@ LAVA_CALLBACK_VALID_METADATA_KEYS = {
             "git.url",
             "image.type",
             "image.url",
+            "test_runner.url",
             "job.dtb_url",
             "job.file_server_resource",
             "job.initrd_url",

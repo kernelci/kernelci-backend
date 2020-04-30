@@ -73,6 +73,7 @@ class TestGroupDocument(modb.BaseDocument):
         self.git_branch = None
         self.git_commit = None
         self.git_describe = None
+        self.test_runner_url = None
         self.git_url = None
         self.image_type = None
         self.index = None
@@ -182,6 +183,7 @@ class TestGroupDocument(modb.BaseDocument):
             models.INDEX_KEY: self.index,
             models.INITRD_KEY: self.initrd,
             models.INITRD_INFO_KEY: self.initrd_info,
+            models.TEST_RUNNER_URL_KEY: self.test_runner_url,
             models.JOB_ID_KEY: self.job_id,
             models.JOB_KEY: self.job,
             models.KERNEL_KEY: self.kernel,
