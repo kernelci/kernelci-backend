@@ -96,6 +96,6 @@ class BatchHandler(hbase.BaseHandler):
         :param db_options: The mongodb database connection parameters.
         :type db_options: dict
         """
-        return taskq.run_batch_group(
+        return taskq.execute_batch_serial(
             json_obj.get(models.BATCH_KEY), db_options
         )

@@ -38,6 +38,22 @@ def execute_batch(json_obj, db_options):
     return utils.batch.common.execute_batch_operation(json_obj, db_options)
 
 
+@taskc.app.task(name="batch-serial-executor", ignore_result=False)
+def execute_batch_serial(batch_op_list, db_options):
+    """Run list of batch operations in series.
+
+    :param json_obj: List of JSON object with the operations to perform.
+    :type json_obj: list
+    :param db_options: The database connection parameters.
+    :type db_options: dict
+    :return A list with the results of each batch operation.
+    """
+    return [
+        utils.batch.common.execute_batch_operation(batch_op, db_options)
+        for batch_op in batch_op_list
+    ]
+
+
 def run_batch_group(batch_op_list, db_options):
     """Execute a list of batch operations.
 
