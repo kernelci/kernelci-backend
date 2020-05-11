@@ -373,9 +373,9 @@ def _get_log_lines(log, start_line, end_line):
             'dt': dparser.parse(l['dt']),
             'msg': l['msg']
         }
-        for l in log[start_line:end_line]
-        if (l['lvl'] == 'target' and
-            not TEST_CASE_SIGNAL_PATTERN.match(l['msg']))
+        for line in log[start_line:end_line]
+        if (line['lvl'] == 'target' and
+            not TEST_CASE_SIGNAL_PATTERN.match(line['msg']))
     ]
     return lines
 
