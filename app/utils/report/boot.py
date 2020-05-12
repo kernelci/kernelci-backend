@@ -77,6 +77,10 @@ FIRST_FAIL_TXT = u"first fail: {bad_kernel:s}"
 FIRST_FAIL_HTML = \
     u"first fail: <a href=\"{boot_id_url:s}\">{bad_kernel:s}</a>"
 
+BASELINE_SUMMARY_URL = u"\
+{base_url:s}/test/job/{job:s}/branch/{git_branch:s}/\
+kernel/{kernel:s}/plan/baseline/"
+
 
 def create_regressions_data(boot_docs, boot_data):
     """Create the regressions data for the email report.
@@ -902,6 +906,7 @@ def _create_boot_email(boot_data):
             tested_string = tested_string.format(**boot_data)
 
     boot_summary_url = rcommon.BOOT_SUMMARY_URL.format(**boot_data)
+    baseline_summary_url = BASELINE_SUMMARY_URL.format(**boot_data)
     build_summary_url = rcommon.BUILD_SUMMARY_URL.format(**boot_data)
 
     boot_data["tree_string"] = G_(u"Tree: {job:s}").format(**boot_data)
@@ -927,6 +932,7 @@ def _create_boot_email(boot_data):
     boot_data["git_url_string"] = (git_txt_string, git_html_string)
 
     boot_data["platforms"] = _parse_and_structure_results(boot_data)
+    boot_data["baseline_summary_url"] = baseline_summary_url
 
     if models.EMAIL_TXT_FORMAT_KEY in email_format:
         boot_data["full_boot_summary"] = (
