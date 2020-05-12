@@ -1,3 +1,20 @@
+******************************************
+* WARNING: Boot tests are now deprecated *
+******************************************
+
+As kernelci.org is expanding its functional testing capabilities, the concept
+of boot testing is now deprecated.  Boot results are scheduled to be dropped on
+*5th June 2020*.  The full schedule for boot tests deprecation is available on
+this GitHub issue: https://github.com/kernelci/kernelci-backend/issues/238
+
+The new equivalent is the *baseline* test suite which also runs sanity checks
+using dmesg and bootrr: https://github.com/kernelci/bootrr
+
+See the *baseline results for this kernel revision* on this page:
+{{ baseline_summary_url }}
+
+-------------------------------------------------------------------------------
+
 {{ subject_str }}
 {# leave an empty space #}
 {{ full_boot_summary }}

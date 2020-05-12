@@ -5,8 +5,30 @@
         <title>{{ subject_str }}</title>
     </head>
     <body>
-        <span><strong>{{ subject_str }}</strong></span>
-        <br />
+        <div style="align: center; text-align: justified; border: 2px solid red;; padding: 12px;">
+          <h2 align="center">&#x26A0;&nbsp;Boot tests are now deprecated&nbsp;&#x26A0;</h2>
+          <p>
+            As kernelci.org is expanding its functional testing capabilities,
+            the concept of boot testing is now deprecated.  Boot results are
+            scheduled to be dropped on <span style="font-weight: bold">5th June
+            2020</span>.  The full schedule for boot tests deprecation is
+            available
+            on <a href="https://github.com/kernelci/kernelci-backend/issues/238">GitHub issue #238</a>.
+          </p>
+          <p>
+            The new equivalent is the
+            <span style="font-weight: bold">baseline</span>
+            test suite which also runs sanity checks using dmesg and
+            <a href="https://github.com/kernelci/bootrr">bootrr</a>.
+          </p>
+          <p>
+            See the <span style="font-weight: bold">baseline results for this
+            kernel revision</span> on this page:<br />
+            <a href="{{ baseline_summary_url }}">{{ baseline_summary_url }}</a>
+          </p>
+        </div>
+
+        <p><span><strong>{{ subject_str }}</strong></span></p>
         <table style="border: none; padding-top: 15px; padding-bottom: 15px;">
             <tbody>
                 <tr><td>{{ full_boot_summary }}</td></tr>
