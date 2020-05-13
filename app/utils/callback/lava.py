@@ -370,8 +370,8 @@ def _prepare_lines_map(end_lines_map, start_log_line):
 def _get_log_lines(log, start_line, end_line):
     lines = [
         {
-            'dt': dparser.parse(l['dt']),
-            'msg': l['msg']
+            'dt': dparser.parse(line['dt']),
+            'msg': line['msg']
         }
         for line in log[start_line:end_line]
         if (line['lvl'] == 'target' and
