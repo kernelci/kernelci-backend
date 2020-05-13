@@ -207,6 +207,9 @@ def send_test_report(job, git_branch, kernel, plan, report_data, email_opts):
 
     body, subject, headers = test_report
 
+    if body is None:
+        return 200
+
     status, errors = utils.emails.send_email(
         subject, body, None, email_opts, taskc.app.conf.mail_options, headers)
 
