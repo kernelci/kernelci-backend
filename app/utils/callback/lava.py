@@ -549,6 +549,9 @@ def _add_test_results(group, results, log_line_data):
         reference = test_meta.get("reference")
         if reference:
             test_case[models.ATTACHMENTS_KEY] = [reference]
+        test_case_log_line = test.get("log_start_line")
+        if test_case_log_line:
+            test_case[models.TEST_CASE_LOG_LINE_KEY] = test_case_log_line
         test_set_name = test_meta.get("set")
         if test_set_name:
             path.append(test_set_name)

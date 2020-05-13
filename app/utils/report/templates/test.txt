@@ -60,6 +60,9 @@ Test Failures
       {%- for tc in group.test_cases %}
         {%- if 'FAIL' == tc.status %}
     * {{ tc.name }}:
+      {%- if tc.test_case_log_line %}
+        Test case HTML log: {{ storage_url }}/{{ group.file_server_resource }}/{{ group.lab_name }}/{{ group.boot_log_html }}#L{{ tc.test_case_log_line }}
+      {%- endif %}
         {{ tc.failure_message }}
           {%- if tc.measurements %}
             {%- for measurement in tc.measurements %}
@@ -76,6 +79,9 @@ Test Failures
         {%- for tc in sg.test_cases %}
           {%- if 'FAIL' == tc.status %}
     * {{ tc.name }}:
+      {%- if tc.test_case_log_line %}
+        Test case HTML log: {{ storage_url }}/{{ group.file_server_resource }}/{{ group.lab_name }}/{{ group.boot_log_html }}#L{{ tc.test_case_log_line }}
+      {%- endif %}
         {{ tc.failure_message }}
             {%- if tc.measurements %}
               {%- for measurement in tc.measurements %}

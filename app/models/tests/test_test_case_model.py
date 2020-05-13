@@ -58,6 +58,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.plan = "cunning"
         test_case.regression_id = 1234
         test_case.status = "FAIL"
+        test_case.test_case_log_line = 321
         test_case.test_case_path = "test.case.path"
         test_case.test_group_id = "another_id"
         test_case.time = 10
@@ -84,6 +85,7 @@ class TestTestCaseModel(unittest.TestCase):
             "plan": "cunning",
             "regression_id": 1234,
             "status": "FAIL",
+            "test_case_log_line": 321,
             "test_case_path": "test.case.path",
             "test_group_id": "another_id",
             "time": 10,
@@ -114,6 +116,7 @@ class TestTestCaseModel(unittest.TestCase):
         test_case.plan = "cunning"
         test_case.regression_id = 1234
         test_case.status = "FAIL"
+        test_case.test_case_log_line = 321
         test_case.test_case_path = "test.case.path"
         test_case.test_group_id = "another_id"
         test_case.time = 10
@@ -140,6 +143,7 @@ class TestTestCaseModel(unittest.TestCase):
             "plan": "cunning",
             "regression_id": 1234,
             "status": "FAIL",
+            "test_case_log_line": 321,
             "test_case_path": "test.case.path",
             "test_group_id": "another_id",
             "time": 10,
@@ -183,6 +187,7 @@ class TestTestCaseModel(unittest.TestCase):
             "plan": "cunning",
             "regression_id": 1234,
             "status": "FAIL",
+            "test_case_log_line": 321,
             "test_case_path": "test.case.path",
             "test_group_id": "another_id",
             "time": 10,
