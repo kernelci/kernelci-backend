@@ -85,13 +85,16 @@ def _regression_message(data):
         first_fail[models.KERNEL_KEY])
 
 
-def _add_test_group_data(group, db, spec, hierarchy=[]):
+def _add_test_group_data(group, db, spec, hierarchy=[], regressions=None):
     hierarchy = hierarchy + [group[models.NAME_KEY]]
     case_collection = db[models.TEST_CASE_COLLECTION]
     regr_collection = db[models.TEST_REGRESSION_COLLECTION]
     group_collection = db[models.TEST_GROUP_COLLECTION]
     regr_spec = dict(spec)
     regr_count = 0
+
+    if regressions is None:
+        regressions = group.setdefault("regressions", list())
 
     test_cases = []
     for test_case_id in group[models.TEST_CASES_KEY]:
@@ -110,6 +113,8 @@ def _add_test_group_data(group, db, spec, hierarchy=[]):
                 if regr else "never passed")
             if regr:
                 regr_count += 1
+                test_case["regression"] = regr
+                regressions.append(test_case)
         test_cases.append(test_case)
 
     test_cases.sort(key=lambda tc: tc[models.INDEX_KEY])
@@ -117,7 +122,7 @@ def _add_test_group_data(group, db, spec, hierarchy=[]):
     sub_groups = []
     for sub_group_id in group[models.SUB_GROUPS_KEY]:
         sub_group = utils.db.find_one2(group_collection, sub_group_id)
-        _add_test_group_data(sub_group, db, spec, hierarchy)
+        _add_test_group_data(sub_group, db, spec, hierarchy, regressions)
         sub_groups.append(sub_group)
 
     results = {
@@ -153,11 +158,10 @@ def _create_summaries(groups):
         return item
 
     columns = [
-        "run", 'platform', 'arch', 'lab', 'compiler', 'defconfig', "results"
+        "platform", "arch", "lab", "compiler", "defconfig", "results"
     ]
     rows = [
         (
-            str(i + 1),
             g['board'],
             g['arch'],
             g['lab_name'],
@@ -247,6 +251,10 @@ def create_test_report(db_options, data, email_format, email_template=None,
     tests_total = sum(group["total_tests"] for group in groups)
     regr_total = sum(group["total_regr"] for group in groups)
 
+    if regr_total == 0:
+        utils.LOG.info("No regressions, not sending any report.")
+        return None, None, None
+
     plan_subject = template.get("subject", plan)
     subject_str = "{}/{} {}: {} runs, {} regressions ({})".format(
         job, branch, plan_subject, len(groups), regr_total, kernel)
@@ -275,6 +283,8 @@ def create_test_report(db_options, data, email_format, email_template=None,
         for status in ["PASS", "FAIL", "SKIP"]
     }
 
+    groups = [gr for gr in groups if gr['total_regr']]
+
     headers = {
         rcommon.X_REPORT: rcommon.TEST_REPORT_TYPE,
         rcommon.X_BRANCH: branch,
@@ -298,6 +308,7 @@ def create_test_report(db_options, data, email_format, email_template=None,
         "boot_log": models.BOOT_LOG_KEY,
         "boot_log_html": models.BOOT_LOG_HTML_KEY,
         "storage_url": rcommon.DEFAULT_STORAGE_URL,
+        "base_url": rcommon.DEFAULT_BASE_URL,
         "test_groups": groups,
         "test_suites": test_suites,
         "totals": totals,

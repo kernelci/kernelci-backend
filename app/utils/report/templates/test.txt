@@ -1,13 +1,14 @@
 {{ subject_str }}
 
-Test results summary
---------------------
+Regressions Summary
+-------------------
 
 {{ summary_headers }}
 {%- for group in test_groups %}
 {{ group.summary }}
 {%- endfor %}
 
+  Details:  {{ base_url }}/test/job/{{ tree }}/branch/{{ branch }}/kernel/{{ kernel }}/plan/{{ plan }}/
 {% block plan_description %}
   Test:     {{ plan }}{% endblock %}
   Tree:     {{ tree }}
@@ -29,63 +30,42 @@ Test results summary
 {%- if totals.FAIL != 0 %} {# total fail #}
 
 
-Test Failures
--------------
-{% for group in test_groups %} {# test_groups #}
-  {%- if group.total_results.FAIL %} {# group fail #}
+Test Regressions
+----------------
+{%- for group in test_groups %} {# test_groups #}
+
 
 {{ summary_headers }}
 {{ group.summary }}
+
+  Details:     {{ base_url }}/test/plan/id/{{ group._id }}
 
   Results:     {{ group.total_results.PASS }} PASS, {{ group.total_results.FAIL }} FAIL, {{ group.total_results.SKIP }} SKIP
   Full config: {{ group.defconfig_full }}
   Compiler:    {{ group.build_environment }}{% if group.compiler_version_full %} ({{ group.compiler_version_full }}){% endif %}
   Plain log:   {{ storage_url }}/{{ group.file_server_resource }}/{{ group.lab_name }}/{{ group.boot_log }}
   HTML log:    {{ storage_url }}/{{ group.file_server_resource }}/{{ group.lab_name }}/{{ group.boot_log_html }}
-    {%- if group.initrd %}
+  {%- if group.initrd %}
   Rootfs:      {{ group.initrd }}
-    {%- endif %}
-    {%- if not test_suites and group.initrd_info.tests_suites %} {# suites_info #}
+  {%- endif %}
+  {%- if not test_suites and group.initrd_info.tests_suites %} {# suites_info #}
 
   Test suite revisions:
-      {%- for suite in group.initrd_info.tests_suites|sort(attribute='name') %}
+    {%- for suite in group.initrd_info.tests_suites|sort(attribute='name') %}
     {{ suite.name }}
       URL:  {{ suite.git_url }}
       SHA:  {{ suite.git_commit }}
-      {%- endfor %}
-    {%- endif %} {# suites_info #}
-    {%- if group.results.FAIL %} {# group fail #}
+    {%- endfor %}
+  {%- endif %} {# suites_info #}
 
-  {{ group.test_cases|length }} tests: {{ group.results.PASS }} PASS, {{ group.results.FAIL }} FAIL, {{ group.results.SKIP }} SKIP
-      {%- for tc in group.test_cases %}
-        {%- if 'FAIL' == tc.status %}
-    * {{ tc.name }}:
-        {{ tc.failure_message }}
-          {%- if tc.measurements %}
-            {%- for measurement in tc.measurements %}
-        {{measurement.value}} {{measurement.unit}}
-            {%- endfor -%}
-          {% endif %}
-        {%- endif %}
-      {%- endfor %}
-    {%- endif %}  {# group fail #}
-    {%- for sg in group.sub_groups|sort(attribute='index') %} {# sub_groups #}
-      {%- if sg.results.FAIL %} {# sg fail #}
-
-  {{ sg.name }} - {{ sg.test_cases|length }} tests: {{ sg.results.PASS }}  PASS, {{ sg.results.FAIL }} FAIL, {{ sg.results.SKIP }} SKIP
-        {%- for tc in sg.test_cases %}
-          {%- if 'FAIL' == tc.status %}
-    * {{ tc.name }}:
-        {{ tc.failure_message }}
-            {%- if tc.measurements %}
-              {%- for measurement in tc.measurements %}
-        {{measurement.value}} {{measurement.unit}}
-              {%- endfor -%}
-            {% endif %}
-          {%- endif %}
-        {%- endfor %}
-      {%- endif %} {# sg fail #}
-    {%- endfor %} {# sub_groups #}
-  {% endif %}  {# group fail #}
+  {% for tc in group.regressions -%}
+  * {{ tc.test_case_path }}: {{ base_url }}/test/case/id/{{ tc._id }}
+      {{ tc.failure_message }}
+    {%- if tc.measurements %}
+      {%- for measurement in tc.measurements %}
+      {{measurement.value}} {{measurement.unit}}
+      {%- endfor -%}
+    {%- endif %}
+  {%- endfor %}
 {%- endfor %} {# test_groups #}
 {%-endif %} {# total fail #}
