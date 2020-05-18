@@ -601,6 +601,14 @@ def aggregate(
         else:
             return _starts_with_dollar(unique)
 
+    def _parse_sort_field(group_dict, sort):
+        for item in sort:
+            field, sort_order = item
+            if sort_order > 0:
+                group_dict['$group'][field] = {'$min': '$'+field}
+            else:
+                group_dict['$group'][field] = {'$max': '$'+field}
+
     # Where the aggregate actions and values will be stored.
     # XXX: The append order is important!
     pipeline = []
@@ -630,6 +638,10 @@ def aggregate(
             ]
 
     group_dict["$group"].update(r_fields)
+
+    if sort:
+        _parse_sort_field(group_dict, sort)
+
     pipeline.append(group_dict)
 
     # Sort everything now.
