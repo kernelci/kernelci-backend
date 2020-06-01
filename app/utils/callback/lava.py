@@ -142,6 +142,8 @@ BL_META_MAP = {
 LOGIN_CASE_END_PATTERN = re.compile(r'end:.*auto-login-action.*')
 TEST_CASE_SIGNAL_PATTERN = re.compile(
     r'\<LAVA_SIGNAL_TESTCASE TEST_CASE_ID.+>')
+SIGNAL_RECEIVED_PATTERN = re.compile(r'Received signal: '
+                                     r'<TESTCASE> TEST_CASE_ID=(\w+)')
 
 
 def _get_job_meta(meta, job_data):
@@ -640,6 +642,40 @@ def _add_rootfs_info(group, base_path, file_name="build_info.json"):
         utils.LOG.warn("ValueError: {}".format(e))
 
 
+def _adjust_log_line_numbers(results, log):
+    """ A workaround for a race condition effect visible in LAVA callbacks
+
+    This function changes log end line numbers in LAVA test results to match
+    the moment when the signal was sent instead of when it was received.
+    Function doesn't return value, but modifies results dictionary.
+    """
+    for ts, result_yaml in results.items():
+        if ts == 'lava':
+            continue
+        results_data = yaml.load(result_yaml, Loader=yaml.CLoader)
+        for result in results_data:
+            end_line_number = int(result['log_end_line'])
+            log_end_line = log[end_line_number]
+            test_case_rcvd = SIGNAL_RECEIVED_PATTERN.match(log_end_line['msg'])
+            test_case_id = test_case_rcvd.group(1) if \
+                test_case_rcvd is not None else None
+            if test_case_id:
+                result['log_end_line'] = _find_new_end_line(end_line_number,
+                                                            log,
+                                                            test_case_id)
+        results[ts] = yaml.dump(results_data)
+
+
+def _find_new_end_line(end_line_number, log, test_case_id):
+    signal_snd_template = r'<LAVA_SIGNAL_TESTCASE TEST_CASE_ID={}'
+    signal_snd_text = signal_snd_template.format(test_case_id)
+    signal_snd_pattern = re.compile(signal_snd_text)
+    for i, log_line in enumerate(reversed(log[:end_line_number]), 1):
+        if signal_snd_pattern.match(unicode(log_line['msg'])):
+            return end_line_number - i
+    return end_line_number
+
+
 def add_tests(job_data, job_meta, lab_name, db_options,
               base_path=utils.BASE_PATH):
     """Entry point to be used as an external task.
@@ -685,17 +721,20 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         _get_directory_path(meta, base_path)
         _get_lava_meta(meta, job_data)
         plan_name = meta[models.PLAN_KEY]
+        log = yaml.load(job_data["log"], Loader=yaml.CLoader)
+        results = job_data["results"]
+        _adjust_log_line_numbers(results, log)
         _add_test_log(meta, job_data["log"], plan_name)
         _add_rootfs_info(meta, base_path)
         _store_lava_json(job_data, meta)
         groups = []
         cases = []
         start_log_line = 0
-        log = yaml.load(job_data["log"], Loader=yaml.CLoader)
         end_lines_map = {}
-        for suite_name, results in job_data["results"].iteritems():
+        for suite_name, suite_results in results.iteritems():
             if suite_name == "lava":
-                _add_login_case(meta, results, cases, 'auto-login-action')
+                _add_login_case(meta, suite_results, cases,
+                                'auto-login-action')
                 login_line_num = _get_log_line_number(log,
                                                       LOGIN_CASE_END_PATTERN)
                 start_log_line = 0 if login_line_num is None \
@@ -704,7 +743,7 @@ def add_tests(job_data, job_meta, lab_name, db_options,
                 suite_name = suite_name.partition("_")[2]
                 group = dict(meta)
                 group[models.NAME_KEY] = suite_name
-                _add_test_results(group, results,
+                _add_test_results(group, suite_results,
                                   end_lines_map)
                 groups.append(group)
         add_log_fragments(groups, log, end_lines_map, start_log_line)
