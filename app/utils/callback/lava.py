@@ -43,6 +43,7 @@ import utils.kci_test
 import utils.db
 import utils.lava_log_parser
 from utils.report.common import DEFAULT_STORAGE_URL
+from utils.callback.lava_filters import LAVA_FILTERS
 
 # copied from lava-server/lava_scheduler_app/models.py
 SUBMITTED = 0
@@ -293,21 +294,20 @@ def _get_directory_path(meta, base_path):
     meta[models.DIRECTORY_PATH] = directory_path
 
 
-def _add_test_log(meta, job_log, suite):
+def _add_test_log(meta, log, suite):
     """Parse and save test logs
 
     Parse the LAVA v2 log in YAML format and save it as plain text and HTML.
 
     :param meta: The boot meta-data.
     :type meta: dictionary
-    :param log: The kernel log in YAML format.
-    :type log: string
+    :param log: The kernel log as list of dicts.
+    :type log: list
     :param base_path: Path to the top-level directory where to store the files.
     :type base_path: string
     :param suite: Test suite name
     :type suite: string
     """
-    log = yaml.load(job_log, Loader=yaml.CLoader)
 
     dir_path = meta[models.DIRECTORY_PATH]
 
@@ -376,8 +376,6 @@ def _get_log_lines(log, start_line, end_line):
             'msg': line['msg']
         }
         for line in log[start_line:end_line]
-        if (line['lvl'] == 'target' and
-            not TEST_CASE_SIGNAL_PATTERN.match(line['msg']))
     ]
     return lines
 
@@ -492,7 +490,7 @@ def add_boot(job_data, job_meta, lab_name, db_options,
 
 def _add_login_case(meta, results, cases, name):
     # ToDo: consolidate with _add_test_results
-    tests = yaml.load(results, Loader=yaml.CLoader)
+    tests = results
     tests_by_name = {t['name']: t for t in tests}
     login = tests_by_name.get(name)
     if not login:
@@ -529,7 +527,7 @@ def _add_test_results(group, results, log_line_data):
     :param log_line_data: dict of {test_case_path: log_end_line}
     :type log_line_data: dict
     """
-    tests = yaml.load(results, Loader=yaml.CLoader)
+    tests = results
     test_cases = []
     test_sets = OrderedDict()
 
@@ -649,10 +647,9 @@ def _adjust_log_line_numbers(results, log):
     the moment when the signal was sent instead of when it was received.
     Function doesn't return value, but modifies results dictionary.
     """
-    for ts, result_yaml in results.items():
+    for ts, results_data in results.items():
         if ts == 'lava':
             continue
-        results_data = yaml.load(result_yaml, Loader=yaml.CLoader)
         for result in results_data:
             end_line_number = int(result['log_end_line'])
             log_end_line = log[end_line_number]
@@ -663,7 +660,6 @@ def _adjust_log_line_numbers(results, log):
                 result['log_end_line'] = _find_new_end_line(end_line_number,
                                                             log,
                                                             test_case_id)
-        results[ts] = yaml.dump(results_data)
 
 
 def _find_new_end_line(end_line_number, log, test_case_id):
@@ -674,6 +670,49 @@ def _find_new_end_line(end_line_number, log, test_case_id):
         if signal_snd_pattern.match(unicode(log_line['msg'])):
             return end_line_number - i
     return end_line_number
+
+
+def _unpack_results(results):
+    return {test_suite: yaml.load(results_yaml, Loader=yaml.CLoader)
+            for test_suite, results_yaml in results.items()}
+
+
+def _filter_log_data(log, filters_funcs):
+    for filter_func in filters_funcs:
+        log[:] = filter(filter_func, log)
+
+
+def _prepare_line_num_translate(results_data, log):
+    end_line_numbers = []
+    for test_suite, results_data in results_data.items():
+        end_line_numbers.extend((int(result['log_end_line'])
+                                 for result in results_data
+                                 if result.get('log_end_line')))
+    line_num_translate = dict.fromkeys(end_line_numbers)
+    for idx, log_line in enumerate(log, 1):
+        for line_num in (ln for ln in line_num_translate
+                         if line_num_translate[ln] is None):
+            if log_line['org_num'] >= line_num:
+                line_num_translate[line_num] = idx
+    return line_num_translate
+
+
+def _translate_log_end_lines(results, translate_map):
+    for ts, results_data in results.items():
+        if ts == 'lava':
+            continue
+        for result in results_data:
+            if int(result['log_end_line']) in translate_map:
+                new_log_end_line = translate_map[result['log_end_line']]
+                result['log_end_line'] = new_log_end_line
+
+
+def _prepare_log(log):
+    log = yaml.load(log, Loader=yaml.CLoader)
+    for i, log_line in enumerate(log, 1):
+        log_line['msg'] = unicode(log_line['msg'])
+        log_line['org_num'] = i
+    return log
 
 
 def add_tests(job_data, job_meta, lab_name, db_options,
@@ -721,10 +760,13 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         _get_directory_path(meta, base_path)
         _get_lava_meta(meta, job_data)
         plan_name = meta[models.PLAN_KEY]
-        log = yaml.load(job_data["log"], Loader=yaml.CLoader)
-        results = job_data["results"]
+        log = _prepare_log(job_data["log"])
+        results = _unpack_results(job_data["results"])
         _adjust_log_line_numbers(results, log)
-        _add_test_log(meta, job_data["log"], plan_name)
+        _filter_log_data(log, LAVA_FILTERS)
+        translate_map = _prepare_line_num_translate(results, log)
+        _translate_log_end_lines(results, translate_map)
+        _add_test_log(meta, log, plan_name)
         _add_rootfs_info(meta, base_path)
         _store_lava_json(job_data, meta)
         groups = []
