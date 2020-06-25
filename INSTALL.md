@@ -117,13 +117,6 @@ $ ansible-playbook -i hosts site.yml -e "@../secrets.yml" -l <$TARGET_NAME>
 
 This will deploy the [KernelCI backend code](https://github.com/kernelci/kernelci-backend.git) into `/srv/$hostname`, install all dependencies and set up an nginx host called `$hostname`.
 
-By default an S3-backup shell script and firewall rules via `ufw` will be
-installed as well. Skip them with:
-
-```
---skip-tags=backup,firewall
-```
-
 ### Requirements
 
 Non exhaustive list of requirements is in the 'requirements.txt' file: those

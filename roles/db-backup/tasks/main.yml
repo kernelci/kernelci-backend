@@ -15,7 +15,6 @@
 - name: Install OS dependencies
   apt:  
     pkg: [
-      's3cmd',
       'xz-utils'
     ]
     state: latest
@@ -32,16 +31,6 @@
         home=/home/kernelci
   tags:
     - backup
-
-- name: Copy s3cmd/s4cmd(for Debian Buster) config file
-  template: src=s3cfg
-            dest=/home/kernelci/.s3cfg
-            owner=kernelci
-            group=nogroup
-            mode=0444
-  tags:
-    - backup
-    - secrets
 
 - name: Copy backup script
   template: src=mongodb-backup.sh
