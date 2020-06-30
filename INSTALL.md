@@ -69,23 +69,23 @@ Change the role to "staging" instead of "production" if you're installing locall
 Replace kci_storage_fqdn with the name you'll be using for the storage.
 
 * `hosts`:
-Add the TARGET_MACHINE and configure how to ansible should connect, for example if your machine
-is named backend.mydomain.local with IP 10.0.17.2 and you connect directly as root (using a ssh key),
+Add the TARGET_NAME and configure how to ansible should connect, for example if your machine
+is named server.mydomain.local with IP 10.0.17.2 and you connect directly as root (using a ssh key),
 your should add:
 
 ```
 [local]
-TARGET_MACHINE ansible_ssh_port=22 ansible_ssh_host=10.0.17.2 ansible_ssh_user=root
+TARGET_NAME ansible_ssh_port=22 ansible_ssh_host=10.0.17.2 ansible_ssh_user=root
 ```
 
 If the user is not root and should use "su" to become root, use the parameter `become_method=su`, if it should use "sudo" instead, use `become_method=sudo`
 
 * `host_vars/TARGET_NAME` this is a file that you must create
 
-For example, you can create the file  `host_vars/myserver.mydomain.local` with the following content:
+For example, you can create the file  `host_vars/server.mydomain.local` with the following content:
 
 ```
-hostname: backend.mydomain.local
+hostname: server.mydomain.local
 role: staging
 ```
 
@@ -101,9 +101,11 @@ To skip the secrets tasks, just pass:
     --skip-tags=secrets
 
 
+It is suggested that you do not skip the secret tasks because you need the master_key variable to create the Tokens which will be important later in this process. 
+
 The only secret key that have to be defined for a local installation for testing ot development is:
 
-* master_key: The password used for generating tokens before any admin token was created (See Manual tasks below).
+* master_key: The password used for generating tokens before any admin token was created (See Manual tasks below). 
 
 Other non-secrets variable might need to be defined, please look at the comments in the file.
 
