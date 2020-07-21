@@ -107,7 +107,7 @@ def push_build(build_id, first, kcidb_options, db_options={}, db=None):
     ns = kcidb_options.get("namespace", "kernelci.org")
     build = utils.db.find_one2(db[models.BUILD_COLLECTION], build_id)
     build_id = _make_id(build[models.ID_KEY], ns)
-    revision_id = _make_id(build[models.KERNEL_KEY], ns)
+    revision_id = _make_id(build[models.GIT_COMMIT_KEY], ns)
 
     kcidb_data = {
         'version': '1',
