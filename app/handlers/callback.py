@@ -30,7 +30,6 @@ import handlers.common.token
 import handlers.response as hresponse
 import models
 import models.token as mtoken
-import taskqueue.tasks.boot
 import taskqueue.tasks.callback
 import taskqueue.tasks.kcidb
 import utils.callback.lava
@@ -54,7 +53,6 @@ class CallbackHandler(hbase.BaseHandler):
 
     @staticmethod
     def _token_validation_func():
-        # Reuse the same token logic validation for the boot resource.
         return handlers.common.token.valid_token_bh
 
     def execute_get(self, *args, **kwargs):
@@ -90,7 +88,7 @@ class CallbackHandler(hbase.BaseHandler):
         We are being paranoid here. We need to make sure the token used to
         post is really associated with the provided lab name.
 
-        To be valid to post boot report, the token must either be an admin
+        To be valid to post test results, the token must either be an admin
         token or a valid token associated with the lab.
 
         :param req_token: The token string from the request.
@@ -116,8 +114,8 @@ class CallbackHandler(hbase.BaseHandler):
                     self.log.warn(
                         "Received callback POST request from an admin token")
                     error = (
-                        "Using an admin token to send boot reports: "
-                        "use the lab token")
+                        "Using an admin token to send test results: "
+                        "use the lab token instead")
                 elif (req_token.token == lab_token.token and
                         not lab_token.expired):
                     valid_lab = True
@@ -205,15 +203,6 @@ class LavaCallbackHandler(CallbackHandler):
                     self.json_obj, self.job_meta, lab_name),
                 taskqueue.tasks.kcidb.push_tests.s(),
                 taskqueue.tasks.test.find_regression.s(),
-            ]
-            celery.chain(tasks).apply_async(
-                link_error=taskqueue.tasks.error_handler.s())
-        # Legacy boot callback to generate boot entries
-        elif action == "boot":
-            tasks = [
-                taskqueue.tasks.callback.lava_boot.s(
-                    self.json_obj, self.job_meta, lab_name),
-                taskqueue.tasks.boot.find_regression.s(),
             ]
             celery.chain(tasks).apply_async(
                 link_error=taskqueue.tasks.error_handler.s())

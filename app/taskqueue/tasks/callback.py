@@ -25,23 +25,6 @@ import utils
 import utils.callback
 
 
-@taskc.app.task(name="lava-boot")
-def lava_boot(json_obj, job_meta, lab_name):
-    """Add boot data from a LAVA v2 boot job callback
-
-    This is a wrapper around the actual function which runs in a Celery task.
-
-    :param json_obj: The JSON object with the values necessary to import the
-    LAVA boot data.
-    :type json_obj: dictionary
-    :param lab_name: The name of the LAVA lab that posted the callback.
-    :type lab_name: string
-    :return ObjectId The boot document object id.
-    """
-    return utils.callback.lava.add_boot(json_obj, job_meta, lab_name,
-                                        taskc.app.conf.db_options)
-
-
 @taskc.app.task(name="lava-test")
 def lava_test(json_obj, job_meta, lab_name):
     """Add test data from a LAVA v2 test job callback
