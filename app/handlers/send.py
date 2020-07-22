@@ -22,7 +22,7 @@
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-"""This module is used to send boot, build and test report emails."""
+"""This module is used to send build, test and bisection report emails."""
 
 import bson
 import copy
@@ -51,12 +51,6 @@ REPORT_TYPE_KEYS = {
         models.JOB_KEY,
         models.GIT_BRANCH_KEY,
         models.KERNEL_KEY,
-    ],
-    'boot': [
-        models.JOB_KEY,
-        models.GIT_BRANCH_KEY,
-        models.KERNEL_KEY,
-        models.LAB_NAME_KEY,
     ],
     'bisect': [
         models.JOB_KEY,
@@ -111,9 +105,7 @@ class SendHandler(hbase.BaseHandler):
             countdown = self.settings["senddelay"]
 
         # Deprecated - ToDo: use report_type only in client code
-        if j_get(models.SEND_BOOT_REPORT_KEY):
-            report_type = 'boot'
-        elif j_get(models.SEND_BUILD_REPORT_KEY):
+        if j_get(models.SEND_BUILD_REPORT_KEY):
             report_type = 'build'
 
         report_keys = REPORT_TYPE_KEYS.get(report_type)
@@ -242,49 +234,6 @@ class SendHandler(hbase.BaseHandler):
                 "Wrong value specified for 'delay': %s" % countdown)
 
         return response
-
-    def _schedule_boot_report(self, report_data, email_opts, countdown):
-        """Schedule the boot report performing some checks on the emails.
-
-        :param report_data: Contents to use in the report.
-        :type report_data: dict
-        :param email_opts: The data necessary for scheduling a report.
-        :type email_opts: dictionary
-        :param countdown: Delay time before sending the email.
-        :type countdown: int
-        :return A tuple with as first parameter a bool indicating if the
-        scheduling had success, as second argument the error string in case
-        of error or None.
-        """
-        has_errors = False
-        error_string = None
-
-        job, git_branch, kernel, lab_name = (report_data[k] for k in [
-            models.JOB_KEY,
-            models.GIT_BRANCH_KEY,
-            models.KERNEL_KEY,
-            models.LAB_NAME_KEY,
-        ])
-
-        if email_opts.get("to"):
-            taskq.send_boot_report.apply_async(
-                [
-                    job,
-                    git_branch,
-                    kernel,
-                    lab_name,
-                    email_opts,
-                ],
-                countdown=countdown
-            )
-        else:
-            has_errors = True
-            error_string = "No email addresses provided to send boot report to"
-            self.log.error(
-                "No email addresses to send boot report to for '%s-%s-%s'",
-                job, git_branch, kernel)
-
-        return has_errors, error_string
 
     def _schedule_build_report(self, report_data, email_opts, countdown):
         """Schedule the build report performing some checks on the emails.
@@ -442,12 +391,12 @@ class SendHandler(hbase.BaseHandler):
 
 
 def _check_status(report_type, errors, when):
-    """Check the status of the boot/build report schedule.
+    """Check the status of the email report schedule.
 
     :param report_type: Report type.
-    :type send_boot: str
-    :param errors_errors: If there have been errors in scheduling the report.
-    :type boot_errors: bool
+    :type report_type: str
+    :param errors: If there have been errors in scheduling the report.
+    :type errors: bool
     :param when: A datetime object when the report should have been scheduled.
     :type when: datetime.datetime
     :return A tuple with the reason message and the status code.
