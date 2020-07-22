@@ -42,7 +42,6 @@ class DailyStats(mbase.BaseDocument):
 
         self.start_date = None
 
-        self.total_boots = 0
         self.total_builds = 0
         self.total_jobs = 0
 
@@ -54,7 +53,6 @@ class DailyStats(mbase.BaseDocument):
         self.total_unique_machs = 0
         self.total_unique_archs = 0
 
-        self.daily_total_boots = 0
         self.daily_total_builds = 0
         self.daily_total_jobs = 0
 
@@ -66,7 +64,6 @@ class DailyStats(mbase.BaseDocument):
         self.daily_unique_kernels = 0
         self.daily_unique_defconfigs = 0
 
-        self.weekly_total_boots = 0
         self.weekly_total_builds = 0
         self.weekly_total_jobs = 0
 
@@ -78,7 +75,6 @@ class DailyStats(mbase.BaseDocument):
         self.weekly_unique_machs = 0
         self.weekly_unique_archs = 0
 
-        self.biweekly_total_boots = 0
         self.biweekly_total_builds = 0
         self.biweekly_total_jobs = 0
 
@@ -141,7 +137,6 @@ class DailyStats(mbase.BaseDocument):
             models.CREATED_KEY: self.created_on,
             models.START_DATE_KEY: self.start_date,
             models.VERSION_KEY: self.version,
-            "biweekly_total_boots": self.biweekly_total_boots,
             "biweekly_total_builds": self.biweekly_total_builds,
             "biweekly_total_jobs": self.biweekly_total_jobs,
             "biweekly_unique_archs": self.biweekly_unique_archs,
@@ -150,7 +145,6 @@ class DailyStats(mbase.BaseDocument):
             "biweekly_unique_machs": self.biweekly_unique_machs,
             "biweekly_unique_trees": self.biweekly_unique_trees,
             "biweekly_unique_defconfigs": self.biweekly_unique_defconfigs,
-            "daily_total_boots": self.daily_total_boots,
             "daily_total_builds": self.daily_total_builds,
             "daily_total_jobs": self.daily_total_jobs,
             "daily_unique_archs": self.daily_unique_archs,
@@ -159,7 +153,6 @@ class DailyStats(mbase.BaseDocument):
             "daily_unique_machs": self.daily_unique_machs,
             "daily_unique_trees": self.daily_unique_trees,
             "daily_unique_defconfigs": self.daily_unique_defconfigs,
-            "total_boots": self.total_boots,
             "total_builds": self.total_builds,
             "total_jobs": self.total_jobs,
             "total_unique_archs": self.total_unique_archs,
@@ -168,7 +161,6 @@ class DailyStats(mbase.BaseDocument):
             "total_unique_machs": self.total_unique_machs,
             "total_unique_trees": self.total_unique_trees,
             "total_unique_defconfigs": self.total_unique_defconfigs,
-            "weekly_total_boots": self.weekly_total_boots,
             "weekly_total_builds": self.weekly_total_builds,
             "weekly_total_jobs": self.weekly_total_jobs,
             "weekly_unique_archs": self.weekly_unique_archs,

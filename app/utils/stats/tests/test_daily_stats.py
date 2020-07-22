@@ -48,18 +48,15 @@ class TestDailyStats(unittest.TestCase):
         logging.disable(logging.NOTSET)
 
     @mock.patch("utils.stats.daily.get_start_date")
-    @mock.patch("utils.stats.daily.calculate_boot_stats")
     @mock.patch("utils.stats.daily.calculate_build_stats")
     @mock.patch("utils.stats.daily.calculate_job_stats")
     def test_calculate_daily_empty(
-            self, mock_job, mock_build, mock_boot, mock_start):
+            self, mock_job, mock_build, mock_start):
         mock_job.return_value = {}
-        mock_boot.return_value = {}
         mock_build.return_value = {}
         mock_start.return_value = "yesterday"
 
         expected = {
-            "biweekly_total_boots": 0,
             "biweekly_total_builds": 0,
             "biweekly_total_jobs": 0,
             "biweekly_unique_archs": 0,
@@ -69,7 +66,6 @@ class TestDailyStats(unittest.TestCase):
             "biweekly_unique_trees": 0,
             "biweekly_unique_defconfigs": 0,
             "created_on": self.today,
-            "daily_total_boots": 0,
             "daily_total_builds": 0,
             "daily_total_jobs": 0,
             "daily_unique_archs": 0,
@@ -79,7 +75,6 @@ class TestDailyStats(unittest.TestCase):
             "daily_unique_trees": 0,
             "daily_unique_defconfigs": 0,
             "start_date": "yesterday",
-            "total_boots": 0,
             "total_builds": 0,
             "total_jobs": 0,
             "total_unique_archs": 0,
@@ -89,7 +84,6 @@ class TestDailyStats(unittest.TestCase):
             "total_unique_trees": 0,
             "total_unique_defconfigs": 0,
             "version": "1.0",
-            "weekly_total_boots": 0,
             "weekly_total_builds": 0,
             "weekly_total_jobs": 0,
             "weekly_unique_archs": 0,
@@ -104,12 +98,10 @@ class TestDailyStats(unittest.TestCase):
         self.assertDictEqual(expected, daily_stats.to_dict())
 
     @mock.patch("utils.stats.daily.get_start_date")
-    @mock.patch("utils.stats.daily.calculate_boot_stats")
     @mock.patch("utils.stats.daily.calculate_build_stats")
     @mock.patch("utils.stats.daily.calculate_job_stats")
     def test_calculate_daily_with_job(
-            self, mock_job, mock_build, mock_boot, mock_date):
-        mock_boot.return_value = {}
+            self, mock_job, mock_build, mock_date):
         mock_build.return_value = {}
         mock_date.return_value = "yesterday"
         mock_job.return_value = {
@@ -128,7 +120,6 @@ class TestDailyStats(unittest.TestCase):
         }
 
         expected = {
-            "biweekly_total_boots": 0,
             "biweekly_total_builds": 0,
             "biweekly_total_jobs": 10,
             "biweekly_unique_archs": 0,
@@ -138,7 +129,6 @@ class TestDailyStats(unittest.TestCase):
             "biweekly_unique_trees": 1,
             "biweekly_unique_defconfigs": 0,
             "created_on": self.today,
-            "daily_total_boots": 0,
             "daily_total_builds": 0,
             "daily_total_jobs": 500,
             "daily_unique_archs": 0,
@@ -148,7 +138,6 @@ class TestDailyStats(unittest.TestCase):
             "daily_unique_trees": 100,
             "daily_unique_defconfigs": 0,
             "start_date": "yesterday",
-            "total_boots": 0,
             "total_builds": 0,
             "total_jobs": 1000,
             "total_unique_archs": 0,
@@ -158,7 +147,6 @@ class TestDailyStats(unittest.TestCase):
             "total_unique_trees": 100,
             "total_unique_defconfigs": 0,
             "version": "1.0",
-            "weekly_total_boots": 0,
             "weekly_total_builds": 0,
             "weekly_total_jobs": 10,
             "weekly_unique_archs": 0,
@@ -173,13 +161,11 @@ class TestDailyStats(unittest.TestCase):
         self.assertDictEqual(expected, daily_stats.to_dict())
 
     @mock.patch("utils.stats.daily.get_start_date")
-    @mock.patch("utils.stats.daily.calculate_boot_stats")
     @mock.patch("utils.stats.daily.calculate_build_stats")
     @mock.patch("utils.stats.daily.calculate_job_stats")
     def test_calculate_daily_with_build(
-            self, mock_job, mock_build, mock_boot, mock_start):
+            self, mock_job, mock_build, mock_start):
         mock_job.return_value = {}
-        mock_boot.return_value = {}
         mock_start.return_value = "yesterday"
         mock_build.return_value = {
             "biweekly_total_builds": 1,
@@ -193,7 +179,6 @@ class TestDailyStats(unittest.TestCase):
         }
 
         expected = {
-            "biweekly_total_boots": 0,
             "biweekly_total_builds": 1,
             "biweekly_total_jobs": 0,
             "biweekly_unique_archs": 0,
@@ -203,7 +188,6 @@ class TestDailyStats(unittest.TestCase):
             "biweekly_unique_trees": 0,
             "biweekly_unique_defconfigs": 1,
             "created_on": self.today,
-            "daily_total_boots": 0,
             "daily_total_builds": 10,
             "daily_total_jobs": 0,
             "daily_unique_archs": 0,
@@ -213,7 +197,6 @@ class TestDailyStats(unittest.TestCase):
             "daily_unique_trees": 0,
             "daily_unique_defconfigs": 10,
             "start_date": "yesterday",
-            "total_boots": 0,
             "total_builds": 1024,
             "total_jobs": 0,
             "total_unique_archs": 0,
@@ -223,7 +206,6 @@ class TestDailyStats(unittest.TestCase):
             "total_unique_trees": 0,
             "total_unique_defconfigs": 10,
             "version": "1.0",
-            "weekly_total_boots": 0,
             "weekly_total_builds": 10,
             "weekly_total_jobs": 0,
             "weekly_unique_archs": 0,
@@ -232,79 +214,6 @@ class TestDailyStats(unittest.TestCase):
             "weekly_unique_machs": 0,
             "weekly_unique_trees": 0,
             "weekly_unique_defconfigs": 10
-        }
-
-        daily_stats = utils.stats.daily.calculate_daily_stats({})
-        self.assertDictEqual(expected, daily_stats.to_dict())
-
-    @mock.patch("utils.stats.daily.get_start_date")
-    @mock.patch("utils.stats.daily.calculate_boot_stats")
-    @mock.patch("utils.stats.daily.calculate_build_stats")
-    @mock.patch("utils.stats.daily.calculate_job_stats")
-    def test_calculate_daily_with_boot(
-            self, mock_job, mock_build, mock_boot, mock_start):
-        mock_job.return_value = {}
-        mock_build.return_value = {}
-        mock_start.return_value = "yesterday"
-        mock_boot.return_value = {
-            "biweekly_total_boots": 10,
-            "biweekly_unique_archs": 3,
-            "biweekly_unique_boards": 100,
-            "biweekly_unique_machs": 20,
-            "daily_total_boots": 10,
-            "daily_unique_archs": 3,
-            "daily_unique_boards": 100,
-            "daily_unique_machs": 20,
-            "total_boots": 10,
-            "total_unique_archs": 3,
-            "total_unique_boards": 100,
-            "total_unique_machs": 20,
-            "weekly_total_boots": 10,
-            "weekly_unique_archs": 3,
-            "weekly_unique_boards": 100,
-            "weekly_unique_machs": 20,
-        }
-
-        expected = {
-            "biweekly_total_boots": 10,
-            "biweekly_total_builds": 0,
-            "biweekly_total_jobs": 0,
-            "biweekly_unique_archs": 3,
-            "biweekly_unique_boards": 100,
-            "biweekly_unique_kernels": 0,
-            "biweekly_unique_machs": 20,
-            "biweekly_unique_trees": 0,
-            "biweekly_unique_defconfigs": 0,
-            "created_on": self.today,
-            "daily_total_boots": 10,
-            "daily_total_builds": 0,
-            "daily_total_jobs": 0,
-            "daily_unique_archs": 3,
-            "daily_unique_boards": 100,
-            "daily_unique_kernels": 0,
-            "daily_unique_machs": 20,
-            "daily_unique_trees": 0,
-            "daily_unique_defconfigs": 0,
-            "start_date": "yesterday",
-            "total_boots": 10,
-            "total_builds": 0,
-            "total_jobs": 0,
-            "total_unique_archs": 3,
-            "total_unique_boards": 100,
-            "total_unique_kernels": 0,
-            "total_unique_machs": 20,
-            "total_unique_trees": 0,
-            "total_unique_defconfigs": 0,
-            "version": "1.0",
-            "weekly_total_boots": 10,
-            "weekly_total_builds": 0,
-            "weekly_total_jobs": 0,
-            "weekly_unique_archs": 3,
-            "weekly_unique_boards": 100,
-            "weekly_unique_kernels": 0,
-            "weekly_unique_machs": 20,
-            "weekly_unique_trees": 0,
-            "weekly_unique_defconfigs": 0
         }
 
         daily_stats = utils.stats.daily.calculate_daily_stats({})

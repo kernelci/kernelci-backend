@@ -35,7 +35,6 @@ class TestStatsModel(unittest.TestCase):
         daily_stats = mstats.DailyStats()
         daily_stats.created_on = "now"
         daily_stats.id = "stats-id"
-        daily_stats.total_boots = 10
         daily_stats.total_builds = 100
         daily_stats.total_jobs = 1000
         daily_stats.version = "foo"
@@ -43,7 +42,6 @@ class TestStatsModel(unittest.TestCase):
 
         expected = {
             "_id": "stats-id",
-            "biweekly_total_boots": 0,
             "biweekly_total_builds": 0,
             "biweekly_total_jobs": 0,
             "biweekly_unique_archs": 0,
@@ -53,7 +51,6 @@ class TestStatsModel(unittest.TestCase):
             "biweekly_unique_trees": 0,
             "biweekly_unique_defconfigs": 0,
             "created_on": "now",
-            "daily_total_boots": 0,
             "daily_total_builds": 0,
             "daily_total_jobs": 0,
             "daily_unique_archs": 0,
@@ -63,7 +60,6 @@ class TestStatsModel(unittest.TestCase):
             "daily_unique_trees": 0,
             "daily_unique_defconfigs": 0,
             "start_date": "yesterday",
-            "total_boots": 10,
             "total_builds": 100,
             "total_jobs": 1000,
             "total_unique_archs": 0,
@@ -73,7 +69,6 @@ class TestStatsModel(unittest.TestCase):
             "total_unique_trees": 0,
             "total_unique_defconfigs": 0,
             "version": "foo",
-            "weekly_total_boots": 0,
             "weekly_total_builds": 0,
             "weekly_total_jobs": 0,
             "weekly_unique_archs": 0,

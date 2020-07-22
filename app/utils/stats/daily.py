@@ -93,46 +93,6 @@ def calculate_build_stats(database, date_range):
     return build_stats
 
 
-def calculate_boot_stats(database, date_range):
-    """Calculate statistics for the boot collection.
-
-    :param database: The database connection.
-    :param date_range: The list of date ranges to calculate statistics for.
-    :param date_range: list
-    :return A dictionary containing the boot statistics.
-    """
-    utils.LOG.info("Calculating boot statistics")
-    boot_collection = database[models.BOOT_COLLECTION]
-
-    total_boots = boot_collection.count()
-    total_unique_archs = len(boot_collection.distinct(models.ARCHITECTURE_KEY))
-    total_unique_boards = len(boot_collection.distinct(models.BOARD_KEY))
-    total_unique_machs = len(boot_collection.distinct(models.MACH_KEY))
-
-    boot_stats = {
-        "total_boots": total_boots,
-        "total_unique_archs": total_unique_archs,
-        "total_unique_boards": total_unique_boards,
-        "total_unique_machs": total_unique_machs
-    }
-
-    for idx, date in enumerate(date_range):
-        prefix = OLD_PREFIXES[idx]
-
-        boot_data = boot_collection.find(
-            {models.CREATED_KEY: {"$lt": date}})
-
-        boot_stats[prefix + "_total_boots"] = boot_data.count()
-        boot_stats[prefix + "_unique_archs"] = \
-            len(boot_data.distinct(models.ARCHITECTURE_KEY))
-        boot_stats[prefix + "_unique_boards"] = \
-            len(boot_data.distinct(models.BOARD_KEY))
-        boot_stats[prefix + "_unique_machs"] = \
-            len(boot_data.distinct(models.MACH_KEY))
-
-    return boot_stats
-
-
 def get_start_date(database):
     """Retrieve the date of the first object stored in the database.
 
@@ -158,23 +118,20 @@ def get_start_date(database):
     return start_date
 
 
-def iter_dicts(dict0, dict1, dict2):
+def iter_dicts(dict0, dict1):
     """Iterate through 3 dictionaries at once.
 
     :param dict0: A dictionary to iterate through.
     :type dict0: dict
     :param dict1: A dictionary to iterate through.
     :type dict1: dict
-    :param dict2: A dictionary to iterate through.
-    :type dict2: dict
     :return Yield the key-value pairs from each dictionaries, returning None
     to fill empty values.
     """
-    for item0, item1, item2 in itertools.izip_longest(
-            dict0.iteritems(), dict1.iteritems(), dict2.iteritems()):
+    for item0, item1 in itertools.izip_longest(
+            dict0.iteritems(), dict1.iteritems()):
         yield item0
         yield item1
-        yield item2
 
 
 def calculate_daily_stats(db_options):
@@ -196,11 +153,10 @@ def calculate_daily_stats(db_options):
     start_date = get_start_date(database)
     job_stats = calculate_job_stats(database, date_range)
     build_stats = calculate_build_stats(database, date_range)
-    boot_stats = calculate_boot_stats(database, date_range)
 
     daily_stats = mstats.DailyStats()
     daily_stats.start_date = start_date
-    for item in iter_dicts(job_stats, build_stats, boot_stats):
+    for item in iter_dicts(job_stats, build_stats):
         if item:
             setattr(daily_stats, item[0], item[1])
 
