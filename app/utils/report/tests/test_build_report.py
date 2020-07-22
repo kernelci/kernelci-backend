@@ -15,7 +15,7 @@
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-"""Test class for the boot email report functions."""
+"""Test class for the build email report functions."""
 
 import unittest
 

@@ -103,10 +103,6 @@ MODULES_LIST = [
 ]
 
 
-def create_boot(build, config=None):
-    pass
-
-
 def create_build(job, config=None):
 
     defconfig = random.choice(DEFCONFIG_LIST)

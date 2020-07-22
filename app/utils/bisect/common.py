@@ -24,19 +24,6 @@ import utils
 import utils.db
 
 
-BOOT_DEFCONFIG_SEARCH_FIELDS = [
-    models.ARCHITECTURE_KEY,
-    models.CREATED_KEY,
-    models.DEFCONFIG_FULL_KEY,
-    models.DEFCONFIG_KEY,
-    models.GIT_BRANCH_KEY,
-    models.GIT_COMMIT_KEY,
-    models.GIT_DESCRIBE_KEY,
-    models.GIT_URL_KEY,
-    models.STATUS_KEY
-]
-
-
 def save_bisect_doc(database, bisect_doc, doc_id):
     """Save the provided bisect document.
 

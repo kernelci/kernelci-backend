@@ -64,30 +64,16 @@ def add_git_branch_field(collection_name):
         if ret_val == 500:
             log_error_add(collection_name, doc)
 
-    if collection_name == models.BOOT_DELTA_COLLECTION:
-        for doc in database[collection_name].find():
-            if not doc.get(models.GIT_BRANCH_KEY):
-                try:
-                    baseline = doc["data"][0]["baseline"]
+    for doc in database[collection_name].find():
+        if not doc.get(models.GIT_BRANCH_KEY):
+            try:
+                job_doc = utils.db.find_one2(
+                    database[models.JOB_COLLECTION],
+                    {models.ID_KEY: doc[models.JOB_ID_KEY]})
 
-                    job_doc = utils.db.find_one2(
-                        database[models.JOB_COLLECTION],
-                        {models.ID_KEY: baseline[models.JOB_ID_KEY]})
-
-                    set_git_branch_field(doc, job_doc)
-                except KeyError:
-                    log_error_add(collection_name, doc)
-    else:
-        for doc in database[collection_name].find():
-            if not doc.get(models.GIT_BRANCH_KEY):
-                try:
-                    job_doc = utils.db.find_one2(
-                        database[models.JOB_COLLECTION],
-                        {models.ID_KEY: doc[models.JOB_ID_KEY]})
-
-                    set_git_branch_field(doc, job_doc)
-                except KeyError:
-                    log_error_add(collection_name, doc)
+                set_git_branch_field(doc, job_doc)
+            except KeyError:
+                log_error_add(collection_name, doc)
 
     connection.close()
 
@@ -126,7 +112,6 @@ if __name__ == "__main__":
         [
             models.JOB_COLLECTION,
             models.BUILD_COLLECTION,
-            models.BOOT_COLLECTION,
             models.ERROR_LOGS_COLLECTION,
         ]
     )
@@ -134,7 +119,6 @@ if __name__ == "__main__":
     process_pool.map(add_git_branch_field, [
         models.ERROR_LOGS_COLLECTION,
         models.ERRORS_SUMMARY_COLLECTION,
-        models.BOOT_DELTA_COLLECTION
     ])
 
     process_pool.close()
