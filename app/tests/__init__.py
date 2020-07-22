@@ -30,7 +30,6 @@ def test_modules():
         "handlers.common.tests.test_token",
         "handlers.tests.test_batch_handler",
         "handlers.tests.test_bisect_handler",
-        "handlers.tests.test_boot_handler",
         "handlers.tests.test_build_handler",
         "handlers.tests.test_build_logs_handler",
         "handlers.tests.test_callback_handler",
