@@ -38,7 +38,6 @@ import urllib2
 from collections import OrderedDict
 
 import utils
-import utils.boot
 import utils.kci_test
 import utils.db
 import utils.lava_log_parser
@@ -109,30 +108,6 @@ META_DATA_MAP_TEST = {
     models.FILE_SERVER_RESOURCE_KEY: "job.file_server_resource",
 }
 
-META_DATA_MAP_BOOT = {
-    models.DEFCONFIG_KEY: "kernel.defconfig_base",
-    models.DEFCONFIG_FULL_KEY: "kernel.defconfig",
-    models.GIT_BRANCH_KEY: "git.branch",
-    models.GIT_COMMIT_KEY: "git.commit",
-    models.GIT_DESCRIBE_KEY: "git.describe",
-    models.GIT_URL_KEY: "git.url",
-    models.KERNEL_KEY: "kernel.version",
-    models.KERNEL_IMAGE_KEY: "job.kernel_image",
-    models.ENDIANNESS_KEY: "kernel.endian",
-    models.JOB_KEY: "kernel.tree",
-    models.ARCHITECTURE_KEY: "job.arch",
-    models.DTB_KEY: "platform.dtb",
-    models.MACH_KEY: "platform.mach",
-    models.FASTBOOT_KEY: "platform.fastboot",
-    models.INITRD_KEY: "job.initrd_url",
-    models.BOARD_KEY: "platform.name",
-    models.DEVICE_TYPE_KEY: "device.type",
-    models.PLAN_KEY: "test.plan",
-    models.PLAN_VARIANT_KEY: "test.plan_variant",
-    models.BUILD_ENVIRONMENT_KEY: "job.build_environment",
-    models.FILE_SERVER_RESOURCE_KEY: "job.file_server_resource",
-}
-
 BL_META_MAP = {
     "ramdisk_addr": "initrd_addr",
     "kernel_addr": "loadaddr",
@@ -156,7 +131,6 @@ def _get_job_meta(meta, job_data):
     :param job_data: The map of keys to search for in the JSON and update.
     :type job_data: dict
     """
-    meta[models.BOOT_RESULT_KEY] = LAVA_JOB_RESULT[job_data["status"]]
     meta[models.BOARD_INSTANCE_KEY] = job_data["actual_device_id"]
 
 
@@ -423,71 +397,6 @@ def _store_lava_json(job_data, meta, base_path=utils.BASE_PATH):
 
     with open(file_path, "wb") as f:
         f.write(json.dumps(job_data))
-
-
-def add_boot(job_data, job_meta, lab_name, db_options,
-             base_path=utils.BASE_PATH):
-    """Entry point to be used as an external task.
-
-    This function should only be called by Celery or other task managers.
-    Parse the boot data from a LAVA v2 job callback and save it along with
-    kernel logs.
-
-    :param job_data: The JSON data from the callback.
-    :type job_data: dict
-    :param lab_name: Name of the LAVA lab that posted the callback.
-    :type lab_name: string
-    :param db_options: The mongodb database connection parameters.
-    :type db_options: dict
-    :param base_path: Path to the top-level directory where to save files.
-    :type base_path: string
-    :return ObjectId The boot document id.
-    """
-    ret_code = 201
-    doc_id = None
-    errors = {}
-
-    utils.LOG.info("Processing LAVA boot data: job {} from {}".format(
-        job_data["id"], lab_name))
-
-    if job_data.get("status") not in (COMPLETE, INCOMPLETE):
-        utils.LOG.warning("Skipping LAVA job due to unsupported status: "
-                          "{}".format(job_data["status_string"]))
-        return None
-
-    meta = {
-        models.VERSION_KEY: "1.1",
-        models.LAB_NAME_KEY: lab_name,
-        models.BOOT_TIME_KEY: "0.0",
-    }
-
-    ex = None
-    msg = None
-
-    try:
-        _get_job_meta(meta, job_data)
-        _get_definition_meta(meta, job_meta, META_DATA_MAP_BOOT)
-        _get_directory_path(meta, base_path)
-        _get_lava_meta(meta, job_data)
-        _store_lava_json(job_data, meta)
-        _add_test_log(meta, job_data["log"], "boot")
-        doc_id = utils.boot.import_and_save_boot(meta, db_options)
-    except (yaml.YAMLError, ValueError) as ex:
-        ret_code = 400
-        msg = "Invalid LAVA data"
-    except (OSError, IOError) as ex:
-        ret_code = 500
-        msg = "Internal error"
-    finally:
-        if ex is not None:
-            utils.LOG.exception(ex)
-        if msg is not None:
-            utils.LOG.error(msg)
-            utils.errors.add_error(errors, ret_code, msg)
-        if errors:
-            raise utils.errors.BackendError(errors)
-
-    return doc_id
 
 
 def _add_login_case(meta, results, cases, name):
