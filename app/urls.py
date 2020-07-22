@@ -26,7 +26,6 @@ import tornado.web
 
 import handlers.batch
 import handlers.bisect
-import handlers.boot
 import handlers.build
 import handlers.build_logs
 import handlers.count
@@ -87,19 +86,6 @@ _BUILD_DISTINCT_URL = tornado.web.url(
     r"/build[s]?/distinct/(?P<field>[A-Za-z0-9_]+)/?$",
     handlers.distinct.DistinctHandler,
     kwargs={"resource": "build"}, name="build-distinct"
-)
-
-_BOOT_URL = tornado.web.url(
-    r"/boot[s]?/?$", handlers.boot.BootHandler, name="boot")
-
-_BOOT_ID_URL = tornado.web.url(
-    r"/boot[s]?/(?P<id>[A-Za-z0-9]{24})/?$",
-    handlers.boot.BootHandler, name="boot-id")
-
-_BOOT_DISTINCT_URL = tornado.web.url(
-    r"/boot[s]?/distinct/(?P<field>[A-Za-z0-9_]+)/?$",
-    handlers.distinct.DistinctHandler,
-    kwargs={"resource": "boot"}, name="boot-distinct"
 )
 
 _COUNT_URL = tornado.web.url(
@@ -181,9 +167,6 @@ _LAVA_CALLBACK_URL = tornado.web.url(
 APP_URLS = [
     _BATCH_URL,
     _BISECT_URL,
-    _BOOT_DISTINCT_URL,
-    _BOOT_ID_URL,
-    _BOOT_URL,
     _BUILD_DISTINCT_URL,
     _BUILD_ID_LOGS_URL,
     _BUILD_ID_URL,
