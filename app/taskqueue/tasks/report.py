@@ -29,64 +29,10 @@ import taskqueue.celery as taskc
 import utils.db
 import utils.emails
 import utils.report.bisect
-import utils.report.boot
 import utils.report.build
 import utils.report.common
 import utils.report.error
 import utils.report.test
-
-
-# pylint: disable=too-many-arguments
-# pylint: disable=invalid-name
-# pylint: disable=too-many-locals
-@taskc.app.task(name="send-boot-report")
-def send_boot_report(job, git_branch, kernel, lab_name, email_opts):
-    """Create the boot report email and send it.
-
-    :param job: The job name.
-    :type job: string
-    :param kernel: The kernel name.
-    :type kernel: string
-    :param lab_name: The name of the lab.
-    :type lab_name: string
-    :param email_opts: Email options.
-    :type email_opts: dict
-    """
-    report_id = "-".join([job, git_branch, kernel])
-    utils.LOG.info("Preparing boot report email for '{}'".format(report_id))
-    status = "ERROR"
-
-    db_options = taskc.app.conf.get("db_options", {})
-
-    txt_body, html_body, new_subject, headers = \
-        utils.report.boot.create_boot_report(
-            job,
-            git_branch,
-            kernel,
-            lab_name,
-            email_opts["format"],
-            db_options=db_options,
-            mail_options=taskc.app.conf.get("mail_options", None)
-        )
-
-    subject = email_opts.get("subject") or new_subject
-
-    if (txt_body or html_body) and subject:
-        utils.LOG.info("Sending boot report email for '{}'".format(report_id))
-        status, errors = utils.emails.send_email(
-            subject, txt_body, html_body, email_opts,
-            taskc.app.conf.mail_options, headers
-        )
-        utils.report.common.save_report(
-            job, git_branch, kernel, models.BOOT_REPORT,
-            status, errors, db_options
-        )
-    else:
-        utils.LOG.error(
-            "No email body nor subject found for boot report '{}'"
-            .format(report_id))
-
-    return status
 
 
 @taskc.app.task(name="send-build-report")
