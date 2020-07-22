@@ -55,12 +55,6 @@ JOB_SEARCH_FIELDS = [
 
 DEFAULT_BASE_URL = u"https://kernelci.org"
 DEFAULT_STORAGE_URL = u"https://storage.kernelci.org"
-BOARD_URL = (
-    u"{base_url:s}/boot/{board:s}/job/{job:s}/branch/{git_branch:s}"
-    u"/kernel/{kernel:s}/defconfig/{defconfig:s}/"
-)
-BOOT_SUMMARY_URL = \
-    u"{boot_url:s}/{job:s}/branch/{git_branch:s}/kernel/{kernel:s}/"
 BUILD_SUMMARY_URL = \
     u"{build_url:s}/{job:s}/branch/{git_branch:s}/kernel/{kernel:s}/"
 
@@ -76,8 +70,6 @@ if os.path.isfile(DEFAULT_CONFIG_FILE):
                 value = line.split("=")[1].strip()
                 DEFAULT_STORAGE_URL = value.replace("'", "")
 
-DEFAULT_BOOT_URL = DEFAULT_BASE_URL + u"/boot/all/job"
-BOOT_ID_URL = DEFAULT_BASE_URL + u"/boot/id/{_id:s}/"
 DEFAULT_BUILD_URL = DEFAULT_BASE_URL + u"/build"
 
 # Default colors for error and warning links.
@@ -146,7 +138,6 @@ X_BRANCH = "X-Kernelci-Branch"
 X_LAB = "X-Kernelci-Lab-Name"
 
 # Type of reports we send.
-BOOT_REPORT_TYPE = "boot"
 BUILD_REPORT_TYPE = "build"
 BISECT_REPORT_TYPE = "bisect"
 TEST_REPORT_TYPE = "test"

@@ -62,7 +62,6 @@ def test_modules():
         "utils.bisect.tests.test_bisect",
         "utils.boot.tests.test_boot_import",
         "utils.build.tests.test_build_import",
-        "utils.report.tests.test_boot_report",
         "utils.report.tests.test_build_report",
         "utils.report.tests.test_report_common",
         "utils.stats.tests.test_daily_stats",
