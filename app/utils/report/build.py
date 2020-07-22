@@ -452,8 +452,6 @@ def _create_build_email(**kwargs):
     :type pass_count: int
     :param base_url: The base URL to build the dashboard links.
     :type base_url: string
-    :param boot_url: The base URL for the boot section of the dashboard.
-    :type boot_url: string
     :param build_url: The base URL for the build section of the dashboard.
     :type build_url: string
     :param info_email: The email address for the footer note.

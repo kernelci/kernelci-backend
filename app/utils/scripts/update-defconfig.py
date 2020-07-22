@@ -74,7 +74,6 @@ if __name__ == "__main__":
     process_pool.map(
         convert_defconfig_id,
         [
-            models.BOOT_COLLECTION,
             models.TEST_GROUP_COLLECTION,
             models.ERROR_LOGS_COLLECTION
         ]

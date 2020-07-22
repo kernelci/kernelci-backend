@@ -45,7 +45,7 @@ class TestBuildModel(unittest.TestCase):
         build_doc.metadata = {}
         build_doc.status = "FAIL"
         build_doc.dirname = "defconfig"
-        build_doc.boot_resul_description = []
+        build_doc.boot_result_description = []
         build_doc.errors = 1
         build_doc.warnings = 1
         build_doc.build_time = 1

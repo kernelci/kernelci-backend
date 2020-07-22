@@ -68,7 +68,7 @@ class TestReportModel(unittest.TestCase):
         report_doc.job = "job"
         report_doc.git_branch = "branch"
         report_doc.kernel = "kernel"
-        report_doc.report_type = "boot"
+        report_doc.report_type = "build"
         report_doc.status = "ERROR"
         report_doc.updated_on = "now"
         report_doc.errors = [(1, "msg")]
@@ -82,7 +82,7 @@ class TestReportModel(unittest.TestCase):
             "git_branch": "branch",
             "name": "name",
             "status": "ERROR",
-            "type": "boot",
+            "type": "build",
             "updated_on": "now",
             "version": "1.1"
         }
