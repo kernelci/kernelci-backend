@@ -33,45 +33,6 @@ INDEX_SPECS = {
         [(models.CREATED_KEY, pymongo.ASCENDING)],
     ],
 
-    models.BOOT_COLLECTION: [
-        [
-            (models.CREATED_KEY, pymongo.DESCENDING),
-        ],
-        [
-            (models.STATUS_KEY, pymongo.ASCENDING),
-            (models.CREATED_KEY, pymongo.DESCENDING),
-        ],
-        [
-            (models.STATUS_KEY, pymongo.ASCENDING),
-            (models.JOB_KEY, pymongo.ASCENDING),
-            (models.KERNEL_KEY, pymongo.ASCENDING),
-        ],
-        [
-            (models.JOB_KEY, pymongo.ASCENDING),
-            (models.KERNEL_KEY, pymongo.ASCENDING),
-        ],
-        [
-            (models.MACH_KEY, pymongo.ASCENDING),
-            (models.BOARD_KEY, pymongo.ASCENDING),
-        ],
-        [
-            (models.MACH_KEY, pymongo.ASCENDING),
-            (models.CREATED_KEY, pymongo.DESCENDING),
-        ],
-        [
-            (models.CREATED_KEY, pymongo.DESCENDING),
-            (models.ID_KEY, pymongo.DESCENDING),
-            (models.JOB_KEY, pymongo.ASCENDING),
-            (models.KERNEL_KEY, pymongo.DESCENDING),
-            (models.DEFCONFIG_FULL_KEY, pymongo.ASCENDING),
-            (models.ARCHITECTURE_KEY, pymongo.ASCENDING),
-            (models.BOARD_KEY, pymongo.ASCENDING),
-            (models.LAB_NAME_KEY, pymongo.ASCENDING),
-            (models.STATUS_KEY, pymongo.ASCENDING),
-            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
-        ],
-    ],
-
     models.BUILD_COLLECTION: [
         [
             (models.CREATED_KEY, pymongo.DESCENDING),

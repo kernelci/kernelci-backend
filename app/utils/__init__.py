@@ -42,7 +42,6 @@ BUILD_MISMATCHES_FILE = "build-mismatches.log"
 
 # All the mongodb ID keys we use.
 ID_KEYS = [
-    models.BOOT_ID_KEY,
     models.BUILD_ID_KEY,
     models.ID_KEY,
     models.JOB_ID_KEY,
