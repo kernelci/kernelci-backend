@@ -113,56 +113,6 @@ class TestSendHandler(TestHandlerBase):
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
 
-    def test_post_boot_report_no_email(self):
-        headers = {
-            "Authorization": "foo",
-            "Content-Type": "application/json",
-        }
-        data = dict(job="job", kernel="kernel", boot_report=1, delay=None)
-        body = json.dumps(data)
-        response = self.fetch(
-            "/send", method="POST", headers=headers, body=body)
-        self.assertEqual(response.code, 400)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-
-    @mock.patch("taskqueue.tasks.report.send_boot_report")
-    def test_post_correct_boot_report(self, mock_schedule):
-        mock_schedule.apply_async = mock.MagicMock()
-        headers = {
-            "Authorization": "foo",
-            "Content-Type": "application/json",
-        }
-        data = dict(
-            job="job",
-            kernel="kernel",
-            git_branch="master",
-            boot_report=1, delay=None, send_to="test@example.org")
-        body = json.dumps(data)
-        response = self.fetch(
-            "/send", method="POST", headers=headers, body=body)
-        self.assertEqual(response.code, 202)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-        mock_schedule.apply_async.assert_called_with(
-            [
-                "job",
-                "master",
-                "kernel",
-                None,
-                {
-                    "to": ["test@example.org"],
-                    "cc": [],
-                    "bcc": [],
-                    "in_reply_to": None,
-                    "subject": None,
-                    "format": ["txt"],
-                    "template": None,
-                },
-            ],
-            countdown=60 * 60,
-        )
-
     def test_post_wrong_delay(self):
         headers = {
             "Authorization": "foo",
@@ -171,7 +121,7 @@ class TestSendHandler(TestHandlerBase):
         data = dict(
             job="job",
             kernel="kernel",
-            boot_report=1, send_to="test@example.org", delay="foo"
+            build_report=1, send_to="test@example.org", delay="foo"
         )
         body = json.dumps(data)
         response = self.fetch(
@@ -179,82 +129,6 @@ class TestSendHandler(TestHandlerBase):
         self.assertEqual(response.code, 400)
         self.assertEqual(
             response.headers["Content-Type"], self.content_type)
-
-    @mock.patch("taskqueue.tasks.report.send_boot_report")
-    def test_post_negative_delay(self, mock_schedule):
-        mock_schedule.apply_async = mock.MagicMock()
-        headers = {
-            "Authorization": "foo",
-            "Content-Type": "application/json",
-        }
-        data = dict(
-            job="job",
-            kernel="kernel",
-            git_branch="master",
-            boot_report=1, send_to="test@example.org", delay=-100
-        )
-        body = json.dumps(data)
-        response = self.fetch(
-            "/send", method="POST", headers=headers, body=body)
-        self.assertEqual(response.code, 202)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-        mock_schedule.apply_async.assert_called_with(
-            [
-                "job",
-                "master",
-                "kernel",
-                None,
-                {
-                    "format": ["txt"],
-                    "to": ["test@example.org"],
-                    "cc": [],
-                    "bcc": [],
-                    "subject": None,
-                    "in_reply_to": None,
-                    "template": None,
-                },
-            ],
-            countdown=100,
-        )
-
-    @mock.patch("taskqueue.tasks.report.send_boot_report")
-    def test_post_higher_delay(self, mock_schedule):
-        mock_schedule.apply_async = mock.MagicMock()
-        headers = {
-            "Authorization": "foo",
-            "Content-Type": "application/json",
-        }
-        data = dict(
-            job="job",
-            kernel="kernel",
-            git_branch="master",
-            boot_report=1, send_to="test@example.org", delay=1000000
-        )
-        body = json.dumps(data)
-        response = self.fetch(
-            "/send", method="POST", headers=headers, body=body)
-        self.assertEqual(response.code, 202)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
-        mock_schedule.apply_async.assert_called_with(
-            [
-                "job",
-                "master",
-                "kernel",
-                None,
-                {
-                    "format": ["txt"],
-                    "to": ["test@example.org"],
-                    "cc": [],
-                    "bcc": [],
-                    "subject": None,
-                    "in_reply_to": None,
-                    "template": None,
-                },
-            ],
-            countdown=18000,
-        )
 
     @mock.patch("taskqueue.tasks.report.send_build_report")
     def test_post_build_report_correct(self, mock_schedule):
@@ -312,7 +186,7 @@ class TestSendHandler(TestHandlerBase):
 
     def test_check_status(self):
         when = datetime.datetime.now()
-        for report_type in ['build', 'boot']:
+        for report_type in ['build', 'test', 'bisect']:
             for errors in [True, False]:
                 reason, status_code = sendh._check_status(
                     report_type, errors, when)
