@@ -107,8 +107,6 @@ def create_batch_operation(json_obj, db_options):
             elif resource:
                 if resource == models.COUNT_COLLECTION:
                     batch_op = batchop.BatchCountOperation()
-                elif resource == models.BOOT_COLLECTION:
-                    batch_op = batchop.BatchBootOperation()
                 elif resource == models.JOB_COLLECTION:
                     batch_op = batchop.BatchJobOperation()
                 elif resource == models.BUILD_COLLECTION:

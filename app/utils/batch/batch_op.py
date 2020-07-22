@@ -210,14 +210,6 @@ class BatchOperation(object):
         return self.prepare_response(result)
 
 
-class BatchBootOperation(BatchOperation):
-    """A batch operation for the `boot` collection."""
-
-    def __init__(self):
-        super(BatchBootOperation, self).__init__()
-        self.valid_keys = models.BOOT_VALID_KEYS
-
-
 class BatchJobOperation(BatchOperation):
     """A batch operation for the `job` collection."""
 
