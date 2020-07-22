@@ -47,7 +47,6 @@ def test_modules():
         "handlers.tests.test_upload_handler",
         "handlers.tests.test_version_handler",
         "models.tests.test_bisect_model",
-        "models.tests.test_boot_model",
         "models.tests.test_build_model",
         "models.tests.test_error_log_model",
         "models.tests.test_error_summary_model",

@@ -34,7 +34,6 @@ TEST_REPORT_FIELDS = [
     models.ARCHITECTURE_KEY,
     models.BOARD_INSTANCE_KEY,
     models.BOARD_KEY,
-    models.BOOT_ID_KEY,
     models.BOOT_LOG_HTML_KEY,
     models.BOOT_LOG_KEY,
     models.BUILD_ID_KEY,

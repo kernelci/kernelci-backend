@@ -74,7 +74,7 @@ class TestCountHandler(TestHandlerBase):
 
     def test_get_count_collection(self):
         headers = {"Authorization": "foo"}
-        response = self.fetch("/count/boot", headers=headers)
+        response = self.fetch("/count/build", headers=headers)
 
         self.assertEqual(response.code, 200)
         self.assertEqual(
@@ -82,7 +82,7 @@ class TestCountHandler(TestHandlerBase):
 
     def test_get_count_collection_with_query(self):
         headers = {"Authorization": "foo"}
-        response = self.fetch("/count/boot?board=foo", headers=headers)
+        response = self.fetch("/count/build?arch=foo", headers=headers)
 
         self.assertEqual(response.code, 200)
         self.assertEqual(

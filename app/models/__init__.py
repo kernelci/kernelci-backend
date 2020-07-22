@@ -44,16 +44,11 @@ BOARD_INSTANCE_KEY = "board_instance"
 BOARD_KEY = "board"
 BOOTLOADER_TYPE_KEY = "bootloader"
 BOOTLOADER_VERSION_KEY = "bootloader_version"
-BOOT_ID_KEY = "boot_id"
-BOOT_JOB_ID_KEY = "boot_job_id"
-BOOT_JOB_PATH_KEY = "boot_job_path"
-BOOT_JOB_URL_KEY = "boot_job_url"
 BOOT_LOAD_ADDR_KEY = "loadaddr"
 BOOT_LOG_HTML_KEY = "boot_log_html"
 BOOT_LOG_KEY = "boot_log"
 BOOT_RESULT_DESC_KEY = "boot_result_description"
 BOOT_RESULT_KEY = "boot_result"
-BOOT_RETRIES_KEY = "boot_retries"
 BOOT_TIME_KEY = "boot_time"
 BOOT_WARNINGS_KEY = "boot_warnings"
 BUILD_COUNTS_KEY = "build_counts"
@@ -203,7 +198,6 @@ WARNINGS_COUNT_KEY = "warnings_count"
 WARNINGS_KEY = "warnings"
 
 # Email reporting control fields.
-SEND_BOOT_REPORT_KEY = "boot_report"
 SEND_BUILD_REPORT_KEY = "build_report"
 REPORT_TYPE_KEY = "report_type"
 REPORT_SEND_TO_KEY = "send_to"
@@ -257,7 +251,6 @@ DISTINCT_KEY = "distinct"
 UNIQUE_KEY = "unique"
 
 # Collection names.
-BOOT_COLLECTION = "boot"
 BUILD_COLLECTION = "build"
 COUNT_COLLECTION = "count"
 JOB_COLLECTION = "job"
@@ -275,14 +268,12 @@ DAILY_STATS_COLLECTION = "daily_stats"
 # Delta collections.
 JOB_DELTA_COLLECTION = "job_delta"
 BUILD_DELTA_COLLECTION = "build_delta"
-BOOT_DELTA_COLLECTION = "boot_delta"
 
 # Build types.
 KERNEL_BUILD_TYPE = "kernel"
 
 # Report types.
 BUILD_REPORT = "build"
-BOOT_REPORT = "boot"
 BISECT_REPORT = "bisect"
 TEST_REPORT = "test"
 
@@ -329,14 +320,6 @@ VALID_BUILD_STATUS = [
     UNKNOWN_STATUS
 ]
 
-# Valid boot status.
-VALID_BOOT_STATUS = [
-    FAIL_STATUS,
-    OFFLINE_STATUS,
-    PASS_STATUS,
-    UNTRIED_STATUS
-]
-
 # Valid job status.
 VALID_JOB_STATUS = [
     BUILD_STATUS,
@@ -365,7 +348,6 @@ VALID_EMAIL_FORMATS = [
 
 # List of all available collections.
 COLLECTIONS = [
-    BOOT_COLLECTION,
     BUILD_COLLECTION,
     COUNT_COLLECTION,
     DAILY_STATS_COLLECTION,
@@ -377,7 +359,6 @@ COLLECTIONS = [
 
 # Slightly different then above: this is used only for the /count API.
 COUNT_COLLECTIONS = [
-    BOOT_COLLECTION,
     BUILD_COLLECTION,
     JOB_COLLECTION,
     TEST_CASE_COLLECTION,
@@ -391,7 +372,6 @@ COUNT_VALID_KEYS = {
         ARCHITECTURE_KEY,
         BOARD_INSTANCE_KEY,
         BOARD_KEY,
-        BOOT_ID_KEY,
         BUILD_ENVIRONMENT_KEY,
         BUILD_ID_KEY,
         COMPILER_KEY,
@@ -432,123 +412,6 @@ COUNT_VALID_KEYS = {
         TIME_KEY,
         VERSION_KEY,
         WARNINGS_KEY,
-    ]
-}
-
-BOOT_VALID_KEYS = {
-    "POST": {
-        MANDATORY_KEYS: [
-            ARCHITECTURE_KEY,
-            BOARD_KEY,
-            DEFCONFIG_KEY,
-            GIT_BRANCH_KEY,
-            JOB_KEY,
-            KERNEL_KEY,
-            LAB_NAME_KEY,
-            VERSION_KEY,
-            BUILD_ENVIRONMENT_KEY
-        ],
-        ACCEPTED_KEYS: [
-            ARCHITECTURE_KEY,
-            BOARD_INSTANCE_KEY,
-            BOARD_KEY,
-            BOOTLOADER_TYPE_KEY,
-            BOOTLOADER_VERSION_KEY,
-            BOOT_JOB_ID_KEY,
-            BOOT_JOB_PATH_KEY,
-            BOOT_JOB_URL_KEY,
-            BOOT_LOAD_ADDR_KEY,
-            BOOT_LOG_HTML_KEY,
-            BOOT_LOG_KEY,
-            BOOT_RESULT_DESC_KEY,
-            BOOT_RESULT_KEY,
-            BOOT_RETRIES_KEY,
-            BOOT_TIME_KEY,
-            BOOT_WARNINGS_KEY,
-            BUILD_ENVIRONMENT_KEY,
-            CHAINLOADER_TYPE_KEY,
-            COMPILER_KEY,
-            COMPILER_VERSION_EXT_KEY,
-            COMPILER_VERSION_KEY,
-            DEFCONFIG_FULL_KEY,
-            DEFCONFIG_KEY,
-            DTB_ADDR_KEY,
-            DTB_APPEND_KEY,
-            DTB_KEY,
-            EMAIL_KEY,
-            ENDIANNESS_KEY,
-            FASTBOOT_CMD_KEY,
-            FASTBOOT_KEY,
-            FILESYSTEM_TYPE_KEY,
-            FILE_SERVER_RESOURCE_KEY,
-            FILE_SERVER_URL_KEY,
-            GIT_BRANCH_KEY,
-            GIT_COMMIT_KEY,
-            GIT_DESCRIBE_KEY,
-            GIT_URL_KEY,
-            ID_KEY,
-            IMAGE_TYPE_KEY,
-            INITRD_ADDR_KEY,
-            INITRD_KEY,
-            JOB_KEY,
-            KERNEL_IMAGE_KEY,
-            KERNEL_IMAGE_SIZE_KEY,
-            KERNEL_KEY,
-            LAB_NAME_KEY,
-            MACH_KEY,
-            METADATA_KEY,
-            QEMU_COMMAND_KEY,
-            QEMU_KEY,
-            STATUS_KEY,
-            UIMAGE_ADDR_KEY,
-            UIMAGE_KEY,
-            VERSION_KEY
-        ]
-    },
-    "GET": [
-        ARCHITECTURE_KEY,
-        BOARD_KEY,
-        BOOTLOADER_TYPE_KEY,
-        BOOTLOADER_VERSION_KEY,
-        BOOT_JOB_ID_KEY,
-        BOOT_JOB_URL_KEY,
-        BUILD_ENVIRONMENT_KEY,
-        BUILD_ID_KEY,
-        CHAINLOADER_TYPE_KEY,
-        COMPILER_KEY,
-        COMPILER_VERSION_KEY,
-        CREATED_KEY,
-        DEFCONFIG_FULL_KEY,
-        DEFCONFIG_KEY,
-        ENDIANNESS_KEY,
-        FILESYSTEM_TYPE_KEY,
-        GIT_BRANCH_KEY,
-        GIT_COMMIT_KEY,
-        GIT_DESCRIBE_KEY,
-        GIT_URL_KEY,
-        ID_KEY,
-        JOB_ID_KEY,
-        JOB_KEY,
-        KERNEL_IMAGE_KEY,
-        KERNEL_IMAGE_SIZE_KEY,
-        KERNEL_KEY,
-        LAB_NAME_KEY,
-        MACH_KEY,
-        RETRIES_KEY,
-        STATUS_KEY,
-        WARNINGS_KEY
-    ],
-    "DELETE": [
-        BOARD_KEY,
-        BOOT_JOB_ID_KEY,
-        BOOT_JOB_URL_KEY,
-        DEFCONFIG_FULL_KEY,
-        BUILD_ID_KEY,
-        DEFCONFIG_KEY,
-        ID_KEY,
-        JOB_ID_KEY,
-        JOB_KEY,
-        KERNEL_KEY,
     ]
 }
 
@@ -778,7 +641,6 @@ SEND_VALID_KEYS = {
             REPORT_BCC_KEY,
             REPORT_CC_KEY,
             REPORT_SEND_TO_KEY,
-            SEND_BOOT_REPORT_KEY,
             SEND_BUILD_REPORT_KEY,
             SUBJECT_KEY,
             EMAIL_TEMPLATE,
@@ -798,7 +660,6 @@ SEND_VALID_KEYS = {
 
 BISECT_VALID_KEYS = {
     "GET": [
-        BOOT_ID_KEY,
         COLLECTION_KEY,
         COMPARE_TO_KEY,
         BUILD_ID_KEY
@@ -840,7 +701,6 @@ TEST_GROUP_VALID_KEYS = {
             ARCHITECTURE_KEY,
             BOARD_INSTANCE_KEY,
             BOARD_KEY,
-            BOOT_ID_KEY,
             BUILD_ENVIRONMENT_KEY,
             CREATED_KEY,
             DEFCONFIG_FULL_KEY,
@@ -872,7 +732,6 @@ TEST_GROUP_VALID_KEYS = {
         ARCHITECTURE_KEY,
         BOARD_INSTANCE_KEY,
         BOARD_KEY,
-        BOOT_ID_KEY,
         BUILD_ENVIRONMENT_KEY,
         CREATED_KEY,
         DEFCONFIG_FULL_KEY,
@@ -890,7 +749,6 @@ TEST_GROUP_VALID_KEYS = {
         ARCHITECTURE_KEY,
         BOARD_INSTANCE_KEY,
         BOARD_KEY,
-        BOOT_ID_KEY,
         BUILD_ENVIRONMENT_KEY,
         BUILD_ID_KEY,
         CREATED_KEY,
@@ -990,7 +848,6 @@ STATISTICS_VALID_KEYS = {
 # Used by the DistinctHandler to handle query arguments on the various
 # supported resources.
 DISTINCT_VALID_KEYS = {
-    BOOT_COLLECTION: BOOT_VALID_KEYS,
     BUILD_COLLECTION: BUILD_VALID_KEYS,
     JOB_COLLECTION: JOB_VALID_KEYS,
     TEST_CASE_COLLECTION: TEST_CASE_VALID_KEYS,
@@ -1029,28 +886,10 @@ DISTINCT_VALID_FIELDS = {
         KERNEL_KEY,
         KERNEL_VERSION_KEY
     ],
-    BOOT_COLLECTION: [
-        ARCHITECTURE_KEY,
-        BOARD_INSTANCE_KEY,
-        BOARD_KEY,
-        BUILD_ENVIRONMENT_KEY,
-        BOOT_JOB_URL_KEY,
-        DEFCONFIG_FULL_KEY,
-        DEFCONFIG_KEY,
-        ENDIANNESS_KEY,
-        GIT_BRANCH_KEY,
-        GIT_COMMIT_KEY,
-        GIT_DESCRIBE_KEY,
-        JOB_KEY,
-        KERNEL_KEY,
-        LAB_NAME_KEY,
-        MACH_KEY
-    ],
     TEST_GROUP_COLLECTION: [
         ARCHITECTURE_KEY,
         BOARD_INSTANCE_KEY,
         BOARD_KEY,
-        BOOT_ID_KEY,
         BUILD_ENVIRONMENT_KEY,
         BUILD_ID_KEY,
         DEFCONFIG_FULL_KEY,
@@ -1096,43 +935,6 @@ LAVA_CALLBACK_VALID_KEYS = {
 }
 
 LAVA_CALLBACK_VALID_METADATA_KEYS = {
-    "boot": {
-        MANDATORY_KEYS: [
-            "git.branch",
-            "kernel.tree",
-            "kernel.version",
-            "platform.name",
-            "job.build_environment",
-        ],
-        ACCEPTED_KEYS: [
-            "device.type",
-            "git.commit",
-            "git.describe",
-            "git.url",
-            "image.type",
-            "image.url",
-            "job.arch",
-            "job.dtb_url",
-            "job.file_server_resource",
-            "job.initrd_url",
-            "job.kernel_image",
-            "job.kernel_url",
-            "job.modules_url",
-            "job.name",
-            "job.nfsrootfs_url",
-            "job.original",
-            "kernel.arch_defconfig",
-            "kernel.defconfig",
-            "kernel.defconfig_base",
-            "kernel.endian",
-            "platform.dtb",
-            "platform.dtb_short",
-            "platform.fastboot",
-            "platform.mach",
-            "test.plan",
-            "test.plan_variant",
-        ],
-    },
     "test": {
         MANDATORY_KEYS: [
             "git.branch",
