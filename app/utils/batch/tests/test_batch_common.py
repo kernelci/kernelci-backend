@@ -23,7 +23,6 @@
 import unittest
 
 from utils.batch.batch_op import (
-    BatchBootOperation,
     BatchBuildOperation,
     BatchCountOperation,
     BatchDistinctOperation,
@@ -82,7 +81,7 @@ class TestBatch(unittest.TestCase):
 
     def test_create_batch_op_generic(self):
         json_obj = {
-            "resource": "boot",
+            "resource": "build",
             "query": "status=FAIL&job=mainline",
             "operation_id": "foo"
         }
@@ -116,17 +115,6 @@ class TestBatch(unittest.TestCase):
 
         op = create_batch_operation(json_obj, {})
         self.assertIsNone(op)
-
-    def test_create_batch_boot_op(self):
-        json_obj = {
-            "resource": "boot",
-            "query": "status=PASS&job=foo",
-            "operation_id": "op_id"
-        }
-
-        op = create_batch_operation(json_obj, {})
-        self.assertIsInstance(op, BatchBootOperation)
-        self.assertEqual("boot", op.resource)
 
     def test_create_batch_job_op(self):
         json_obj = {
@@ -174,11 +162,11 @@ class TestBatch(unittest.TestCase):
 
     def test_create_batch_distinct(self):
         json_obj = {
-            "resource": "boot",
-            "distinct": "board",
-            "operation_id": "distinct-board"
+            "resource": "build",
+            "distinct": "arch",
+            "operation_id": "distinct-arch"
         }
 
         op = create_batch_operation(json_obj, {})
         self.assertIsInstance(op, BatchDistinctOperation)
-        self.assertEqual("board", op.distinct)
+        self.assertEqual("arch", op.distinct)
