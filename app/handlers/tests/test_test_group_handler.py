@@ -218,14 +218,13 @@ class TestTestGroupHandler(TestHandlerBase):
         body = json.dumps(
             dict(
                 name="test", lab_name="lab_name", version="1.0",
-                build_environment="build-environment",
+                build_environment="build-environment", device_type="device",
                 arch="x86", defconfig="defconfig", git_branch="git_branch",
-                job="job", kernel="kernel")
+                git_commit="commit", job="job", kernel="kernel")
         )
 
         response = self.fetch(
             "/test/group", method="POST", headers=headers, body=body)
 
         self.assertEqual(response.code, 500)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
+        self.assertEqual(response.headers["Content-Type"], self.content_type)

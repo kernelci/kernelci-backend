@@ -47,12 +47,16 @@ except NameError:
 
 # Keys that need to be checked for None or null value.
 NON_NULL_KEYS_GROUP = [
+    models.ARCHITECTURE_KEY,
+    models.BUILD_ENVIRONMENT_KEY,
     models.DEFCONFIG_KEY,
     models.DEVICE_TYPE_KEY,
+    models.GIT_BRANCH_KEY,
+    models.GIT_COMMIT_KEY,
     models.JOB_KEY,
     models.KERNEL_KEY,
-    models.GIT_COMMIT_KEY,
-    models.BUILD_ENVIRONMENT_KEY,
+    models.LAB_NAME_KEY,
+    models.NAME_KEY,
 ]
 
 NON_NULL_KEYS_CASE = [
@@ -67,10 +71,10 @@ SPEC_TEST_GROUP = {
     models.DEVICE_TYPE_KEY: "device_type",
     models.BUILD_ENVIRONMENT_KEY: "build_environment",
     models.GIT_BRANCH_KEY: "git_branch",
+    models.GIT_COMMIT_KEY: "git_commit",
     models.INITRD_KEY: "initrd",
     models.JOB_KEY: "job",
     models.KERNEL_KEY: "kernel",
-    models.GIT_COMMIT_KEY: "git_commit",
     models.LAB_NAME_KEY: "lab_name",
     models.NAME_KEY: "name",
     models.PLAN_VARIANT_KEY: "plan_variant",
@@ -156,8 +160,8 @@ def _add_test_log(dir_path, filename, log_data):
         logfile.write(log_data)
 
 
-def _check_for_null(test_dict, NON_NULL_KEYS):
-    """Check if the NON_NULL_KEYS dictionary has values resembling None in its
+def _check_for_null(test_dict, keys):
+    """Check if the keys dictionary has values resembling None in its
     mandatory keys.
 
     Values must be different than:
@@ -167,11 +171,11 @@ def _check_for_null(test_dict, NON_NULL_KEYS):
 
     :param test_dict: The dictionary to check.
     :type test_dict: dict
-    :param NON_NULL_KEYS: The dict of keys to parse and check for non null.
-    :type NON_NULL_KEYS: dict
+    :param keys: The dict of keys to parse and check for non null.
+    :type keys: dict
     :raise TestValidationError if any of the keys matches the condition.
     """
-    for key in NON_NULL_KEYS:
+    for key in keys:
         val = test_dict.get(key)
         if (val is None or
             (isinstance(val, basestring) and
