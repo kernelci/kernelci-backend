@@ -939,7 +939,7 @@ LAVA_CALLBACK_VALID_METADATA_KEYS = {
             "job.arch",
             "job.build_environment",
             "kernel.defconfig",
-            "kernel.defconfig_base",
+            "kernel.defconfig_full",
             "kernel.tree",
             "test.plan",
         ],
