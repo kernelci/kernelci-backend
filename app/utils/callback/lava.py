@@ -101,7 +101,6 @@ META_DATA_MAP_TEST = {
     models.KERNEL_KEY: "kernel.version",
     models.KERNEL_IMAGE_KEY: "job.kernel_image",
     models.MACH_KEY: "platform.mach",
-    models.IMAGE_TYPE_KEY: "image.type",
     models.PLAN_KEY: "test.plan",
     models.PLAN_VARIANT_KEY: "test.plan_variant",
     models.BUILD_ENVIRONMENT_KEY: "job.build_environment",

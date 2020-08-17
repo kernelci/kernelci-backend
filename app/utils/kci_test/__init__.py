@@ -377,7 +377,6 @@ def _update_test_group_doc_from_json(group_doc, group_dict, errors):
     group_doc.git_describe = group_dict.get(models.GIT_DESCRIBE_KEY)
     group_doc.git_url = group_dict.get(models.GIT_URL_KEY)
     group_doc.index = group_dict.get(models.INDEX_KEY)
-    group_doc.image_type = group_dict.get(models.IMAGE_TYPE_KEY)
     group_doc.initrd = group_dict.get(models.INITRD_KEY)
     group_doc.initrd_info = group_dict.get(models.INITRD_INFO_KEY)
     group_doc.job = group_dict.get(models.JOB_KEY)
