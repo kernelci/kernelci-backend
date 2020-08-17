@@ -79,7 +79,7 @@ class TestGroupHandler(htbase.TestBaseHandler):
                     directory_path = os.path.join(*path_parts)
 
                     name = "-".join((group_get(models.NAME_KEY),
-                                     group_get(models.BOARD_KEY)))
+                                     group_get(models.DEVICE_TYPE_KEY)))
                     ext = 'txt'
                     filename = "{}.{}".format(name, ext)
                     kci_test._add_test_log(directory_path,

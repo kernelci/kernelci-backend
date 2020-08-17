@@ -33,7 +33,7 @@ HTML_HEAD = """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 <head>
-  <title>Boot log: {board}</title>
+  <title>Boot log: {device_type}</title>
   <style type="text/css">
   body {{ background-color: black; color: white; }}
   pre {{ font-size: 0.8em; }}
@@ -61,15 +61,15 @@ HTML_HEAD = """\
   </style>
 </head>
 <body>
-<h1>Boot log: {board}</h1>
+<h1>Boot log: {device_type}</h1>
 """
 
 # datetime follows this format: 2018-12-04T10:44:15.938887
 DT_RE = re.compile(r"([0-9-]+)T([0-9:.]+)")
 
 
-def run(log, boot, txt, html):
-    boot_result = boot.get("boot_result", "Unknown")
+def run(log, meta, txt, html):
+    boot_result = meta.get("boot_result", "Unknown")
     if boot_result == "PASS":
         boot_result_html = "<span class=\"pass\">PASS</span>"
     elif boot_result == "FAIL":
@@ -156,7 +156,7 @@ def run(log, boot, txt, html):
         elif level == "info" and msg.startswith("Start time: "):
             start_ts = msg
 
-    html.write(HTML_HEAD.format(board=boot["board"]))
+    html.write(HTML_HEAD.format(device_type=meta["device_type"]))
     html.write("<ul class=\"results\">")
     results = {
         "Boot result": boot_result_html,
@@ -180,19 +180,19 @@ def main(args):
     with open(args.log, "r") as log_yaml:
         log = yaml.load(log_yaml, Loader=yaml.CLoader)
 
-    with open(args.meta, "r") as boot_json:
-        boot = json.load(boot_json)
+    with open(args.meta, "r") as meta_json:
+        meta = json.load(meta_json)
 
     with open(args.txt, "w") as txt, open(args.html, "w") as html:
-        run(log, boot, txt, html)
+        run(log, meta, txt, html)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("Generate HTML page from kernel boot log")
+    parser = argparse.ArgumentParser("Generate HTML page from kernel job log")
     parser.add_argument("--log", required=True,
-                        help="Path to a YAML file with the kernel boot log")
+                        help="Path to a YAML file with the kernel job log")
     parser.add_argument("--meta", required=True,
-                        help="Path to a JSON file with the boot meta-data")
+                        help="Path to a JSON file with the job meta-data")
     parser.add_argument("--txt", required=True,
                         help="Path to the output text file")
     parser.add_argument("--html", required=True,

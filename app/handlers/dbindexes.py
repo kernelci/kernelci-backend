@@ -261,7 +261,7 @@ INDEX_SPECS = {
         ],
         [
             (models.ARCHITECTURE_KEY, pymongo.ASCENDING),
-            (models.BOARD_KEY, pymongo.ASCENDING),
+            (models.DEVICE_TYPE_KEY, pymongo.ASCENDING),
             (models.DEFCONFIG_FULL_KEY, pymongo.ASCENDING),
             (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
             (models.JOB_KEY, pymongo.ASCENDING),

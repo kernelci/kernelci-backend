@@ -41,8 +41,8 @@ L10N = gettext.translation(models.I18N_DOMAIN, fallback=True)
 
 DEFAULT_UNIQUE_KEYS = [
     models.ARCHITECTURE_KEY,
-    models.BOARD_KEY,
     models.DEFCONFIG_FULL_KEY,
+    models.DEVICE_TYPE_KEY,
     models.MACH_KEY,
     models.BUILD_ENVIRONMENT_KEY
 ]
