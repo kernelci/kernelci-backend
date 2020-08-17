@@ -87,8 +87,8 @@ TEST_CASE_NAME_EXTRA = {
 
 META_DATA_MAP_TEST = {
     models.ARCHITECTURE_KEY: "job.arch",
-    models.DEFCONFIG_KEY: "kernel.defconfig_base",
-    models.DEFCONFIG_FULL_KEY: "kernel.defconfig",
+    models.DEFCONFIG_KEY: "kernel.defconfig",
+    models.DEFCONFIG_FULL_KEY: "kernel.defconfig_full",
     models.DEVICE_TYPE_KEY: "device.type",
     models.DTB_KEY: "platform.dtb",
     models.ENDIANNESS_KEY: "kernel.endian",
