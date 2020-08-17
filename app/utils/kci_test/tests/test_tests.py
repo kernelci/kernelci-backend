@@ -64,8 +64,6 @@ class TestTests(unittest.TestCase):
             models.TEST_CASES_KEY: test_cases,
             models.BUILD_ENVIRONMENT_KEY: "concrete",
         }
-        # ToDo: remove BOARD_KEY as it's redundant, use DEVICE_TYPE_KEY instead
-        group_data[models.BOARD_KEY] = group_data[models.DEVICE_TYPE_KEY]
         # ToDo: make TIME_KEY not required
         group_data[models.TIME_KEY] = 123456789.0
         return group_data

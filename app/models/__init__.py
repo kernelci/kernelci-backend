@@ -371,7 +371,6 @@ COUNT_VALID_KEYS = {
     "GET": [
         ARCHITECTURE_KEY,
         BOARD_INSTANCE_KEY,
-        BOARD_KEY,
         BUILD_ENVIRONMENT_KEY,
         BUILD_ID_KEY,
         COMPILER_KEY,
@@ -700,7 +699,6 @@ TEST_GROUP_VALID_KEYS = {
         ACCEPTED_KEYS: [
             ARCHITECTURE_KEY,
             BOARD_INSTANCE_KEY,
-            BOARD_KEY,
             BUILD_ENVIRONMENT_KEY,
             CREATED_KEY,
             DEFCONFIG_FULL_KEY,
@@ -731,7 +729,6 @@ TEST_GROUP_VALID_KEYS = {
     "PUT": [
         ARCHITECTURE_KEY,
         BOARD_INSTANCE_KEY,
-        BOARD_KEY,
         BUILD_ENVIRONMENT_KEY,
         CREATED_KEY,
         DEFCONFIG_FULL_KEY,
@@ -748,7 +745,6 @@ TEST_GROUP_VALID_KEYS = {
     "GET": [
         ARCHITECTURE_KEY,
         BOARD_INSTANCE_KEY,
-        BOARD_KEY,
         BUILD_ENVIRONMENT_KEY,
         BUILD_ID_KEY,
         CREATED_KEY,
@@ -889,11 +885,11 @@ DISTINCT_VALID_FIELDS = {
     TEST_GROUP_COLLECTION: [
         ARCHITECTURE_KEY,
         BOARD_INSTANCE_KEY,
-        BOARD_KEY,
         BUILD_ENVIRONMENT_KEY,
         BUILD_ID_KEY,
         DEFCONFIG_FULL_KEY,
         DEFCONFIG_KEY,
+        DEVICE_TYPE_KEY,
         GIT_BRANCH_KEY,
         INITRD_KEY,
         INITRD_INFO_KEY,
@@ -937,6 +933,7 @@ LAVA_CALLBACK_VALID_KEYS = {
 LAVA_CALLBACK_VALID_METADATA_KEYS = {
     "test": {
         MANDATORY_KEYS: [
+            "device.type",
             "git.branch",
             "git.commit",
             "job.arch",
@@ -944,11 +941,9 @@ LAVA_CALLBACK_VALID_METADATA_KEYS = {
             "kernel.defconfig",
             "kernel.defconfig_base",
             "kernel.tree",
-            "platform.name",
             "test.plan",
         ],
         ACCEPTED_KEYS: [
-            "device.type",
             "git.describe",
             "git.url",
             "image.type",

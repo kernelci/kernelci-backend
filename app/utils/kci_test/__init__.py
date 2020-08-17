@@ -47,8 +47,8 @@ except NameError:
 
 # Keys that need to be checked for None or null value.
 NON_NULL_KEYS_GROUP = [
-    models.BOARD_KEY,
     models.DEFCONFIG_KEY,
+    models.DEVICE_TYPE_KEY,
     models.JOB_KEY,
     models.KERNEL_KEY,
     models.GIT_COMMIT_KEY,
@@ -62,9 +62,9 @@ NON_NULL_KEYS_CASE = [
 
 SPEC_TEST_GROUP = {
     models.ARCHITECTURE_KEY: "arch",
-    models.BOARD_KEY: "board",
     models.DEFCONFIG_FULL_KEY: "defconfig_full",
     models.DEFCONFIG_KEY: "defconfig",
+    models.DEVICE_TYPE_KEY: "device_type",
     models.BUILD_ENVIRONMENT_KEY: "build_environment",
     models.GIT_BRANCH_KEY: "git_branch",
     models.INITRD_KEY: "initrd",
@@ -359,7 +359,6 @@ def _update_test_group_doc_from_json(group_doc, group_dict, errors):
         group_doc.time = _seconds_as_datetime(seconds)
 
     group_doc.arch = group_dict.get(models.ARCHITECTURE_KEY)
-    group_doc.board = group_dict.get(models.BOARD_KEY)
     group_doc.board_instance = group_dict.get(models.BOARD_INSTANCE_KEY)
     group_doc.boot_log = group_dict.get(models.BOOT_LOG_KEY)
     group_doc.boot_log_html = group_dict.get(models.BOOT_LOG_HTML_KEY)

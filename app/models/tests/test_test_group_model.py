@@ -36,7 +36,6 @@ class TestTestGroupModel(unittest.TestCase):
         test_group = mtgroup.TestGroupDocument("name", "lab-name")
 
         test_group.arch = "arm"
-        test_group.board = "board"
         test_group.board_instance = 1
         test_group.boot_log = "boot-log"
         test_group.boot_log_html = "boot-log-html"
@@ -80,7 +79,6 @@ class TestTestGroupModel(unittest.TestCase):
         expected = {
             "_id": "id",
             "arch": "arm",
-            "board": "board",
             "board_instance": 1,
             "boot_log": "boot-log",
             "boot_log_html": "boot-log-html",
@@ -142,7 +140,6 @@ class TestTestGroupModel(unittest.TestCase):
         group_json = {
             "_id": "id",
             "arch": "arm",
-            "board": "board",
             "board_instance": 1,
             "boot_log": None,
             "boot_log_html": None,

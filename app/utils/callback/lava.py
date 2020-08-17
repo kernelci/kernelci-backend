@@ -87,7 +87,6 @@ TEST_CASE_NAME_EXTRA = {
 
 META_DATA_MAP_TEST = {
     models.ARCHITECTURE_KEY: "job.arch",
-    models.BOARD_KEY: "platform.name",
     models.DEFCONFIG_KEY: "kernel.defconfig_base",
     models.DEFCONFIG_FULL_KEY: "kernel.defconfig",
     models.DEVICE_TYPE_KEY: "device.type",
@@ -287,7 +286,7 @@ def _add_test_log(meta, log, suite):
     dir_path = meta[models.DIRECTORY_PATH]
 
     utils.LOG.info("Generating {} log files in {}".format(suite, dir_path))
-    file_name = "-".join([suite, meta[models.BOARD_KEY]])
+    file_name = "-".join([suite, meta[models.DEVICE_TYPE_KEY]])
     files = tuple(".".join([file_name, ext]) for ext in ["txt", "html"])
     meta[models.BOOT_LOG_KEY], meta[models.BOOT_LOG_HTML_KEY] = files
     txt_path, html_path = (os.path.join(dir_path, f) for f in files)
@@ -368,7 +367,7 @@ def _store_lava_json(job_data, meta, base_path=utils.BASE_PATH):
     :type base_path: string
     """
 
-    file_name = "-".join(["lava-json", meta[models.BOARD_KEY]])
+    file_name = "-".join(["lava-json", meta[models.DEVICE_TYPE_KEY]])
     file_name = ".".join([file_name, "json"])
 
     dir_path = meta[models.DIRECTORY_PATH]
@@ -481,12 +480,12 @@ def _add_test_results(group, results, log_line_data):
         sub_group.update({
             k: group[k] for k in [
                 models.ARCHITECTURE_KEY,
-                models.BOARD_KEY,
                 models.BOOT_LOG_KEY,
                 models.BOOT_LOG_HTML_KEY,
                 models.BUILD_ENVIRONMENT_KEY,
                 models.DEFCONFIG_FULL_KEY,
                 models.DEFCONFIG_KEY,
+                models.DEVICE_TYPE_KEY,
                 models.DTB_KEY,
                 models.FILE_SERVER_RESOURCE_KEY,
                 models.GIT_BRANCH_KEY,

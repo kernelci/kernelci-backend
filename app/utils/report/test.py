@@ -33,7 +33,6 @@ import yaml
 TEST_REPORT_FIELDS = [
     models.ARCHITECTURE_KEY,
     models.BOARD_INSTANCE_KEY,
-    models.BOARD_KEY,
     models.BOOT_LOG_HTML_KEY,
     models.BOOT_LOG_KEY,
     models.BUILD_ID_KEY,
@@ -166,7 +165,7 @@ def _create_summaries(groups):
     ]
     rows = [
         (
-            g['board'],
+            g['device_type'],
             g['arch'],
             g['lab_name'],
             g['build_environment'],
@@ -228,7 +227,7 @@ def create_test_report(db_options, data, email_format, email_template=None,
         spec=group_spec,
         fields=TEST_REPORT_FIELDS,
         sort=[
-            (models.BOARD_KEY, pymongo.ASCENDING),
+            (models.DEVICE_TYPE_KEY, pymongo.ASCENDING),
             (models.BUILD_ENVIRONMENT_KEY, pymongo.ASCENDING),
             (models.DEFCONFIG_KEY, pymongo.ASCENDING),
             (models.LAB_NAME_KEY, pymongo.ASCENDING),
