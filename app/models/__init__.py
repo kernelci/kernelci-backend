@@ -115,7 +115,6 @@ GIT_URL_KEY = "git_url"
 GTE_KEY = "gte"
 HIERARCHY_KEY = "hierarchy"
 ID_KEY = "_id"
-IMAGE_TYPE_KEY = "image_type"
 INDEX_KEY = "index"
 INITRD_ADDR_KEY = "initrd_addr"
 INITRD_INFO_KEY = "initrd_info"
@@ -709,7 +708,6 @@ TEST_GROUP_VALID_KEYS = {
             FILE_SERVER_RESOURCE_KEY,
             GIT_COMMIT_KEY,
             GIT_BRANCH_KEY,
-            IMAGE_TYPE_KEY,
             INDEX_KEY,
             INITRD_KEY,
             INITRD_INFO_KEY,
@@ -893,7 +891,6 @@ DISTINCT_VALID_FIELDS = {
         GIT_BRANCH_KEY,
         INITRD_KEY,
         INITRD_INFO_KEY,
-        IMAGE_TYPE_KEY,
         JOB_ID_KEY,
         JOB_KEY,
         KERNEL_KEY,
@@ -946,7 +943,6 @@ LAVA_CALLBACK_VALID_METADATA_KEYS = {
         ACCEPTED_KEYS: [
             "git.describe",
             "git.url",
-            "image.type",
             "image.url",
             "job.dtb_url",
             "job.file_server_resource",

@@ -59,7 +59,6 @@ class TestTestGroupModel(unittest.TestCase):
         test_group.git_url = "git-url"
         test_group.id = "id"
         test_group.index = 1
-        test_group.image_type = "image_type"
         test_group.initrd = "initrd"
         test_group.initrd_info = "initrd-info"
         test_group.job = "job"
@@ -100,7 +99,6 @@ class TestTestGroupModel(unittest.TestCase):
             "git_commit": "git-commit",
             "git_describe": "git-describe",
             "git_url": "git-url",
-            "image_type": "image_type",
             "index": 1,
             "initrd": "initrd",
             "initrd_info": "initrd-info",
@@ -163,7 +161,6 @@ class TestTestGroupModel(unittest.TestCase):
             "git_url": "git_url",
             "initrd": "initrd",
             "index": 1,
-            "image_type": "image_type",
             "initrd_info": None,
             "job": "job",
             "job_id": "job_id",
