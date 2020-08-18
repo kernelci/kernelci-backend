@@ -485,12 +485,14 @@ def import_and_save_test_cases(group_doc, test_cases, database, errors, path):
     """
     ret_code = 500
 
-    if not all((group_doc, test_cases)):
-        return ret_code
-
     for test_case in test_cases:
         tc_doc = _parse_test_case_from_json(
             group_doc, test_case, database, errors, path)
+
+    for index, test_case in enumerate(test_cases, 1):
+        tc_doc = _parse_test_case_from_json(
+            group_doc, test_case, database, errors, path)
+        tc_doc.index = index
         if tc_doc:
             ret_code, tc_doc_id = save_or_update(
                 tc_doc, SPEC_TEST_CASE, models.TEST_CASE_COLLECTION,
@@ -593,7 +595,29 @@ def import_and_save_test_group(group, parent_id, database, errors, path=None):
 
     sub_groups = group.get(models.SUB_GROUPS_KEY)
     if sub_groups:
-        for sub_group in sub_groups:
+        for index, sub_group in enumerate(sub_groups, 1):
+            sub_group.update({
+                k: group.get(k) for k in [
+                    models.ARCHITECTURE_KEY,
+                    models.BOOT_LOG_KEY,
+                    models.BOOT_LOG_HTML_KEY,
+                    models.BUILD_ENVIRONMENT_KEY,
+                    models.DEFCONFIG_FULL_KEY,
+                    models.DEFCONFIG_KEY,
+                    models.DEVICE_TYPE_KEY,
+                    models.DTB_KEY,
+                    models.FILE_SERVER_RESOURCE_KEY,
+                    models.GIT_BRANCH_KEY,
+                    models.GIT_COMMIT_KEY,
+                    models.JOB_KEY,
+                    models.KERNEL_KEY,
+                    models.KERNEL_IMAGE_KEY,
+                    models.LAB_NAME_KEY,
+                    models.PLAN_VARIANT_KEY,
+                    models.TIME_KEY,
+                ]
+            })
+            sub_group[models.INDEX_KEY] = index
             sub_group_doc_id = import_and_save_test_group(
                 sub_group, group_doc_id, database, errors, path)
             if not sub_group_doc_id:
