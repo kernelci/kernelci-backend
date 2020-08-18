@@ -131,6 +131,7 @@ def save_or_update(doc, spec_map, collection, database, errors):
         ret_val, _ = utils.db.save(database, doc)
     else:
         ret_val, doc_id = utils.db.save(database, doc)
+        doc.id = doc_id
         utils.LOG.debug("New test document with id '%s'", doc_id)
 
     if ret_val == 500:
@@ -197,7 +198,7 @@ def _get_time_as_datetime(data):
     return test_datetime
 
 
-def _update_test_case_doc_from_json(case_doc, test_case, errors):
+def _update_test_case_doc_from_json(case_doc, group_doc, test_case, errors):
     """Update a TestCaseDocument from the provided test dictionary.
 
     This function does not return anything, the TestCaseDocument passed is
@@ -210,58 +211,30 @@ def _update_test_case_doc_from_json(case_doc, test_case, errors):
     :param errors: Where errors should be stored.
     :type errors: dict
     """
-    case_doc.time = _get_time_as_datetime(test_case)
-    case_doc.arch = test_case.get(models.ARCHITECTURE_KEY)
-    case_doc.build_environment = test_case.get(models.BUILD_ENVIRONMENT_KEY)
-    case_doc.defconfig_full = test_case.get(models.DEFCONFIG_FULL_KEY)
-    case_doc.device_type = test_case.get(models.DEVICE_TYPE_KEY)
-    case_doc.git_commit = test_case.get(models.GIT_COMMIT_KEY)
-    case_doc.git_branch = test_case.get(models.GIT_BRANCH_KEY)
+    case_doc.arch = group_doc.arch
+    case_doc.build_environment = group_doc.build_environment
+    case_doc.defconfig_full = group_doc.defconfig_full
+    case_doc.device_type = group_doc.device_type
+    case_doc.git_commit = group_doc.git_commit
+    case_doc.git_branch = group_doc.git_branch
+    case_doc.job = group_doc.job
+    case_doc.kernel = group_doc.kernel
+    case_doc.lab_name = group_doc.lab_name
+    case_doc.mach = group_doc.mach
+    case_doc.test_group_id = group_doc.id
+
     case_doc.index = test_case.get(models.INDEX_KEY)
-    case_doc.job = test_case.get(models.JOB_KEY)
-    case_doc.kernel = test_case.get(models.KERNEL_KEY)
-    case_doc.lab_name = test_case.get(models.LAB_NAME_KEY)
     case_doc.log_lines = test_case.get(models.LOG_LINES_KEY, [])
-    case_doc.mach = test_case.get(models.MACH_KEY)
     case_doc.measurements = test_case.get(models.MEASUREMENTS_KEY, [])
     case_doc.status = test_case[models.STATUS_KEY].upper()
+    case_doc.time = _get_time_as_datetime(test_case)
 
 
-def _update_test_case_doc_ids(ts_name, ts_id, case_doc, database):
-    """Update test case document test group IDs references.
-
-    :param ts_name: The test case name
-    :type ts_name: str
-    :param ts_id: The test case ID
-    :type ts_id: str
-    :param case_doc: The test case document to update.
-    :type case_doc: TestCaseDocument
-    :param database: The database connection to use.
-    """
-
-    # Make sure the test group ID provided is correct
-    ts_oid = bson.objectid.ObjectId(ts_id)
-    test_group_doc = utils.db.find_one2(database[models.TEST_GROUP_COLLECTION],
-                                        ts_oid,
-                                        [models.ID_KEY])
-    # If exists, update the test case
-    if test_group_doc:
-        case_doc.test_group_id = test_group_doc.get(models.ID_KEY)
-    else:
-        utils.LOG.error(
-            "No test group document with ID %s found for test case %s",
-            ts_oid, case_doc.name)
-        return None
-
-
-def _parse_test_case_from_json(group_name, group_doc_id, test_case,
-                               database, errors, path):
+def _parse_test_case_from_json(group_doc, test_case, database, errors, path):
     """Parse the test case report from a JSON object.
 
-    :param group_name: The test group name.
-    :type group_name: str
-    :param group_doc_id: The test group ID.
-    :type group_doc_id: str
+    :param group_doc: The test group document.
+    :type group_doc: test group document
     :param test_case: The test case data.
     :type test_case: dict
     :param database: The database connection.
@@ -290,8 +263,7 @@ def _parse_test_case_from_json(group_name, group_doc_id, test_case,
     test_doc.created_on = datetime.datetime.now(tz=bson.tz_util.utc)
     test_doc.test_case_path = '.'.join(path + [test_doc.name])
     test_doc.plan = path[0]
-    _update_test_case_doc_from_json(test_doc, test_case, errors)
-    _update_test_case_doc_ids(group_name, group_doc_id, test_doc, database)
+    _update_test_case_doc_from_json(test_doc, group_doc, test_case, errors)
     return test_doc
 
 
@@ -493,8 +465,7 @@ def update_test_group_add_test_case_id(
     return ret_val, errors
 
 
-def import_and_save_test_cases(group_doc_id, group_name, test_cases,
-                               database, errors, path):
+def import_and_save_test_cases(group_doc, test_cases, database, errors, path):
     """Import the tests cases from a JSON object into a group.
 
     Parse the test_cases JSON data into a list of test cases, add them to the
@@ -503,10 +474,8 @@ def import_and_save_test_cases(group_doc_id, group_name, test_cases,
     This function returns an operation code based on the import result
     of all the test cases.
 
-    :param group_doc_id: The related test group ID.
-    :type group_doc_id: str
-    :param group_name: The related test group name.
-    :type group_name: str
+    :param group_doc: The test_group document object
+    :type group_doc: TestGroupDocument
     :param test_cases: The JSON object with incoming test cases data.
     :type test_cases: dict
     :param database: The database connection.
@@ -516,12 +485,12 @@ def import_and_save_test_cases(group_doc_id, group_name, test_cases,
     """
     ret_code = 500
 
-    if not all((group_doc_id, group_name, test_cases)):
+    if not all((group_doc, test_cases)):
         return ret_code
 
     for test_case in test_cases:
-        tc_doc = _parse_test_case_from_json(group_name, group_doc_id,
-                                            test_case, database, errors, path)
+        tc_doc = _parse_test_case_from_json(
+            group_doc, test_case, database, errors, path)
         if tc_doc:
             ret_code, tc_doc_id = save_or_update(
                 tc_doc, SPEC_TEST_CASE, models.TEST_CASE_COLLECTION,
@@ -542,7 +511,7 @@ def import_and_save_test_cases(group_doc_id, group_name, test_cases,
         else:
             # Test case imported successfully update test group
             ret_code, errors = update_test_group_add_test_case_id(
-                tc_doc_id, group_doc_id, group_name, database)
+                tc_doc_id, group_doc.id, group_doc.name, database)
 
     return ret_code
 
@@ -620,7 +589,7 @@ def import_and_save_test_group(group, parent_id, database, errors, path=None):
     test_cases = group.get(models.TEST_CASES_KEY)
     if test_cases:
         ret_code = import_and_save_test_cases(
-            group_doc_id, group_doc.name, test_cases, database, errors, path)
+            group_doc, test_cases, database, errors, path)
 
     sub_groups = group.get(models.SUB_GROUPS_KEY)
     if sub_groups:

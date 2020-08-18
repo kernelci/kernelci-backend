@@ -178,27 +178,29 @@ class TestTestGroupHandler(TestHandlerBase):
             response.headers["Content-Type"], self.content_type)
 
     @mock.patch("utils.db.get_db_connection")
-    def test_post_correct_with_test_cases(self,
-                                          mock_db):
+    def test_post_correct_with_test_cases(self, mock_db):
         mock_db.return_value = self.database
         headers = {"Authorization": "foo", "Content-Type": "application/json"}
         body = json.dumps(
             dict(
-                name="suite",
-                version="1.0",
-                lab_name="lab",
-                build_id="build", test_cases=[{"name": "foo",
-                                               "status": "pass",
-                                               "time": 1.0}],
+                arch="x86",
+                build_id="build",
                 build_environment="build_environment",
                 defconfig="defconfig",
                 device_type="device_type",
+                git_branch="branch",
+                git_commit="git_commit",
                 job="job",
                 kernel="kernel",
-                git_commit="git_commit",
+                lab_name="lab",
+                name="suite",
+                test_cases=[{
+                    "name": "foo",
+                    "status": "pass",
+                    "time": 1.0,
+                }],
                 time=1.0,
-                arch="x86",
-                git_branch="branch"
+                version="1.0"
             )
         )
 
@@ -206,8 +208,7 @@ class TestTestGroupHandler(TestHandlerBase):
             "/test/group", method="POST", headers=headers, body=body)
 
         self.assertEqual(response.code, 201)
-        self.assertEqual(
-            response.headers["Content-Type"], self.content_type)
+        self.assertEqual(response.headers["Content-Type"], self.content_type)
 
     @mock.patch("utils.db.get_db_connection")
     @mock.patch("utils.db.save")
