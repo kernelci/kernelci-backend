@@ -47,7 +47,6 @@ class TestTests(unittest.TestCase):
         test_cases = list({
             models.NAME_KEY: name,
             models.STATUS_KEY: status,
-            models.TIME_KEY: 123456789.0,  # ToDo: make optional
             models.LAB_NAME_KEY: "unit-test-lab",
         } for name, status in test_series)
         group_data = {
@@ -64,8 +63,6 @@ class TestTests(unittest.TestCase):
             models.TEST_CASES_KEY: test_cases,
             models.BUILD_ENVIRONMENT_KEY: "concrete",
         }
-        # ToDo: make TIME_KEY not required
-        group_data[models.TIME_KEY] = 123456789.0
         return group_data
 
     def test_import_test_group(self):
@@ -84,7 +81,6 @@ class TestTests(unittest.TestCase):
         group_id = self._save_group_assert(group_data, self._db)
         group_doc = utils.db.find_one2(group_collection, group_id)
         self.assertIsNotNone(group_doc)
-        del group_data[models.TIME_KEY]
         del group_data[models.TEST_CASES_KEY]
         self.assertDictContainsSubset(group_data, group_doc)
         test_cases = group_doc[models.TEST_CASES_KEY]
@@ -92,7 +88,6 @@ class TestTests(unittest.TestCase):
         test_case_docs = [utils.db.find_one2(case_collection, case_id)
                           for case_id in test_cases]
         for ref, doc in zip(test_case_list, test_case_docs):
-            del ref[models.TIME_KEY]
             self.assertDictContainsSubset(ref, doc)
 
     def test_new_failure(self):

@@ -185,28 +185,16 @@ def _check_for_null(test_dict, keys):
                     key, val))
 
 
-def _get_test_seconds(data):
-    """Returns test time in seconds"""
-    try:
-        test_time_raw = data[models.TIME_KEY]
-    except KeyError:
-        raise TestValidationError("Test time missing")
-    try:
-        test_time = float(test_time_raw)
-    except ValueError:
-        raise TestValidationError(
-            "Test time is not a number: {!r}".format(test_time_raw))
+def _get_time_as_datetime(data):
+    test_time_raw = data.get(models.TIME_KEY)
+    if test_time_raw is None:
+        test_time_raw = 0.0
+    test_time = float(test_time_raw)
     if test_time < 0.0:
-        raise TestValidationError("Found negative test time")
-    return test_time
-
-
-def _seconds_as_datetime(seconds):
-    """
-    Returns seconds encoded as a point in time `seconds` seconds after since
-    1970-01-01T00:00:00Z.
-    """
-    return datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=seconds)
+        raise ValueError("Found negative test time")
+    test_datetime = \
+        datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=test_time)
+    return test_datetime
 
 
 def _update_test_case_doc_from_json(case_doc, test_case, errors):
@@ -222,28 +210,7 @@ def _update_test_case_doc_from_json(case_doc, test_case, errors):
     :param errors: Where errors should be stored.
     :type errors: dict
     """
-
-    try:
-        seconds = _get_test_seconds(test_case)
-    except TestValidationError as ex:
-        seconds = 0.0
-        err_msg = "Error reading test time data; defaulting to 0"
-        utils.LOG.exception(ex)
-        utils.LOG.error(err_msg)
-        ERR_ADD(errors, 400, err_msg)
-
-    try:
-        case_doc.time = _seconds_as_datetime(seconds)
-    except OverflowError as ex:
-        seconds = 0.0
-        err_msg = "Test time value is too large for a time value, default to 0"
-        utils.LOG.exception(ex)
-        utils.LOG.error(err_msg)
-        ERR_ADD(errors, 400, err_msg)
-
-    if seconds == 0.0:
-        case_doc.time = _seconds_as_datetime(seconds)
-
+    case_doc.time = _get_time_as_datetime(test_case)
     case_doc.arch = test_case.get(models.ARCHITECTURE_KEY)
     case_doc.build_environment = test_case.get(models.BUILD_ENVIRONMENT_KEY)
     case_doc.defconfig_full = test_case.get(models.DEFCONFIG_FULL_KEY)
@@ -341,27 +308,7 @@ def _update_test_group_doc_from_json(group_doc, group_dict, errors):
     :param errors: Where errors should be stored.
     :type errors: dict
     """
-    try:
-        seconds = _get_test_seconds(group_dict)
-    except TestValidationError as ex:
-        seconds = 0.0
-        err_msg = "Error reading test time data; defaulting to 0"
-        utils.LOG.exception(ex)
-        utils.LOG.error(err_msg)
-        ERR_ADD(errors, 400, err_msg)
-
-    try:
-        group_doc.time = _seconds_as_datetime(seconds)
-    except OverflowError as ex:
-        seconds = 0.0
-        err_msg = "Test time value is too large for a time value, default to 0"
-        utils.LOG.exception(ex)
-        utils.LOG.error(err_msg)
-        ERR_ADD(errors, 400, err_msg)
-
-    if seconds == 0.0:
-        group_doc.time = _seconds_as_datetime(seconds)
-
+    group_doc.time = _get_time_as_datetime(group_dict)
     group_doc.arch = group_dict.get(models.ARCHITECTURE_KEY)
     group_doc.board_instance = group_dict.get(models.BOARD_INSTANCE_KEY)
     group_doc.boot_log = group_dict.get(models.BOOT_LOG_KEY)
