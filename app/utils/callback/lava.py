@@ -406,7 +406,6 @@ def _add_login_case(meta, results, cases, name):
     test_case = {
         models.VERSION_KEY: "1.1",
         models.TIME_KEY: "0.0",
-        models.INDEX_KEY: len(cases) + 1,
         models.NAME_KEY: "login",
         models.STATUS_KEY: login["result"],
     }
@@ -465,38 +464,15 @@ def _add_test_results(group, results, log_line_data):
             test_case_list = test_cases
         path.append(test_case[models.NAME_KEY])
         log_line_data[tuple(path)] = int(test["log_end_line"])
-        test_case[models.INDEX_KEY] = len(test_case_list) + 1
         test_case_list.append(test_case)
 
     sub_groups = []
-    for index, test_set in enumerate(test_sets.iteritems(), 1):
+    for test_set in test_sets.iteritems():
         test_set_name, test_set_cases = test_set
         sub_group = {
             models.NAME_KEY: test_set_name,
             models.TEST_CASES_KEY: test_set_cases,
-            models.INDEX_KEY: index,
         }
-        sub_group.update({
-            k: group[k] for k in [
-                models.ARCHITECTURE_KEY,
-                models.BOOT_LOG_KEY,
-                models.BOOT_LOG_HTML_KEY,
-                models.BUILD_ENVIRONMENT_KEY,
-                models.DEFCONFIG_FULL_KEY,
-                models.DEFCONFIG_KEY,
-                models.DEVICE_TYPE_KEY,
-                models.DTB_KEY,
-                models.FILE_SERVER_RESOURCE_KEY,
-                models.GIT_BRANCH_KEY,
-                models.GIT_COMMIT_KEY,
-                models.JOB_KEY,
-                models.KERNEL_KEY,
-                models.KERNEL_IMAGE_KEY,
-                models.LAB_NAME_KEY,
-                models.PLAN_VARIANT_KEY,
-                models.TIME_KEY,
-            ]
-        })
         sub_groups.append(sub_group)
 
     group.update({
@@ -704,16 +680,12 @@ def add_tests(job_data, job_meta, lab_name, db_options,
             if cases:
                 insert_len = len(cases)
                 plan_cases = plan[models.TEST_CASES_KEY]
-                for case in plan_cases:
-                    case[models.INDEX_KEY] += insert_len
                 cases.extend(plan_cases)
                 plan[models.TEST_CASES_KEY] = cases
         elif groups or cases:
             # Create top-level group with the test plan name
             plan = dict(meta)
             plan[models.NAME_KEY] = plan_name
-            for index, group in enumerate(groups):
-                group[models.INDEX_KEY] = index
             plan[models.SUB_GROUPS_KEY] = groups
             plan[models.TEST_CASES_KEY] = cases
 
