@@ -131,6 +131,7 @@ def _get_job_meta(meta, job_data):
     :param job_data: The map of keys to search for in the JSON and update.
     :type job_data: dict
     """
+    meta[models.BOOT_RESULT_KEY] = LAVA_JOB_RESULT[job_data["status"]]
     meta[models.BOARD_INSTANCE_KEY] = job_data["actual_device_id"]
 
 
