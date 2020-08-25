@@ -612,8 +612,8 @@ def _translate_log_end_lines(results, translate_map):
         if ts == 'lava':
             continue
         for result in results_data:
-            if int(result['log_end_line']) in translate_map:
-                new_log_end_line = translate_map[result['log_end_line']]
+            new_log_end_line = translate_map.get(int(result['log_end_line']))
+            if new_log_end_line:
                 result['log_end_line'] = new_log_end_line
 
 
