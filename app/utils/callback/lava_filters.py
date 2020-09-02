@@ -37,7 +37,7 @@ import inspect
 
 
 LAVA_SIGNAL_PATTERN = re.compile(
-    r'\<LAVA_SIGNAL_.+>')
+    r'^<LAVA_.+>')
 
 
 def filter_log_levels(log_line):
