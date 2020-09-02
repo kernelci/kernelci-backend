@@ -396,9 +396,8 @@ def _store_lava_json(job_data, meta, base_path=utils.BASE_PATH):
         f.write(json.dumps(job_data))
 
 
-def _add_login_case(meta, results, cases, name):
+def _add_login_case(meta, tests, cases, name):
     # ToDo: consolidate with _add_test_results
-    tests = results
     tests_by_name = {t['name']: t for t in tests}
     login = tests_by_name.get(name)
     if not login:
