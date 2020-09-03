@@ -25,6 +25,7 @@
 import models
 import os
 import pymongo
+import urllib
 import utils
 import utils.db
 import utils.report.common as rcommon
@@ -304,6 +305,7 @@ def create_test_report(db_options, data, email_format, email_template=None,
         "summary_headers": summary_headers,
         "tree": job,
         "branch": branch,
+        "branch_uri": urllib.quote_plus(branch),
         "git_url": git_url,
         "kernel": kernel,
         "git_commit": git_commit,
