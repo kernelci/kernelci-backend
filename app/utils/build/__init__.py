@@ -513,9 +513,6 @@ def import_single_build(json_obj, db_options, base_path=utils.BASE_PATH):
     build_environment = j_get(models.BUILD_ENVIRONMENT_KEY)
     defconfig_full = j_get(models.DEFCONFIG_FULL_KEY, None)
 
-    # Clean up the branch name so we don't have "local/*" anymore.
-    git_branch = utils.clean_branch_name(git_branch)
-
     if (utils.valid_name(job) and utils.valid_name(kernel)):
         file_server_resource = j_get(models.FILE_SERVER_RESOURCE_KEY)
         build_dir = os.path.join(base_path, file_server_resource)

@@ -37,7 +37,6 @@ import models
 import taskqueue.tasks.bisect
 import taskqueue.tasks.report
 import taskqueue.tasks.report as taskq
-import utils
 
 # Max delay in sending email report set to 5hrs.
 MAX_DELAY = 18000
@@ -96,7 +95,7 @@ class SendHandler(hbase.BaseHandler):
         # Mandatory keys
         job = j_get(models.JOB_KEY)
         kernel = j_get(models.KERNEL_KEY)
-        branch = utils.clean_branch_name(j_get(models.GIT_BRANCH_KEY))
+        branch = j_get(models.GIT_BRANCH_KEY)
 
         # Optional keys
         report_type = j_get(models.REPORT_TYPE_KEY)

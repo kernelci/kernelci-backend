@@ -23,7 +23,6 @@ import handlers.base as hbase
 import handlers.response as hresponse
 import models
 import taskqueue.tasks.build as taskb
-import utils
 import utils.db
 
 JOB_NOT_FOUND = "Job '%s-%s (branch %s)' not found"
@@ -55,7 +54,7 @@ class JobHandler(hbase.BaseHandler):
 
         job = obj.get(models.JOB_KEY)
         kernel = obj.get(models.KERNEL_KEY)
-        git_branch = utils.clean_branch_name(obj.get(models.GIT_BRANCH_KEY))
+        git_branch = obj.get(models.GIT_BRANCH_KEY)
         status = obj.get(models.STATUS_KEY, None)
 
         if not status:

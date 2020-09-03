@@ -53,28 +53,6 @@ VALID_TEST_NAME = re.compile(r"[^a-zA-Z0-9\.\-_+]")
 VALID_KCI_NAME = re.compile(r"[^a-zA-Z0-9\.\-_+=]")
 
 
-def clean_branch_name(branch):
-    """Clean up the branch name we get from a build.
-
-    Previously, branch names could be like:
-
-        local/for-next
-        local/linux-4.4.y
-
-    We are not interested in the "local/" part so we clean it out.
-
-    :param branch: The name of the branch.
-    :type branch: str
-    :return The cleaned branch name or the same one.
-    :rtpye str
-    """
-    valid_branch = branch
-    if branch:
-        parts = branch.split("/")
-        valid_branch = parts[-1]
-    return valid_branch
-
-
 def update_id_fields(spec):
     """Make sure ID fields are treated correctly.
 

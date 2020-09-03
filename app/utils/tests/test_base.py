@@ -173,12 +173,3 @@ class TestBaseUtils(unittest.TestCase):
         }
 
         self.assertDictEqual(expected, spec)
-
-    def test_clean_branch_name(self):
-        self.assertIsNone(utils.clean_branch_name(None))
-        self.assertEqual("", utils.clean_branch_name(""))
-        self.assertEqual("master", utils.clean_branch_name("master"))
-        self.assertEqual("master", utils.clean_branch_name("local/master"))
-        self.assertEqual("for-next", utils.clean_branch_name("local/for-next"))
-        self.assertEqual(
-            "linux-4.4.y", utils.clean_branch_name("local/linux-4.4.y"))
