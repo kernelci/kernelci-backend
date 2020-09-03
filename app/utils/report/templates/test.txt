@@ -8,7 +8,7 @@ Regressions Summary
 {{ group.summary }}
 {%- endfor %}
 
-  Details:  {{ base_url }}/test/job/{{ tree }}/branch/{{ branch }}/kernel/{{ kernel }}/plan/{{ plan }}/
+  Details:  {{ base_url }}/test/job/{{ tree }}/branch/{{ branch_uri }}/kernel/{{ kernel }}/plan/{{ plan }}/
 {% block plan_description %}
   Test:     {{ plan }}{% endblock %}
   Tree:     {{ tree }}
