@@ -19,6 +19,8 @@
 """Create the build email report."""
 
 import pymongo
+import urllib
+import urlparse
 
 import models
 import utils.db
@@ -65,8 +67,6 @@ WARN_LOG_URL = (
 MISM_LOG_URL = (
     u"{storage_url:s}/{job:s}/{git_branch:s}/{kernel:s}/{arch:s}" +
     u"/{defconfig:s}/{build_environment:s}/" + utils.BUILD_MISMATCHES_FILE)
-BUILD_SUMMARY_URL = \
-    u"{build_url:s}/{job:s}/branch/{git_branch:}/kernel/{kernel:s}/"
 
 
 # Other template strings.
@@ -83,6 +83,15 @@ WARN_STR_HTML = (
     u"<a style=\"color: {yellow:s};\" href=\"{warn_log_url:s}\">"
     u"{warn_string:s}</a>"
 )
+
+
+def _make_quoted_url(base, items):
+    url = urlparse.urljoin(
+        base, '/'.join(urllib.quote_plus(str(item)) for item in items)
+    )
+    if not url.endswith('/'):
+        url += '/'
+    return url
 
 
 def _get_errors_count(results):
@@ -491,7 +500,13 @@ def _create_build_email(**kwargs):
         if built_unique_string:
             built_unique_string = built_unique_string.format(**kwargs)
 
-    build_summary_url = BUILD_SUMMARY_URL.format(**kwargs)
+    build_summary_url = _make_quoted_url(
+        kwargs['base_url'], [
+            'build', kwargs['job'],
+            'branch', kwargs['git_branch'],
+            'kernel', kwargs['kernel'],
+        ]
+    )
 
     kwargs["built_unique_string"] = built_unique_string
     kwargs["tree_string"] = G_(u"Tree: {job:s}").format(**kwargs)
