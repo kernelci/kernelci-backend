@@ -85,8 +85,6 @@ def convert_git_branch_field(collection_name):
     for doc in database[collection_name].find():
         git_branch = doc.get(models.GIT_BRANCH_KEY)
         if git_branch and "local" in git_branch:
-            git_branch = utils.clean_branch_name(git_branch)
-
             ret_val = utils.db.update2(
                 database,
                 collection_name,
