@@ -396,20 +396,21 @@ def _store_lava_json(job_data, meta, base_path=utils.BASE_PATH):
         f.write(json.dumps(job_data))
 
 
-def _add_login_case(meta, tests, cases, names):
-    # ToDo: consolidate with _add_test_results
+def _get_test_case(tests, names):
     tests_by_name = {t['name']: t for t in tests}
     for name in names:
         login = tests_by_name.get(name)
         if login:
-            break
-    if not login:
-        return
+            return login
+
+
+def _add_login_case(meta, cases, login_tc):
+    # ToDo: consolidate with _add_test_results
     test_case = {
         models.VERSION_KEY: "1.1",
         models.TIME_KEY: "0.0",
         models.NAME_KEY: "login",
-        models.STATUS_KEY: login["result"],
+        models.STATUS_KEY: login_tc["result"],
     }
     test_case.update({k: meta[k] for k in TEST_CASE_GROUP_KEYS})
     cases.append(test_case)
@@ -659,10 +660,14 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         cases = []
         start_log_line = 0
         end_lines_map = {}
+        job_tc = None
+        login_tc = None
         for suite_name, suite_results in results.iteritems():
             if suite_name == "lava":
-                _add_login_case(meta, suite_results, cases,
-                                ('login-action', 'auto-login-action'))
+                login_tc = _get_test_case(suite_results,
+                                          ('login-action',
+                                           'auto-login-action'))
+                job_tc = _get_test_case(suite_results, ('job',))
                 login_line_num = _get_log_line_number(log,
                                                       LOGIN_CASE_END_PATTERN)
                 start_log_line = 0 if login_line_num is None \
@@ -674,6 +679,10 @@ def add_tests(job_data, job_meta, lab_name, db_options,
                 _add_test_results(group, suite_results,
                                   end_lines_map)
                 groups.append(group)
+        if login_tc and login_tc.get('result') == 'pass' and len(groups) == 0:
+            login_tc = job_tc
+        if login_tc:
+            _add_login_case(meta, cases, login_tc)
         add_log_fragments(groups, log, end_lines_map, start_log_line)
 
         if (len(groups) == 1) and (groups[0][models.NAME_KEY] == plan_name):
