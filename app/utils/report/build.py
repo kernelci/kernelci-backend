@@ -38,9 +38,10 @@ BUILD_SEARCH_FIELDS = [
     models.DEFCONFIG_FULL_KEY,
     models.BUILD_ENVIRONMENT_KEY,
     models.ERRORS_KEY,
+    models.FILE_SERVER_RESOURCE_KEY,
     models.ID_KEY,
     models.STATUS_KEY,
-    models.WARNINGS_KEY
+    models.WARNINGS_KEY,
 ]
 
 BUILD_SEARCH_SORT = [
@@ -53,17 +54,13 @@ BUILD_SEARCH_SORT = [
 # Various build URLS.
 DEFCONFIG_ID_URL = (u"{build_url:s}/id/{build_id:s}/")
 LOG_URL = (
-    u"{storage_url:s}/{job:s}/{git_branch:}/{kernel:s}/{arch:s}" +
-    u"/{defconfig:s}/{build_environment:s}/" + utils.BUILD_LOG_FILE)
+    u"{storage_url:s}/{file_server_resource:s}/" + utils.BUILD_LOG_FILE)
 ERR_LOG_URL = (
-    u"{storage_url:s}/{job:s}/{git_branch:s}/{kernel:s}/{arch:s}" +
-    u"/{defconfig:s}/{build_environment:s}/" + utils.BUILD_ERRORS_FILE)
+    u"{storage_url:s}/{file_server_resource:s}/" + utils.BUILD_ERRORS_FILE)
 WARN_LOG_URL = (
-    u"{storage_url:s}/{job:s}/{git_branch:s}/{kernel:s}/{arch:s}" +
-    u"/{defconfig:s}/{build_environment:s}/" + utils.BUILD_WARNINGS_FILE)
+    u"{storage_url:s}/{file_server_resource:s}/" + utils.BUILD_WARNINGS_FILE)
 MISM_LOG_URL = (
-    u"{storage_url:s}/{job:s}/{git_branch:s}/{kernel:s}/{arch:s}" +
-    u"/{defconfig:s}/{build_environment:s}/" + utils.BUILD_MISMATCHES_FILE)
+    u"{storage_url:s}/{file_server_resource:s}/" + utils.BUILD_MISMATCHES_FILE)
 
 
 # Other template strings.
@@ -109,6 +106,7 @@ def _get_errors_count(results):
                 ("build_environment", models.BUILD_ENVIRONMENT_KEY),
                 ("status", models.STATUS_KEY),
                 ("build_id", models.BUILD_ID_KEY),
+                ("file_server_resource", models.FILE_SERVER_RESOURCE_KEY),
             ]
         }
 
@@ -153,6 +151,7 @@ def _parse_build_data(results):
                 ("build_environment", models.BUILD_ENVIRONMENT_KEY),
                 ("status", models.STATUS_KEY),
                 ("build_id", models.ID_KEY),
+                ("file_server_resource", models.FILE_SERVER_RESOURCE_KEY),
             ]
         }
         arch_data = parsed_data.setdefault(
@@ -324,6 +323,7 @@ def _parse_and_structure_results(**kwargs):
                         "build_environment",
                         "status",
                         "build_id",
+                        "file_server_resource",
                     ]}
                 )
 
@@ -369,6 +369,7 @@ def _parse_and_structure_results(**kwargs):
                         "build_id",
                         "warnings",
                         "errors",
+                        "file_server_resource",
                     ]
                 })
                 errors = subs["errors"]
@@ -602,7 +603,7 @@ def create_build_report(
     errors_spec = {
         models.JOB_KEY: job,
         models.GIT_BRANCH_KEY: branch,
-        models.KERNEL_KEY: kernel
+        models.KERNEL_KEY: kernel,
     }
 
     errors_summary = utils.db.find_one2(
