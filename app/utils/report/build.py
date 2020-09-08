@@ -51,9 +51,6 @@ BUILD_SEARCH_SORT = [
 ]
 
 # Various build URLS.
-DEFCONFIG_URL = (
-    u"{build_url:s}/{job:s}/branch/{git_branch:s}/kernel/{kernel:s}"
-    u"/defconfig/{defconfig:s}/")
 DEFCONFIG_ID_URL = (u"{build_url:s}/id/{build_id:s}/")
 LOG_URL = (
     u"{storage_url:s}/{job:s}/{git_branch:}/{kernel:s}/{arch:s}" +
@@ -114,7 +111,7 @@ def _get_errors_count(results):
         environment = res_get(models.BUILD_ENVIRONMENT_KEY)
         res_errors = res_get(models.ERRORS_COUNT_KEY, 0)
         res_warnings = res_get(models.WARNINGS_COUNT_KEY, 0)
-        res_id = res_get(models.ID_KEY)
+        res_id = res_get(models.BUILD_ID_KEY)
 
         if res_errors:
             total_errors += res_errors
@@ -296,7 +293,7 @@ def _parse_and_structure_results(**kwargs):
     gen_subs = {
         "build_url": k_get("build_url"),
         "err_log_url": ERR_LOG_URL,
-        "defconfig_url": DEFCONFIG_URL,
+        "defconfig_url": DEFCONFIG_ID_URL,
         "job": k_get("job"),
         "kernel": k_get("kernel"),
         "git_branch": k_get("git_branch"),
@@ -336,9 +333,7 @@ def _parse_and_structure_results(**kwargs):
                 subs["defconfig"] = struct[0]
                 subs["build_environment"] = struct[1]
                 subs["status"] = struct[2]
-                if struct[3]:
-                    subs["defconfig_url"] = DEFCONFIG_ID_URL
-                    subs["build_id"] = struct[3]
+                subs["build_id"] = struct[3]
 
                 txt_str = G_(
                     u"{defconfig:s}: ({build_environment:s}) {status:s}"
@@ -381,6 +376,7 @@ def _parse_and_structure_results(**kwargs):
                 subs["defconfig"] = struct[0]
                 subs["build_environment"] = struct[1]
                 subs["status"] = struct[2]
+                subs["build_id"] = struct[3]
                 subs["warnings"] = struct[4]
                 subs["errors"] = struct[5]
                 err_numb = subs["errors"]
@@ -389,10 +385,6 @@ def _parse_and_structure_results(**kwargs):
                     continue
                 txt_desc_str = ""
                 html_desc_str = ""
-
-                if struct[3]:
-                    subs["defconfig_url"] = DEFCONFIG_ID_URL
-                    subs["build_id"] = struct[3]
 
                 err_string = P_(
                     u"{errors:d} error",
