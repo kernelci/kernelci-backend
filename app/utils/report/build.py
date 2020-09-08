@@ -103,15 +103,17 @@ def _get_errors_count(results):
     total_errors = total_warnings = 0
 
     for result in results:
-        res_get = result.get
+        data = {
+            key: result[field] for key, field in [
+                ("defconfig", models.DEFCONFIG_FULL_KEY),
+                ("build_environment", models.BUILD_ENVIRONMENT_KEY),
+                ("status", models.STATUS_KEY),
+                ("build_id", models.BUILD_ID_KEY),
+            ]
+        }
 
-        arch = res_get(models.ARCHITECTURE_KEY)
-        defconfig = res_get(models.DEFCONFIG_KEY)
-        defconfig_full = res_get(models.DEFCONFIG_FULL_KEY, defconfig)
-        environment = res_get(models.BUILD_ENVIRONMENT_KEY)
-        res_errors = res_get(models.ERRORS_COUNT_KEY, 0)
-        res_warnings = res_get(models.WARNINGS_COUNT_KEY, 0)
-        res_id = res_get(models.BUILD_ID_KEY)
+        res_errors = result.get(models.ERRORS_COUNT_KEY, 0)
+        res_warnings = result.get(models.WARNINGS_COUNT_KEY, 0)
 
         if res_errors:
             total_errors += res_errors
@@ -119,17 +121,14 @@ def _get_errors_count(results):
         if res_warnings:
             total_warnings += res_warnings
 
-        struct = (
-            defconfig_full or defconfig,
-            environment,
-            res_get(models.STATUS_KEY),
-            res_id,
-            res_warnings,
-            res_errors
-        )
+        data.update({
+            "errors": res_errors,
+            "warnings": res_warnings,
+        })
 
-        arch_data = parsed_data.setdefault(arch, list())
-        arch_data.append(struct)
+        arch_data = parsed_data.setdefault(
+            result[models.ARCHITECTURE_KEY], list())
+        arch_data.append(data)
 
     return parsed_data, total_errors, total_warnings
 
@@ -146,28 +145,19 @@ def _parse_build_data(results):
     :return A dictionary.
     """
     parsed_data = {}
-    arch_keys = parsed_data.viewkeys()
 
     for result in results:
-        res_get = result.get
-
-        arch = res_get(models.ARCHITECTURE_KEY)
-        defconfig = res_get(models.DEFCONFIG_FULL_KEY, None) or \
-            res_get(models.DEFCONFIG_KEY)
-        environment = res_get(models.BUILD_ENVIRONMENT_KEY)
-
-        struct = (
-            defconfig,
-            environment,
-            res_get(models.STATUS_KEY),
-            res_get(models.ID_KEY)
-        )
-
-        if arch in arch_keys:
-            parsed_data[arch].append(struct)
-        else:
-            parsed_data[arch] = []
-            parsed_data[arch].append(struct)
+        build_data = {
+            key: result[field] for key, field in [
+                ("defconfig", models.DEFCONFIG_FULL_KEY),
+                ("build_environment", models.BUILD_ENVIRONMENT_KEY),
+                ("status", models.STATUS_KEY),
+                ("build_id", models.ID_KEY),
+            ]
+        }
+        arch_data = parsed_data.setdefault(
+            result[models.ARCHITECTURE_KEY], list())
+        arch_data.append(build_data)
 
     return parsed_data
 
@@ -320,20 +310,22 @@ def _parse_and_structure_results(**kwargs):
         platforms["failed_data"]["data"] = {}
         failed_struct = platforms["failed_data"]["data"]
 
-        f_get = failed_data.get
         subs = gen_subs.copy()
-
-        for arch in failed_data.viewkeys():
+        for arch, arch_data in failed_data.iteritems():
             subs["arch"] = arch
             arch_string = G_(u"{arch:s}:").format(**subs)
             failed_struct[arch_string] = []
             failed_append = failed_struct[arch_string].append
 
-            for struct in f_get(arch):
-                subs["defconfig"] = struct[0]
-                subs["build_environment"] = struct[1]
-                subs["status"] = struct[2]
-                subs["build_id"] = struct[3]
+            for struct in arch_data:
+                subs.update({
+                    key: struct[key] for key in [
+                        "defconfig",
+                        "build_environment",
+                        "status",
+                        "build_id",
+                    ]}
+                )
 
                 txt_str = G_(
                     u"{defconfig:s}: ({build_environment:s}) {status:s}"
@@ -362,51 +354,55 @@ def _parse_and_structure_results(**kwargs):
         platforms["error_data"]["data"] = {}
         error_struct = platforms["error_data"]["data"]
 
-        err_get = error_data.get
         subs = gen_subs.copy()
-
-        for arch in error_data.viewkeys():
+        for arch, arch_data in error_data.iteritems():
             subs["arch"] = arch
             arch_string = G_(u"{:s}:").format(arch)
-            error_struct[arch_string] = []
+            arch_errors = error_struct[arch_string] = []
 
-            error_append = error_struct[arch_string].append
-
-            for struct in err_get(arch):
-                subs["defconfig"] = struct[0]
-                subs["build_environment"] = struct[1]
-                subs["status"] = struct[2]
-                subs["build_id"] = struct[3]
-                subs["warnings"] = struct[4]
-                subs["errors"] = struct[5]
-                err_numb = subs["errors"]
-                warn_numb = subs["warnings"]
-                if err_numb == 0 and warn_numb == 0:
+            for struct in arch_data:
+                subs.update({
+                    key: struct[key] for key in [
+                        "defconfig",
+                        "build_environment",
+                        "status",
+                        "build_id",
+                        "warnings",
+                        "errors",
+                    ]
+                })
+                errors = subs["errors"]
+                warnings = subs["warnings"]
+                if errors == 0 and warnings == 0:
                     continue
                 txt_desc_str = ""
                 html_desc_str = ""
 
                 err_string = P_(
                     u"{errors:d} error",
-                    u"{errors:d} errors", subs["errors"])
+                    u"{errors:d} errors",
+                    errors
+                )
                 warn_string = P_(
                     u"{warnings:d} warning",
-                    u"{warnings:d} warnings", subs["warnings"])
+                    u"{warnings:d} warnings",
+                    warnings
+                )
                 subs["err_string"] = err_string
                 subs["warn_string"] = warn_string
 
-                if err_numb > 0 and warn_numb > 0:
+                if errors > 0 and warnings > 0:
                     txt_desc_str = G_(
                         u"{err_string:s}, {warn_string:s}")
                     html_desc_str = (
                         ERR_STR_HTML.format(**subs).format(**subs),
                         WARN_STR_HTML.format(**subs).format(**subs)
                     )
-                elif err_numb > 0 and warn_numb == 0:
+                elif errors > 0 and warnings == 0:
                     txt_desc_str = u"{err_string:s}"
                     html_desc_str = (
                         ERR_STR_HTML.format(**subs).format(**subs), u"")
-                elif err_numb == 0 and warn_numb > 0:
+                elif errors == 0 and warnings > 0:
                     txt_desc_str = u"{warn_string:s}"
                     html_desc_str = (
                         u"", WARN_STR_HTML.format(**subs).format(**subs))
@@ -421,7 +417,7 @@ def _parse_and_structure_results(**kwargs):
                 html_defconfing_str = (
                     DEFCONFIG_URL_HTML.format(**subs).format(**subs),
                     html_desc_str)
-                error_append((txt_defconfig_str, html_defconfing_str))
+                arch_errors.append((txt_defconfig_str, html_defconfing_str))
     else:
         platforms["error_data"] = None
 
