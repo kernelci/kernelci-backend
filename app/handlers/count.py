@@ -96,6 +96,8 @@ def count_one_collection(
     spec = handlers.common.query.get_query_spec(
         query_args_func, valid_keys)
     handlers.common.query.get_and_add_date_range(spec, query_args_func)
+    handlers.common.query.get_and_add_gte_lt_keys(
+        spec, query_args_func, valid_keys)
     utils.update_id_fields(spec)
 
     if spec:
