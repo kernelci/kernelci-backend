@@ -396,10 +396,13 @@ def _store_lava_json(job_data, meta, base_path=utils.BASE_PATH):
         f.write(json.dumps(job_data))
 
 
-def _add_login_case(meta, tests, cases, name):
+def _add_login_case(meta, tests, cases, names):
     # ToDo: consolidate with _add_test_results
     tests_by_name = {t['name']: t for t in tests}
-    login = tests_by_name.get(name)
+    for name in names:
+        login = tests_by_name.get(name)
+        if login:
+            break
     if not login:
         return
     test_case = {
@@ -659,7 +662,7 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         for suite_name, suite_results in results.iteritems():
             if suite_name == "lava":
                 _add_login_case(meta, suite_results, cases,
-                                'auto-login-action')
+                                ('login-action', 'auto-login-action'))
                 login_line_num = _get_log_line_number(log,
                                                       LOGIN_CASE_END_PATTERN)
                 start_log_line = 0 if login_line_num is None \
