@@ -54,7 +54,8 @@ def get_db_client(db_options):
         db_pool = db_options_get("mongodb_pool", 100)
 
         CLIENT = pymongo.MongoClient(
-            host=db_host, maxPoolSize=db_pool, port=db_port, w="majority")
+            host=db_host, maxPoolSize=db_pool, port=db_port, w="majority",
+            tz_aware=True)
 
     return CLIENT
 
@@ -107,7 +108,8 @@ def get_db_connection(db_options, db_name=models.DB_NAME):
     db_pwd = db_options_get("mongodb_password", "")
 
     connection = pymongo.MongoClient(
-        host=db_host, maxPoolSize=db_pool, port=db_port, w="majority"
+        host=db_host, maxPoolSize=db_pool, port=db_port, w="majority",
+        tz_aware=True
     )[db_name]
 
     if all([db_user, db_pwd]):
