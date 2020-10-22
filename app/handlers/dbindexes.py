@@ -153,6 +153,10 @@ INDEX_SPECS = {
             (models.MACH_KEY, pymongo.ASCENDING),
         ],
         [
+            (models.MACH_KEY, pymongo.ASCENDING),
+            (models.DEVICE_TYPE_KEY, pymongo.ASCENDING),
+        ],
+        [
             (models.KERNEL_KEY, pymongo.DESCENDING),
             (models.NAME_KEY, pymongo.ASCENDING),
             (models.TEST_GROUP_ID_KEY, pymongo.ASCENDING),
@@ -238,6 +242,13 @@ INDEX_SPECS = {
         [
             (models.CREATED_KEY, pymongo.DESCENDING),
             (models.PARENT_ID_KEY, pymongo.ASCENDING),
+        ],
+        [
+            (models.MACH_KEY, pymongo.ASCENDING),
+        ],
+        [
+            (models.MACH_KEY, pymongo.ASCENDING),
+            (models.LAB_NAME_KEY, pymongo.ASCENDING),
         ],
         [
             (models.BUILD_ID_KEY, pymongo.ASCENDING),
