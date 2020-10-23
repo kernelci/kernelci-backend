@@ -346,4 +346,4 @@ def ensure_indexes(database):
             expire = INDEX_EXPIRATION.get((collection, name))
             if name not in db_indexes:
                 kw = {'expireAfterSeconds': expire} if expire else {}
-                db_collection.create_index(index, background=True, **kw)
+                db_collection.create_index(index, **kw)
