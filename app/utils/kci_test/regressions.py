@@ -104,7 +104,6 @@ def _check_and_track(test_case, group, last_case, last_group, db, spec,
     regr[models.KERNEL_KEY] = last_group[models.KERNEL_KEY]
     regr_doc = utils.db.find_one2(db[models.TEST_REGRESSION_COLLECTION], regr)
     if not regr_doc:
-        utils.LOG.info("Not tracking: {}".format(test_case_path))
         return (200, None)
 
     utils.LOG.info("Tracking regression: {}".format(test_case_path))
