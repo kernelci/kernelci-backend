@@ -332,7 +332,8 @@ VALID_TEST_CASE_STATUS = [
     ERROR_STATUS,
     FAIL_STATUS,
     PASS_STATUS,
-    SKIP_STATUS
+    SKIP_STATUS,
+    UNKNOWN_STATUS
 ]
 
 # The valid collections for the bisect handler.
