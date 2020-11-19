@@ -173,6 +173,12 @@ INDEX_SPECS = {
             (models.STATUS_KEY, pymongo.ASCENDING),
         ],
         [
+            (models.CREATED_KEY, pymongo.DESCENDING),
+            (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
+            (models.KERNEL_KEY, pymongo.ASCENDING),
+            (models.MACH_KEY, pymongo.ASCENDING),
+        ],
+        [
             (models.GIT_BRANCH_KEY, pymongo.ASCENDING),
             (models.JOB_KEY, pymongo.ASCENDING),
             (models.KERNEL_KEY, pymongo.DESCENDING),
