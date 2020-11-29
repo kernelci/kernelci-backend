@@ -166,6 +166,60 @@ class BisectHandler(hbase.BaseHandler):
 
         return response
 
+    def _bisect(self, id_key, spec, bisect_func, fields=None):
+        """Perform the bisect operation.
+
+        :param id_key: The name of the key that contains the ID value of the
+        document we want to bisect.
+        :type id_key: string
+        :param spec: The spec data structure as retrieved with the request
+        query args.
+        :type spec: dictionary
+        :param bisect_func: The bisect function that should be called. It
+        should accept the `doc_id` as string, the database options as
+        dictionary and `**kwargs`.
+        :type bisect_func: function
+        :param fields: A `fields` data structure with the fields to return or
+        exclude. Default to None.
+        :type fields: list or dict
+        :return A HandlerResponse instance.
+        """
+        response = None
+        s_get = spec.get
+        doc_id = s_get(id_key, None)
+
+        if doc_id:
+            try:
+                obj_id = bson.objectid.ObjectId(doc_id)
+                spec[id_key] = obj_id
+
+                bisect_result = utils.db.find_one2(
+                    self.db[self.collection],
+                    spec,
+                    fields=fields
+                )
+
+                if bisect_result:
+                    response = hresponse.HandlerResponse()
+                    response.result = bisect_result
+                else:
+                    kwargs = {
+                        "fields": fields,
+                        "compare_to": s_get(models.COMPARE_TO_KEY, None)}
+                    response = bisect_func(
+                        doc_id, self.settings["dboptions"], **kwargs)
+            except bson.errors.InvalidId, ex:
+                self.log.exception(ex)
+                self.log.error(
+                    "Wrong ID '%s' value passed as object ID", doc_id)
+                response = hresponse.HandlerResponse(400)
+                response.reason = "Wrong ID value passed as object ID"
+        else:
+            response = hresponse.HandlerResponse(400)
+            response.reason = "Missing boot ID value to look for"
+
+        return response
+
 
 def execute_build_bisect(doc_id, db_options, **kwargs):
     """Execute the build bisect operation.
