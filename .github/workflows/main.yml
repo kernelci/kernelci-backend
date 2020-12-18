@@ -1,0 +1,58 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the
+  # master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [2.7]
+
+    steps:
+
+      # Checks out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+
+      - name: Install Debian dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python-setuptools pycodestyle python-wheel
+
+      - name: Install pip dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run unit tests
+        run: |
+          cd app
+          for dir in \
+            models/tests \
+            utils/tests \
+            utils/build/tests \
+            utils/bisect/tests \
+            handlers/common/tests \
+            handlers/tests \
+            utils/report/tests
+          do
+            echo Running tests in $dir
+            python -m unittest discover $dir || exit 1
+          done
+
+      - name: Run pycodestyle
+        run: |
+          cd app
+          pycodestyle .
