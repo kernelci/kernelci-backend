@@ -36,6 +36,8 @@ import yaml
 import json
 import urllib2
 from collections import OrderedDict
+from urlparse import urlparse
+
 
 import utils
 import utils.kci_test
@@ -83,28 +85,6 @@ TEST_CASE_NAME_EXTRA = {
     "test-overlay": ["name"],
     "test-runscript-overlay": ["name"],
     "test-install-overlay": ["name"],
-}
-
-META_DATA_MAP_TEST = {
-    models.ARCHITECTURE_KEY: "job.arch",
-    models.DEFCONFIG_KEY: "kernel.defconfig",
-    models.DEFCONFIG_FULL_KEY: "kernel.defconfig_full",
-    models.DEVICE_TYPE_KEY: "device.type",
-    models.DTB_KEY: "platform.dtb",
-    models.ENDIANNESS_KEY: "kernel.endian",
-    models.GIT_BRANCH_KEY: "git.branch",
-    models.GIT_COMMIT_KEY: "git.commit",
-    models.GIT_DESCRIBE_KEY: "git.describe",
-    models.GIT_URL_KEY: "git.url",
-    models.INITRD_KEY: "job.initrd_url",
-    models.JOB_KEY: "kernel.tree",
-    models.KERNEL_KEY: "kernel.version",
-    models.KERNEL_IMAGE_KEY: "job.kernel_image",
-    models.MACH_KEY: "platform.mach",
-    models.PLAN_KEY: "test.plan",
-    models.PLAN_VARIANT_KEY: "test.plan_variant",
-    models.BUILD_ENVIRONMENT_KEY: "job.build_environment",
-    models.FILE_SERVER_RESOURCE_KEY: "job.file_server_resource",
 }
 
 BL_META_MAP = {
@@ -267,41 +247,6 @@ def _get_directory_path(meta, base_path):
     meta[models.DIRECTORY_PATH] = directory_path
 
 
-def _add_test_log(meta, log, suite):
-    """Parse and save test logs
-
-    Parse the LAVA v2 log in YAML format and save it as plain text and HTML.
-
-    :param meta: The boot meta-data.
-    :type meta: dictionary
-    :param log: The kernel log as list of dicts.
-    :type log: list
-    :param base_path: Path to the top-level directory where to store the files.
-    :type base_path: string
-    :param suite: Test suite name
-    :type suite: string
-    """
-
-    dir_path = meta[models.DIRECTORY_PATH]
-
-    utils.LOG.info("Generating {} log files in {}".format(suite, dir_path))
-    file_name = "-".join([suite, meta[models.DEVICE_TYPE_KEY]])
-    files = tuple(".".join([file_name, ext]) for ext in ["txt", "html"])
-    meta[models.BOOT_LOG_KEY], meta[models.BOOT_LOG_HTML_KEY] = files
-    txt_path, html_path = (os.path.join(dir_path, f) for f in files)
-
-    if not os.path.isdir(dir_path):
-        try:
-            os.makedirs(dir_path)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise e
-
-    with codecs.open(txt_path, "w", "utf-8") as txt:
-        with codecs.open(html_path, "w", "utf-8") as html:
-            utils.lava_log_parser.run(log, meta, txt, html)
-
-
 def add_log_fragments(groups, log, end_lines_map, start_log_line):
     lines_map = _prepare_lines_map(end_lines_map, start_log_line)
     for path, tc in _test_case_iter(groups):
@@ -351,49 +296,6 @@ def _get_log_lines(log, start_line, end_line):
         for line in log[start_line:end_line]
     ]
     return lines
-
-
-def _store_lava_json(job_data, meta, base_path=utils.BASE_PATH):
-    """ Save the json LAVA v2 callback object
-
-    Save LAVA v2 callback data as json file.
-
-    :param job_data: The JSON data from the LAVA callback.
-    :type job_data: dictionary
-    :param meta: The boot meta-data.
-    :type meta: dictionary
-    :param base_path: Path to the top-level directory where to store the files.
-    :type base_path: string
-    """
-
-    file_name = "-".join(["lava-json", meta[models.DEVICE_TYPE_KEY]])
-    file_name = ".".join([file_name, "json"])
-
-    dir_path = meta[models.DIRECTORY_PATH]
-
-    utils.LOG.info("Saving LAVA v2 callback file {} data in {}".format(
-        file_name,
-        dir_path))
-
-    file_path = os.path.join(dir_path, file_name)
-
-    # Removing the token
-    job_data.pop("token", None)
-
-    # Add extra information
-    job_data["lab_name"] = meta.get("lab_name")
-    job_data["version"] = meta.get("version")
-    job_data["boot_log_html"] = meta.get("boot_log_html")
-
-    if not os.path.isdir(dir_path):
-        try:
-            os.makedirs(dir_path)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise e
-
-    with open(file_path, "wb") as f:
-        f.write(json.dumps(job_data))
 
 
 def _get_test_case(tests, names):
@@ -484,49 +386,6 @@ def _add_test_results(group, results, log_line_data):
     })
 
 
-def _add_rootfs_info(group, base_path, file_name="build_info.json"):
-    """Add rootfs info
-
-    Parse the the JSON file with the information of the rootfs if it's
-    available and add its information to the group data.  If the file URL
-    matches the local storage server, then read it directly from the file
-    system.
-
-    :param group: Test group data.
-    :type group: dict
-    :param base_path: Path to the top-level directory where files are stored.
-    :type base_path: string
-    :param file_name: Name of the JSON file with the rootfs info.
-    :type file_name: string
-    """
-
-    rootfs_url = group.get("initrd")
-    if not rootfs_url or rootfs_url == "None":
-        return
-
-    try:
-        # compare to default URL without the scheme
-        _default_url = urllib2.urlparse.urlparse(DEFAULT_STORAGE_URL).netloc
-        _rootfs_url = urllib2.urlparse.urlparse(rootfs_url).netloc
-        if _rootfs_url.startswith(_default_url):
-            rootfs_url_path = urllib2.urlparse.urlparse(rootfs_url).path
-            rootfs_rel_dir = os.path.dirname(rootfs_url_path).lstrip("/")
-            json_file = os.path.join(base_path, rootfs_rel_dir, file_name)
-            rootfs_info_json = open(json_file)
-        else:
-            rootfs_top_url = rootfs_url.rpartition("/")[0]
-            file_url = "/".join([rootfs_top_url, file_name])
-            utils.LOG.info("Downloading rootfs info: {}".format(file_url))
-            rootfs_info_json = urllib2.urlopen(file_url)
-
-        rootfs_info = json.load(rootfs_info_json)
-        group[models.INITRD_INFO_KEY] = rootfs_info
-    except IOError as e:
-        utils.LOG.warn("IOError: {}".format(e))
-    except ValueError as e:
-        utils.LOG.warn("ValueError: {}".format(e))
-
-
 def _adjust_log_line_numbers(results, log):
     """ A workaround for a race condition effect visible in LAVA callbacks
 
@@ -559,11 +418,6 @@ def _find_new_end_line(end_line_number, log, test_case_id):
     return end_line_number
 
 
-def _unpack_results(results):
-    return {test_suite: yaml.load(results_yaml, Loader=yaml.CLoader)
-            for test_suite, results_yaml in results.items()}
-
-
 def _filter_log_data(log, filters_funcs):
     for filter_func in filters_funcs:
         log[:] = filter(filter_func, log)
@@ -594,12 +448,194 @@ def _translate_log_end_lines(results, translate_map):
                 result['log_end_line'] = new_log_end_line
 
 
-def _prepare_log(log):
-    log = yaml.load(log, Loader=yaml.CLoader)
-    for i, log_line in enumerate(log, 1):
-        log_line['msg'] = unicode(log_line['msg'])
-        log_line['org_num'] = i
-    return log
+class LavaCallback(object):
+    META_DATA_MAP_TEST = {
+        models.ARCHITECTURE_KEY: "job.arch",
+        models.DEFCONFIG_KEY: "kernel.defconfig",
+        models.DEFCONFIG_FULL_KEY: "kernel.defconfig_full",
+        models.DEVICE_TYPE_KEY: "device.type",
+        models.DTB_KEY: "platform.dtb",
+        models.ENDIANNESS_KEY: "kernel.endian",
+        models.GIT_BRANCH_KEY: "git.branch",
+        models.GIT_COMMIT_KEY: "git.commit",
+        models.GIT_DESCRIBE_KEY: "git.describe",
+        models.GIT_URL_KEY: "git.url",
+        models.INITRD_KEY: "job.initrd_url",
+        models.JOB_KEY: "kernel.tree",
+        models.KERNEL_KEY: "kernel.version",
+        models.KERNEL_IMAGE_KEY: "job.kernel_image",
+        models.MACH_KEY: "platform.mach",
+        models.PLAN_KEY: "test.plan",
+        models.PLAN_VARIANT_KEY: "test.plan_variant",
+        models.BUILD_ENVIRONMENT_KEY: "job.build_environment",
+        models.FILE_SERVER_RESOURCE_KEY: "job.file_server_resource",
+    }
+
+    @classmethod
+    def process_callback(cls, job_data, definition_meta, lab_name,
+                         base_path=utils.BASE_PATH):
+        utils.LOG.info("Processing LAVA test data: job {} from {}".format(
+            job_data["id"], lab_name))
+
+        if job_data.get("status") not in (COMPLETE, INCOMPLETE):
+            utils.LOG.warning("Skipping LAVA job due to unsupported status: "
+                              "{}".format(job_data["status_string"]))
+            return None
+        return cls(job_data, definition_meta, lab_name, base_path)
+
+    def __init__(self, job_data, definition_meta, lab_name,
+                 base_path):
+        self._job_data = job_data
+        self._errors = {}
+        self.base_path = base_path
+        try:
+            self.meta = self._prepare_meta(job_data, definition_meta, lab_name)
+            self.results = self._prepare_results(job_data["results"])
+            self.definition = yaml.load(job_data["definition"],
+                                        Loader=yaml.CLoader)
+            self.log = self._prepare_log(job_data["log"])
+        except yaml.YAMLError:
+            ret_code = 401
+            msg = "Invalid test data from LAVA callback"
+            utils.errors.add_error(self._errors, ret_code, msg)
+
+    def _prepare_meta(self, job_data, definition_meta, lab_name):
+        meta = {
+            models.VERSION_KEY: "1.1",
+            models.LAB_NAME_KEY: lab_name,
+            models.TIME_KEY: "0.0",
+            models.BOOT_RESULT_KEY: LAVA_JOB_RESULT[job_data["status"]],
+            models.BOARD_INSTANCE_KEY: job_data["actual_device_id"]
+        }
+
+        for x, y in self.META_DATA_MAP_TEST.iteritems():
+            try:
+                meta.update({x: definition_meta[y]})
+            except KeyError as ex:
+                utils.LOG.warn("Metadata field {} missing in the job"
+                               " result.".format(ex))
+        return meta
+
+    def _prepare_results(self, results):
+        return {test_suite: yaml.load(results_yaml, Loader=yaml.CLoader)
+                for test_suite, results_yaml in results.items()}
+
+    def _prepare_log(self, log):
+        log = yaml.load(log, Loader=yaml.CLoader)
+        for i, log_line in enumerate(log, 1):
+            log_line['msg'] = unicode(log_line['msg'])
+            log_line['org_num'] = i
+            log_line['line_num'] = i
+        return log
+
+    def store_artifacts(self):
+        try:
+            self.store_test_log()
+            self.store_lava_json()
+            self.store_rootfs_info("build_info.json")
+        except (OSError, IOError):
+            ret_code = 500
+            msg = "Internal error"
+            utils.errors.add_error(self._errors, ret_code, msg)
+
+    def store_lava_json(self):
+        """ Save the json LAVA v2 callback object
+
+        Save LAVA v2 callback data as json file.
+        """
+
+        file_name = "-".join(["lava-json", self.meta[models.DEVICE_TYPE_KEY]])
+        file_name = ".".join([file_name, "json"])
+
+        dir_path = self.meta[models.DIRECTORY_PATH]
+
+        utils.LOG.info("Saving LAVA v2 callback file {} data in {}".format(
+            file_name,
+            dir_path))
+
+        file_path = os.path.join(dir_path, file_name)
+
+        # Removing the token
+        self._job_data.pop("token", None)
+
+        # Add extra information
+        self._job_data["lab_name"] = self.meta.get("lab_name")
+        self._job_data["version"] = self.meta.get("version")
+        self._job_data["boot_log_html"] = self.meta.get("boot_log_html")
+
+        if not os.path.isdir(dir_path):
+            try:
+                os.makedirs(dir_path)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    raise e
+
+        with open(file_path, "wb") as f:
+            f.write(json.dumps(self._job_data))
+
+    def store_test_log(self):
+        """Parse and save test logs
+
+        Parse the LAVA v2 log in YAML format and save it
+        as plain text and HTML.
+        """
+
+        dir_path = self.meta[models.DIRECTORY_PATH]
+        suite = self.meta[models.PLAN_KEY]
+        utils.LOG.info("Generating {} "
+                       "log files in {}".format(suite, dir_path))
+        file_name = "-".join([suite, self.meta[models.DEVICE_TYPE_KEY]])
+        files = tuple(".".join([file_name, ext]) for ext in ["txt", "html"])
+        (self.meta[models.BOOT_LOG_KEY],
+         self.meta[models.BOOT_LOG_HTML_KEY]) = files
+        txt_path, html_path = (os.path.join(dir_path, f) for f in files)
+
+        if not os.path.isdir(dir_path):
+            try:
+                os.makedirs(dir_path)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    raise e
+
+        with codecs.open(txt_path, "w", "utf-8") as txt:
+            with codecs.open(html_path, "w", "utf-8") as html:
+                utils.lava_log_parser.run(self.log, self.meta, txt, html)
+
+    def store_rootfs_info(self, file_name):
+        """Add rootfs info
+
+        Parse the the JSON file with the information of the rootfs if it's
+        available and add its information to the group data.  If the file URL
+        matches the local storage server, then read it directly from the file
+        system.
+        """
+
+        rootfs_url = self.meta.get("initrd")
+        if not rootfs_url or rootfs_url == "None":
+            return
+
+        try:
+            # compare to default URL without the scheme
+            _default_url = urlparse(DEFAULT_STORAGE_URL).netloc
+            _rootfs_url = urlparse(rootfs_url).netloc
+            if _rootfs_url.startswith(_default_url):
+                rootfs_url_path = urlparse(rootfs_url).path
+                rootfs_rel_dir = os.path.dirname(rootfs_url_path).lstrip("/")
+                json_file = os.path.join(self.base_path, rootfs_rel_dir,
+                                         file_name)
+                rootfs_info_json = open(json_file)
+            else:
+                rootfs_top_url = rootfs_url.rpartition("/")[0]
+                file_url = "/".join([rootfs_top_url, file_name])
+                utils.LOG.info("Downloading rootfs info: {}".format(file_url))
+                rootfs_info_json = urllib2.urlopen(file_url)
+
+            rootfs_info = json.load(rootfs_info_json)
+            self.meta[models.INITRD_INFO_KEY] = rootfs_info
+        except IOError as e:
+            utils.LOG.warn("IOError: {}".format(e))
+        except ValueError as e:
+            utils.LOG.warn("ValueError: {}".format(e))
 
 
 def add_tests(job_data, job_meta, lab_name, db_options,
@@ -642,33 +678,21 @@ def add_tests(job_data, job_meta, lab_name, db_options,
     }
 
     try:
-        _get_job_meta(meta, job_data)
-        _get_definition_meta(meta, job_meta, META_DATA_MAP_TEST)
-        _get_directory_path(meta, base_path)
-        _get_lava_meta(meta, job_data)
-        plan_name = meta[models.PLAN_KEY]
-        log = _prepare_log(job_data["log"])
-        results = _unpack_results(job_data["results"])
-        _adjust_log_line_numbers(results, log)
-        _filter_log_data(log, LAVA_FILTERS)
-        translate_map = _prepare_line_num_translate(results, log)
-        _translate_log_end_lines(results, translate_map)
-        _add_test_log(meta, log, plan_name)
-        _add_rootfs_info(meta, base_path)
-        _store_lava_json(job_data, meta)
+        callback = LavaCallback.process_callback(job_data, job_meta,
+                                                 lab_name, base_path)
         groups = []
         cases = []
         start_log_line = 0
         end_lines_map = {}
         job_tc = None
         login_tc = None
-        for suite_name, suite_results in results.iteritems():
+        for suite_name, suite_results in callback.results.iteritems():
             if suite_name == "lava":
                 login_tc = _get_test_case(suite_results,
                                           ('login-action',
                                            'auto-login-action'))
                 job_tc = _get_test_case(suite_results, ('job',))
-                login_line_num = _get_log_line_number(log,
+                login_line_num = _get_log_line_number(callback.log,
                                                       LOGIN_CASE_END_PATTERN)
                 start_log_line = 0 if login_line_num is None \
                     else login_line_num
@@ -683,9 +707,11 @@ def add_tests(job_data, job_meta, lab_name, db_options,
             login_tc = job_tc
         if login_tc:
             _add_login_case(meta, cases, login_tc)
-        add_log_fragments(groups, log, end_lines_map, start_log_line)
+        add_log_fragments(groups, callback.log, end_lines_map, start_log_line)
 
-        if (len(groups) == 1) and (groups[0][models.NAME_KEY] == plan_name):
+        plan_name = callback.meta[models.PLAN_KEY]
+        if ((len(groups) == 1) and
+                (groups[0][models.NAME_KEY] == plan_name)):
             # Only one group with same name as test plan
             plan = groups[0]
             if cases:
@@ -704,12 +730,6 @@ def add_tests(job_data, job_meta, lab_name, db_options,
             ret_code, plan_doc_id, err = \
                 utils.kci_test.import_and_save_kci_tests(plan, db_options)
             utils.errors.update_errors(errors, err)
-    except (yaml.YAMLError, ValueError) as ex:
-        ret_code = 400
-        msg = "Invalid test data from LAVA callback"
-    except (OSError, IOError) as ex:
-        ret_code = 500
-        msg = "Internal error"
     finally:
         if ex is not None:
             utils.LOG.exception(ex)
