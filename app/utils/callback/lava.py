@@ -61,24 +61,6 @@ LAVA_JOB_RESULT = {
     CANCELING: "UNKNOWN",
 }
 
-TEST_CASE_MAP = {
-    models.NAME_KEY: "name",
-    models.STATUS_KEY: "result",
-}
-
-TEST_CASE_GROUP_KEYS = [
-    models.ARCHITECTURE_KEY,
-    models.BUILD_ENVIRONMENT_KEY,
-    models.DEFCONFIG_FULL_KEY,
-    models.DEVICE_TYPE_KEY,
-    models.GIT_BRANCH_KEY,
-    models.GIT_COMMIT_KEY,
-    models.JOB_KEY,
-    models.KERNEL_KEY,
-    models.LAB_NAME_KEY,
-    models.MACH_KEY,
-]
-
 TEST_CASE_NAME_EXTRA = {
     "http-download": ["label"],
     "git-repo-action": ["commit", "path"],
@@ -325,67 +307,6 @@ def _get_log_line_number(log, pattern):
             return line_number
 
 
-def _add_test_results(group, results, log_line_data):
-    """Add test results from test suite data to a group.
-
-    Import test results from a LAVA test suite into a group dictionary with the
-    list of test cases that are not in any test set.  Test sets are converted
-    into sub-groups with the test cases they contain.
-
-    :param group: Test group data.
-    :type group: dict
-    :param results: Test results from the callback.
-    :type results: dict
-    :param log_line_data: dict of {test_case_path: log_end_line}
-    :type log_line_data: dict
-    """
-    tests = results
-    test_cases = []
-    test_sets = OrderedDict()
-
-    for test in reversed(tests):
-        test_case = {
-            models.VERSION_KEY: "1.1",
-            models.TIME_KEY: "0.0",
-        }
-        path = [group.get('name')]
-        test_case.update({k: test[v] for k, v in TEST_CASE_MAP.iteritems()})
-        test_case.update({k: group[k] for k in TEST_CASE_GROUP_KEYS})
-        measurement = test.get("measurement")
-        if measurement and measurement != 'None':
-            test_case[models.MEASUREMENTS_KEY] = [{
-                "value": float(measurement),
-                "unit": test["unit"],
-            }]
-        test_meta = test["metadata"]
-        reference = test_meta.get("reference")
-        if reference:
-            test_case[models.ATTACHMENTS_KEY] = [reference]
-        test_set_name = test_meta.get("set")
-        if test_set_name:
-            path.append(test_set_name)
-            test_case_list = test_sets.setdefault(test_set_name, [])
-        else:
-            test_case_list = test_cases
-        path.append(test_case[models.NAME_KEY])
-        log_line_data[tuple(path)] = int(test["log_end_line"])
-        test_case_list.append(test_case)
-
-    sub_groups = []
-    for test_set in test_sets.iteritems():
-        test_set_name, test_set_cases = test_set
-        sub_group = {
-            models.NAME_KEY: test_set_name,
-            models.TEST_CASES_KEY: test_set_cases,
-        }
-        sub_groups.append(sub_group)
-
-    group.update({
-        models.TEST_CASES_KEY: test_cases,
-        models.SUB_GROUPS_KEY: sub_groups,
-    })
-
-
 def _adjust_log_line_numbers(results, log):
     """ A workaround for a race condition effect visible in LAVA callbacks
 
@@ -486,18 +407,12 @@ class LavaCallback(object):
     def __init__(self, job_data, definition_meta, lab_name,
                  base_path):
         self._job_data = job_data
-        self._errors = {}
         self.base_path = base_path
-        try:
-            self.meta = self._prepare_meta(job_data, definition_meta, lab_name)
-            self.results = self._prepare_results(job_data["results"])
-            self.definition = yaml.load(job_data["definition"],
-                                        Loader=yaml.CLoader)
-            self.log = self._prepare_log(job_data["log"])
-        except yaml.YAMLError:
-            ret_code = 401
-            msg = "Invalid test data from LAVA callback"
-            utils.errors.add_error(self._errors, ret_code, msg)
+        self.meta = self._prepare_meta(job_data, definition_meta, lab_name)
+        self.results = self._prepare_results(job_data["results"])
+        self.definition = yaml.load(job_data["definition"],
+                                    Loader=yaml.CLoader)
+        self.log = self._prepare_log(job_data["log"])
 
     def _prepare_meta(self, job_data, definition_meta, lab_name):
         meta = {
@@ -514,6 +429,7 @@ class LavaCallback(object):
             except KeyError as ex:
                 utils.LOG.warn("Metadata field {} missing in the job"
                                " result.".format(ex))
+        self.add_rootfs_info()
         return meta
 
     def _prepare_results(self, results):
@@ -528,80 +444,7 @@ class LavaCallback(object):
             log_line['line_num'] = i
         return log
 
-    def store_artifacts(self):
-        try:
-            self.store_test_log()
-            self.store_lava_json()
-            self.store_rootfs_info("build_info.json")
-        except (OSError, IOError):
-            ret_code = 500
-            msg = "Internal error"
-            utils.errors.add_error(self._errors, ret_code, msg)
-
-    def store_lava_json(self):
-        """ Save the json LAVA v2 callback object
-
-        Save LAVA v2 callback data as json file.
-        """
-
-        file_name = "-".join(["lava-json", self.meta[models.DEVICE_TYPE_KEY]])
-        file_name = ".".join([file_name, "json"])
-
-        dir_path = self.meta[models.DIRECTORY_PATH]
-
-        utils.LOG.info("Saving LAVA v2 callback file {} data in {}".format(
-            file_name,
-            dir_path))
-
-        file_path = os.path.join(dir_path, file_name)
-
-        # Removing the token
-        self._job_data.pop("token", None)
-
-        # Add extra information
-        self._job_data["lab_name"] = self.meta.get("lab_name")
-        self._job_data["version"] = self.meta.get("version")
-        self._job_data["boot_log_html"] = self.meta.get("boot_log_html")
-
-        if not os.path.isdir(dir_path):
-            try:
-                os.makedirs(dir_path)
-            except OSError as e:
-                if e.errno != errno.EEXIST:
-                    raise e
-
-        with open(file_path, "wb") as f:
-            f.write(json.dumps(self._job_data))
-
-    def store_test_log(self):
-        """Parse and save test logs
-
-        Parse the LAVA v2 log in YAML format and save it
-        as plain text and HTML.
-        """
-
-        dir_path = self.meta[models.DIRECTORY_PATH]
-        suite = self.meta[models.PLAN_KEY]
-        utils.LOG.info("Generating {} "
-                       "log files in {}".format(suite, dir_path))
-        file_name = "-".join([suite, self.meta[models.DEVICE_TYPE_KEY]])
-        files = tuple(".".join([file_name, ext]) for ext in ["txt", "html"])
-        (self.meta[models.BOOT_LOG_KEY],
-         self.meta[models.BOOT_LOG_HTML_KEY]) = files
-        txt_path, html_path = (os.path.join(dir_path, f) for f in files)
-
-        if not os.path.isdir(dir_path):
-            try:
-                os.makedirs(dir_path)
-            except OSError as e:
-                if e.errno != errno.EEXIST:
-                    raise e
-
-        with codecs.open(txt_path, "w", "utf-8") as txt:
-            with codecs.open(html_path, "w", "utf-8") as html:
-                utils.lava_log_parser.run(self.log, self.meta, txt, html)
-
-    def store_rootfs_info(self, file_name):
+    def add_rootfs_info(self, file_name='build_info.json'):
         """Add rootfs info
 
         Parse the the JSON file with the information of the rootfs if it's
@@ -610,7 +453,7 @@ class LavaCallback(object):
         system.
         """
 
-        rootfs_url = self.meta.get("initrd")
+        rootfs_url = self.meta.get(models.INITRD_KEY)
         if not rootfs_url or rootfs_url == "None":
             return
 
@@ -638,6 +481,169 @@ class LavaCallback(object):
             utils.LOG.warn("ValueError: {}".format(e))
 
 
+def store_artifacts(metadata, job_data, log):
+    store_test_log(metadata, log)
+    store_lava_json(metadata, job_data)
+
+
+def store_lava_json(metadata, job_data):
+    """ Save the json LAVA v2 callback object
+
+    Save LAVA v2 callback data as json file.
+    """
+
+    file_name = "-".join(["lava-json", metadata[models.DEVICE_TYPE_KEY]])
+    file_name = ".".join([file_name, "json"])
+
+    dir_path = metadata[models.DIRECTORY_PATH]
+
+    utils.LOG.info("Saving LAVA v2 callback file {} data in {}".format(
+        file_name,
+        dir_path))
+
+    file_path = os.path.join(dir_path, file_name)
+
+    # Removing the token
+    job_data.pop("token", None)
+
+    # Add extra information
+    job_data["lab_name"] = metadata.get("lab_name")
+    job_data["version"] = metadata.get("version")
+    job_data["boot_log_html"] = metadata.get("boot_log_html")
+    utils.make_path(dir_path)
+    with open(file_path, "wb") as f:
+        f.write(json.dumps(job_data))
+
+
+def store_test_log(metadata, log):
+    """Parse and save test logs
+
+    Parse the LAVA v2 log in YAML format and save it
+    as plain text and HTML.
+    """
+
+    dir_path = metadata[models.DIRECTORY_PATH]
+    suite = metadata[models.PLAN_KEY]
+    utils.LOG.info("Generating {} "
+                   "log files in {}".format(suite, dir_path))
+    file_name = "-".join([suite, metadata[models.DEVICE_TYPE_KEY]])
+    files = tuple(".".join([file_name, ext]) for ext in ["txt", "html"])
+    (metadata[models.BOOT_LOG_KEY],
+     metadata[models.BOOT_LOG_HTML_KEY]) = files
+    txt_path, html_path = (os.path.join(dir_path, f) for f in files)
+    utils.make_path(dir_path)
+    with codecs.open(txt_path, "w", "utf-8") as txt:
+        with codecs.open(html_path, "w", "utf-8") as html:
+            utils.lava_log_parser.run(log, metadata, txt, html)
+
+
+class LavaResults(object):
+    TEST_CASE_MAP = {
+        models.NAME_KEY: "name",
+        models.STATUS_KEY: "result",
+    }
+
+    TEST_CASE_GROUP_KEYS = [
+        models.ARCHITECTURE_KEY,
+        models.BUILD_ENVIRONMENT_KEY,
+        models.DEFCONFIG_FULL_KEY,
+        models.DEVICE_TYPE_KEY,
+        models.GIT_BRANCH_KEY,
+        models.GIT_COMMIT_KEY,
+        models.JOB_KEY,
+        models.KERNEL_KEY,
+        models.LAB_NAME_KEY,
+        models.MACH_KEY,
+    ]
+
+    def __init__(self, results, metadata):
+        self.groups = self._populate_groups(results,
+                                            metadata)
+
+    def _populate_groups(self, results, metadata):
+        groups = []
+        cases = []
+        job_tc = None
+        login_tc = None
+        for suite_name, suite_results in results.iteritems():
+            if suite_name == "lava":
+                login_tc = _get_test_case(suite_results,
+                                          ('login-action',
+                                           'auto-login-action'))
+                job_tc = _get_test_case(suite_results, ('job',))
+            else:
+                suite_name = suite_name.partition("_")[2]
+                group = dict(metadata)
+                group[models.NAME_KEY] = suite_name
+                self._add_test_results(group, suite_results)
+                groups.append(group)
+        if login_tc and login_tc.get('result') == 'pass' and len(groups) == 0:
+            login_tc = job_tc
+        # if login_tc:
+        #     _add_login_case(meta, cases, login_tc)
+        return groups
+
+    def _add_test_results(self, group, results):
+        """Add test results from test suite data to a group.
+
+        Import test results from a LAVA test suite into a group dictionary
+        with the list of test cases that are not in any test set.
+        Test sets are converted into sub-groups with the test cases they
+        contain.
+
+        :param group: Test group data.
+        :type group: dict
+        :param results: Test results from the callback.
+        :type results: dict
+        """
+        tests = results
+        test_cases = []
+        test_sets = OrderedDict()
+
+        for test in reversed(tests):
+            test_case = {
+                models.VERSION_KEY: "1.1",
+                models.TIME_KEY: "0.0",
+            }
+            path = [group.get('name')]
+            test_case.update({k: test[v]
+                              for k, v in self.TEST_CASE_MAP.iteritems()})
+            test_case.update({k: group[k]
+                              for k in self.TEST_CASE_GROUP_KEYS})
+            measurement = test.get("measurement")
+            if measurement and measurement != 'None':
+                test_case[models.MEASUREMENTS_KEY] = [{
+                    "value": float(measurement),
+                    "unit": test["unit"],
+                }]
+            test_meta = test["metadata"]
+            reference = test_meta.get("reference")
+            if reference:
+                test_case[models.ATTACHMENTS_KEY] = [reference]
+            test_set_name = test_meta.get("set")
+            if test_set_name:
+                path.append(test_set_name)
+                test_case_list = test_sets.setdefault(test_set_name, [])
+            else:
+                test_case_list = test_cases
+            path.append(test_case[models.NAME_KEY])
+            test_case_list.append(test_case)
+
+        sub_groups = []
+        for test_set in test_sets.iteritems():
+            test_set_name, test_set_cases = test_set
+            sub_group = {
+                models.NAME_KEY: test_set_name,
+                models.TEST_CASES_KEY: test_set_cases,
+            }
+            sub_groups.append(sub_group)
+
+        group.update({
+            models.TEST_CASES_KEY: test_cases,
+            models.SUB_GROUPS_KEY: sub_groups,
+        })
+
+
 def add_tests(job_data, job_meta, lab_name, db_options,
               base_path=utils.BASE_PATH):
     """Entry point to be used as an external task.
@@ -663,84 +669,64 @@ def add_tests(job_data, job_meta, lab_name, db_options,
     ex = None
     msg = None
 
-    utils.LOG.info("Processing LAVA test data: job {} from {}".format(
-        job_data["id"], lab_name))
-
-    if job_data.get("status") not in (COMPLETE, INCOMPLETE):
-        utils.LOG.warning("Skipping LAVA job due to unsupported status: "
-                          "{}".format(job_data["status_string"]))
-        return None
-
-    meta = {
-        models.VERSION_KEY: "1.1",
-        models.LAB_NAME_KEY: lab_name,
-        models.TIME_KEY: "0.0",
-    }
-
+    callback = None
     try:
         callback = LavaCallback.process_callback(job_data, job_meta,
                                                  lab_name, base_path)
-        groups = []
-        cases = []
-        start_log_line = 0
-        end_lines_map = {}
-        job_tc = None
-        login_tc = None
-        for suite_name, suite_results in callback.results.iteritems():
-            if suite_name == "lava":
-                login_tc = _get_test_case(suite_results,
-                                          ('login-action',
-                                           'auto-login-action'))
-                job_tc = _get_test_case(suite_results, ('job',))
-                login_line_num = _get_log_line_number(callback.log,
-                                                      LOGIN_CASE_END_PATTERN)
-                start_log_line = 0 if login_line_num is None \
-                    else login_line_num
-            else:
-                suite_name = suite_name.partition("_")[2]
-                group = dict(meta)
-                group[models.NAME_KEY] = suite_name
-                _add_test_results(group, suite_results,
-                                  end_lines_map)
-                groups.append(group)
-        if login_tc and login_tc.get('result') == 'pass' and len(groups) == 0:
-            login_tc = job_tc
-        if login_tc:
-            _add_login_case(meta, cases, login_tc)
-        add_log_fragments(groups, callback.log, end_lines_map, start_log_line)
+    except yaml.YAMLError as ex:
+        ret_code = 401
+        msg = "Invalid test data from LAVA callback"
+        utils.errors.add_error(errors, ret_code, msg)
+        handle_errors(ex, msg, errors)
 
-        plan_name = callback.meta[models.PLAN_KEY]
-        if ((len(groups) == 1) and
-                (groups[0][models.NAME_KEY] == plan_name)):
-            # Only one group with same name as test plan
-            plan = groups[0]
-            if cases:
-                insert_len = len(cases)
-                plan_cases = plan[models.TEST_CASES_KEY]
-                cases.extend(plan_cases)
-                plan[models.TEST_CASES_KEY] = cases
-        elif groups or cases:
-            # Create top-level group with the test plan name
-            plan = dict(meta)
-            plan[models.NAME_KEY] = plan_name
-            plan[models.SUB_GROUPS_KEY] = groups
+    if callback is None:
+        return None
+
+    try:
+        store_artifacts(callback.meta, job_data, callback.log)
+    except (OSError, IOError) as ex:
+        ret_code = 500
+        msg = "Internal error"
+        utils.errors.add_error(errors, ret_code, msg)
+        handle_errors(ex, msg, errors)
+
+    test_results = LavaResults(callback.results,
+                               callback.meta)
+    cases = []
+    plan_name = callback.meta[models.PLAN_KEY]
+    if ((len(test_results.groups) == 1) and
+            (test_results.groups[0][models.NAME_KEY] == plan_name)):
+        # Only one group with same name as test plan
+        plan = test_results.groups[0]
+        if cases:
+            insert_len = len(cases)
+            plan_cases = plan[models.TEST_CASES_KEY]
+            cases.extend(plan_cases)
             plan[models.TEST_CASES_KEY] = cases
+    elif test_results.groups or cases:
+        # Create top-level group with the test plan name
+        plan = dict(callback.meta)
+        plan[models.NAME_KEY] = plan_name
+        plan[models.SUB_GROUPS_KEY] = test_results.groups
+        plan[models.TEST_CASES_KEY] = cases
 
-        if plan:
-            ret_code, plan_doc_id, err = \
-                utils.kci_test.import_and_save_kci_tests(plan, db_options)
-            utils.errors.update_errors(errors, err)
-    finally:
-        if ex is not None:
-            utils.LOG.exception(ex)
-        if msg is not None:
-            utils.LOG.error(msg)
-            utils.errors.add_error(errors, ret_code, msg)
-        if errors:
-            raise utils.errors.BackendError(errors)
+    if plan:
+        ret_code, plan_doc_id, err = \
+            utils.kci_test.import_and_save_kci_tests(plan, db_options)
+        utils.errors.update_errors(errors, err)
+        handle_errors(errors=errors)
 
     if not plan_doc_id:
         utils.LOG.warn("No test results")
         return None
 
     return plan_doc_id
+
+
+def handle_errors(ex=None, msg=None, errors=None):
+    if ex is not None:
+        utils.LOG.exception(ex)
+    if msg is not None:
+        utils.LOG.error(msg)
+    if errors:
+        raise utils.errors.BackendError(errors)
