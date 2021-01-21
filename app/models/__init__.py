@@ -39,6 +39,7 @@ ACCEPTED_KEYS = "accepted"
 ADDRESS_KEY = "address"
 AGGREGATE_KEY = "aggregate"
 ARCHITECTURE_KEY = "arch"
+ATTACHMENTS_KEY = 'attachments'
 BASELINE_KEY = "baseline"
 BOARD_INSTANCE_KEY = "board_instance"
 BOARD_KEY = "board"
