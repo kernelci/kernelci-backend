@@ -245,7 +245,8 @@ def push_tests(group_id, kcidb_options, db_options={}, db=None):
                 },
                 'path': test['path'],
                 'description': test_description,
-                'status': test['status'],
+                'status': ('SKIP' if test['status'] == 'UNKNOWN'
+                           else test['status']),
                 'waived': False,
                 'start_time': test['start_time'],
                 'output_files': output_files,
