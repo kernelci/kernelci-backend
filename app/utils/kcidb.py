@@ -180,6 +180,9 @@ def push_build(build_id, first, kcidb_options, db_options={}, db=None):
 
 
 def push_tests(group_id, kcidb_options, db_options={}, db=None):
+    status_translate = {
+        'UNKNOWN': 'SKIP'
+    }
     if db is None:
         db = utils.db.get_db_connection(db_options)
     collection = db[models.TEST_GROUP_COLLECTION]
@@ -245,11 +248,13 @@ def push_tests(group_id, kcidb_options, db_options={}, db=None):
                 },
                 'path': test['path'],
                 'description': test_description,
-                'status': test['status'],
+                'status': status_translate.get(test['status'], test['status']),
                 'waived': False,
                 'start_time': test['start_time'],
                 'output_files': output_files,
-                'misc': misc,
+                'misc': misc.copy().update(
+                    {'kernelci-status': test['status']}
+                ),
             }
             for test in test_cases
         ],
