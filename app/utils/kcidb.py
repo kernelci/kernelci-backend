@@ -259,4 +259,8 @@ def push_tests(group_id, kcidb_options, db_options={}, db=None):
             for test in test_cases
         ],
     }
+    from pprint import pprint
+    pprint('-=Data to be sent to kcidb=-')
+    pprint(kcidb_data)
+    pprint('=' * 20)
     _submit(kcidb_data, kcidb_options)
