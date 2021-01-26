@@ -119,116 +119,6 @@ def _get_definition_meta(meta, job_meta, meta_data_map):
                            " result.".format(ex))
 
 
-def _get_lava_job_meta(meta, boot_meta):
-    """Parse the job meta-data from LAVA
-
-    :param meta: The boot meta-data.
-    :type meta: dictionary
-    :param boot_meta: The boot and auto_login meta-data from the LAVA v2 job.
-    :type boot_meta: dictionary
-    """
-    if boot_meta.get("error_type") == "Infrastructure":
-        meta[models.BOOT_RESULT_KEY] = "UNKNOWN"
-
-
-def _get_lava_boot_meta(meta, boot_meta):
-    """Parse the boot and login meta-data from LAVA
-
-    :param meta: The boot meta-data.
-    :type meta: dictionary
-    :param boot_meta: The boot and auto_login meta-data from the LAVA v2 job.
-    :type boot_meta: dictionary
-    """
-    meta[models.BOOT_TIME_KEY] = boot_meta["duration"]
-    extra = boot_meta.get("extra", None)
-    if extra is None:
-        return
-    kernel_messages = []
-    for e in extra:
-        fail = e.get("fail", None)
-        if not fail:
-            continue
-        if isinstance(fail, str):
-            kernel_messages.append(fail)
-        else:
-            for msg in (f.get("message", None) for f in fail):
-                if msg:
-                    kernel_messages.append(msg)
-    if kernel_messages:
-        meta[models.BOOT_WARNINGS_KEY] = len(kernel_messages)
-
-
-def _get_lava_bootloader_meta(meta, bl_meta):
-    """Parse the bootloader meta-data from LAVA
-
-    :param meta: The boot meta-data.
-    :type meta: dictionary
-    :param bl_meta: The bootloader meta-data from the LAVA v2 job.
-    :type bl_meta: dictionary
-    """
-    extra = bl_meta.get("extra", None)
-    if extra is None:
-        return
-    for e in extra:
-        for k, v in e.iteritems():
-            meta_key = BL_META_MAP.get(k, None)
-            if meta_key:
-                meta[meta_key] = v
-
-
-def _get_lava_meta(meta, job_data):
-    """Parse the meta-data from LAVA
-
-    Go through the LAVA meta-data and extract the fields needed to create a
-    boot entry in the database.
-
-    :param meta: The boot meta-data.
-    :type meta: dictionary
-    :param job_data: The JSON data from the callback.
-    :type job_data: dict
-    """
-    lava = yaml.load(job_data["results"]["lava"], Loader=yaml.CLoader)
-    meta_handlers = {
-        'job': _get_lava_job_meta,
-        'auto-login-action': _get_lava_boot_meta,
-        'bootloader-overlay': _get_lava_bootloader_meta,
-    }
-    for step in lava:
-        handler = meta_handlers.get(step["name"])
-        if handler:
-            handler(meta, step["metadata"])
-
-
-def _get_directory_path(meta, base_path):
-    """Create the dir_path from LAVA metadata
-
-    Update the metadata with the storage path of the artifacts.
-    If possible, use the file_server_resource from the metadata.
-
-    :param meta: The boot meta-data.
-    :type meta: dictionary
-    :param base_path: The filesystem path where all storage is based
-    :type base_path: dict
-    """
-    file_server_resource = meta.get(models.FILE_SERVER_RESOURCE_KEY)
-    if file_server_resource:
-        directory_path = os.path.join(
-            base_path,
-            file_server_resource,
-            meta[models.LAB_NAME_KEY])
-    else:
-        directory_path = os.path.join(
-            base_path,
-            meta[models.JOB_KEY],
-            meta[models.GIT_BRANCH_KEY],
-            meta[models.KERNEL_KEY],
-            meta[models.ARCHITECTURE_KEY],
-            meta[models.DEFCONFIG_FULL_KEY],
-            meta[models.BUILD_ENVIRONMENT_KEY],
-            meta[models.LAB_NAME_KEY])
-    meta[models.DIRECTORY_PATH] = directory_path
-
-
 def add_log_fragments(groups, log, end_lines_map, start_log_line):
     lines_map = _prepare_lines_map(end_lines_map, start_log_line)
     for path, tc in _test_case_iter(groups):
@@ -425,11 +315,121 @@ class LavaCallback(object):
         """
         self._job_data = job_data
         self.base_path = base_path
-        self.meta = self._prepare_meta(job_data, definition_meta, lab_name)
         self.results = self._prepare_results(job_data["results"])
+        self.meta = self._prepare_meta(job_data, definition_meta, lab_name)
         self.definition = yaml.load(job_data["definition"],
                                     Loader=yaml.CLoader)
         self.log = self._prepare_log(job_data["log"])
+
+    def _get_lava_job_meta(self, boot_meta):
+        """Parse the job meta-data from LAVA
+
+        :param meta: The boot meta-data.
+        :type meta: dictionary
+        :param boot_meta: The boot and auto_login meta-data
+               from the LAVA v2 job.
+        :type boot_meta: dictionary
+        """
+        meta = {}
+        if boot_meta.get("error_type") == "Infrastructure":
+            meta[models.BOOT_RESULT_KEY] = "UNKNOWN"
+        return meta
+
+    def _get_lava_boot_meta(self, boot_meta):
+        """Parse the boot and login meta-data from LAVA
+
+        :param boot_meta: The boot and auto_login meta-data
+               from the LAVA v2 job.
+        :type boot_meta: dictionary
+        :return meta: The boot meta-data dict
+        """
+        meta = {}
+        meta[models.BOOT_TIME_KEY] = boot_meta["duration"]
+        extra = boot_meta.get("extra", None)
+        if extra is None:
+            return
+        kernel_messages = []
+        for e in extra:
+            fail = e.get("fail", None)
+            if not fail:
+                continue
+            if isinstance(fail, str):
+                kernel_messages.append(fail)
+            else:
+                for msg in (f.get("message", None) for f in fail):
+                    if msg:
+                        kernel_messages.append(msg)
+        if kernel_messages:
+            meta[models.BOOT_WARNINGS_KEY] = len(kernel_messages)
+        return meta
+
+    def _get_lava_bootloader_meta(self, bl_meta):
+        """Parse the bootloader meta-data from LAVA
+
+        :param bl_meta: The bootloader meta-data from the LAVA v2 job.
+        :type bl_meta: dictionary
+        :return The boot meta-data
+        """
+        meta = {}
+        extra = bl_meta.get("extra", None)
+        if extra is None:
+            return
+        for e in extra:
+            for k, v in e.iteritems():
+                meta_key = BL_META_MAP.get(k, None)
+                if meta_key:
+                    meta[meta_key] = v
+        return meta
+
+    def _get_directory_path(self, meta):
+        """Create the dir_path from LAVA metadata
+
+        Update the metadata with the storage path of the artifacts.
+        If possible, use the file_server_resource from the metadata.
+
+        :param meta: The boot meta-data.
+        :type meta: dictionary
+        """
+
+        file_server_resource = meta.get(models.FILE_SERVER_RESOURCE_KEY)
+        if file_server_resource:
+            directory_path = os.path.join(
+                self.base_path,
+                file_server_resource,
+                meta[models.LAB_NAME_KEY])
+        else:
+            directory_path = os.path.join(
+                self.base_path,
+                meta[models.JOB_KEY],
+                meta[models.GIT_BRANCH_KEY],
+                meta[models.KERNEL_KEY],
+                meta[models.ARCHITECTURE_KEY],
+                meta[models.DEFCONFIG_FULL_KEY],
+                meta[models.BUILD_ENVIRONMENT_KEY],
+                meta[models.LAB_NAME_KEY])
+        return directory_path
+
+    def _get_lava_meta(self):
+        """Parse the meta-data from LAVA
+
+        Go through the LAVA meta-data and extract the fields needed to create a
+        boot entry in the database.
+
+        :return LAVA metadata dict
+        """
+        lava = self.results["lava"]
+        meta_handlers = {
+            'job': self._get_lava_job_meta,
+            'auto-login-action': self._get_lava_boot_meta,
+            'login-action': self._get_lava_boot_meta,
+            'bootloader-overlay': self._get_lava_bootloader_meta,
+        }
+        meta = {}
+        for step in lava:
+            handler = meta_handlers.get(step["name"])
+            if handler:
+                meta.update(handler(step["metadata"]))
+        return meta
 
     def _prepare_meta(self, job_data, definition_meta, lab_name):
         meta = {
@@ -446,7 +446,13 @@ class LavaCallback(object):
             except KeyError as ex:
                 utils.LOG.warn("Metadata field {} missing in the job"
                                " result.".format(ex))
-        self.add_rootfs_info()
+        meta.update(self._get_lava_meta())
+        meta[models.DIRECTORY_PATH] = self._get_directory_path(meta)
+        rootfs_url = meta.get(models.INITRD_KEY)
+        if rootfs_url and rootfs_url != "None":
+            rootfs_info = self._get_rootfs_info(rootfs_url)
+            if rootfs_info:
+                meta[models.INITRD_INFO_KEY] = rootfs_info
         return meta
 
     def _prepare_results(self, results):
@@ -461,7 +467,7 @@ class LavaCallback(object):
             log_line['line_num'] = i
         return log
 
-    def add_rootfs_info(self, file_name='build_info.json'):
+    def _get_rootfs_info(self, rootfs_url, file_name='build_info.json'):
         """Add rootfs info
 
         Parse the the JSON file with the information of the rootfs if it's
@@ -469,11 +475,7 @@ class LavaCallback(object):
         matches the local storage server, then read it directly from the file
         system.
         """
-
-        rootfs_url = self.meta.get(models.INITRD_KEY)
-        if not rootfs_url or rootfs_url == "None":
-            return
-
+        rootfs_info = None
         try:
             # compare to default URL without the scheme
             _default_url = urlparse(DEFAULT_STORAGE_URL).netloc
@@ -489,13 +491,12 @@ class LavaCallback(object):
                 file_url = "/".join([rootfs_top_url, file_name])
                 utils.LOG.info("Downloading rootfs info: {}".format(file_url))
                 rootfs_info_json = urllib2.urlopen(file_url)
-
             rootfs_info = json.load(rootfs_info_json)
-            self.meta[models.INITRD_INFO_KEY] = rootfs_info
         except IOError as e:
             utils.LOG.warn("IOError: {}".format(e))
         except ValueError as e:
             utils.LOG.warn("ValueError: {}".format(e))
+        return rootfs_info
 
 
 def store_artifacts(metadata, job_data, log):
