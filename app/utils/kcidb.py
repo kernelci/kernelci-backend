@@ -179,7 +179,19 @@ def push_build(build_id, first, kcidb_options, db_options={}, db=None):
     _submit(kcidb_data, kcidb_options)
 
 
+def _get_test_misc(group, test):
+    misc = {
+        'plan': group[models.NAME_KEY],
+        'plan_variant': group[models.PLAN_VARIANT_KEY],
+        'kernelci_status': test['status']
+    }
+    return misc
+
+
 def push_tests(group_id, kcidb_options, db_options={}, db=None):
+    status_translate = {
+        'UNKNOWN': 'SKIP'
+    }
     if db is None:
         db = utils.db.get_db_connection(db_options)
     collection = db[models.TEST_GROUP_COLLECTION]
@@ -201,10 +213,6 @@ def push_tests(group_id, kcidb_options, db_options={}, db=None):
         group[models.DEVICE_TYPE_KEY],
         group[models.LAB_NAME_KEY]
     )
-    misc = {
-        'plan': group[models.NAME_KEY],
-        'plan_variant': group[models.PLAN_VARIANT_KEY],
-    }
     env_misc = {
         'device': group[models.DEVICE_TYPE_KEY],
         'lab': group[models.LAB_NAME_KEY],
@@ -245,11 +253,11 @@ def push_tests(group_id, kcidb_options, db_options={}, db=None):
                 },
                 'path': test['path'],
                 'description': test_description,
-                'status': test['status'],
+                'status': status_translate.get(test['status'], test['status']),
                 'waived': False,
                 'start_time': test['start_time'],
                 'output_files': output_files,
-                'misc': misc,
+                'misc': _get_test_misc(group, test)
             }
             for test in test_cases
         ],
