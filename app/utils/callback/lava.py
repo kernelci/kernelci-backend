@@ -119,36 +119,6 @@ def _get_definition_meta(meta, job_meta, meta_data_map):
                            " result.".format(ex))
 
 
-def _get_directory_path(meta, base_path):
-    """Create the dir_path from LAVA metadata
-
-    Update the metadata with the storage path of the artifacts.
-    If possible, use the file_server_resource from the metadata.
-
-    :param meta: The boot meta-data.
-    :type meta: dictionary
-    :param base_path: The filesystem path where all storage is based
-    :type base_path: dict
-    """
-    file_server_resource = meta.get(models.FILE_SERVER_RESOURCE_KEY)
-    if file_server_resource:
-        directory_path = os.path.join(
-            base_path,
-            file_server_resource,
-            meta[models.LAB_NAME_KEY])
-    else:
-        directory_path = os.path.join(
-            base_path,
-            meta[models.JOB_KEY],
-            meta[models.GIT_BRANCH_KEY],
-            meta[models.KERNEL_KEY],
-            meta[models.ARCHITECTURE_KEY],
-            meta[models.DEFCONFIG_FULL_KEY],
-            meta[models.BUILD_ENVIRONMENT_KEY],
-            meta[models.LAB_NAME_KEY])
-    meta[models.DIRECTORY_PATH] = directory_path
-
-
 def add_log_fragments(groups, log, end_lines_map, start_log_line):
     lines_map = _prepare_lines_map(end_lines_map, start_log_line)
     for path, tc in _test_case_iter(groups):
@@ -394,6 +364,34 @@ class LavaCallback(object):
                     meta[meta_key] = v
         return meta
 
+    def _get_directory_path(self):
+        """Create the dir_path from LAVA metadata
+
+        Update the metadata with the storage path of the artifacts.
+        If possible, use the file_server_resource from the metadata.
+
+        :param meta: The boot meta-data.
+        :type meta: dictionary
+        """
+
+        file_server_resource = self.meta.get(models.FILE_SERVER_RESOURCE_KEY)
+        if file_server_resource:
+            directory_path = os.path.join(
+                self.base_path,
+                file_server_resource,
+                self.meta[models.LAB_NAME_KEY])
+        else:
+            directory_path = os.path.join(
+                self.base_path,
+                self.meta[models.JOB_KEY],
+                self.meta[models.GIT_BRANCH_KEY],
+                self.meta[models.KERNEL_KEY],
+                self.meta[models.ARCHITECTURE_KEY],
+                self.meta[models.DEFCONFIG_FULL_KEY],
+                self.meta[models.BUILD_ENVIRONMENT_KEY],
+                self.meta[models.LAB_NAME_KEY])
+        return directory_path
+
     def _get_lava_meta(self):
         """Parse the meta-data from LAVA
 
@@ -432,6 +430,7 @@ class LavaCallback(object):
                 utils.LOG.warn("Metadata field {} missing in the job"
                                " result.".format(ex))
         meta.update(self._get_lava_meta())
+        meta[models.DIRECTORY_PATH] = self._get_directory_path()
         self.add_rootfs_info()
         return meta
 
