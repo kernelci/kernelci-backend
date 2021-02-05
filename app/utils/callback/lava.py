@@ -527,6 +527,31 @@ def store_test_log(metadata, log):
             utils.lava_log_parser.run(log, metadata, txt, html)
 
 
+class LavaPlan(object):
+    def __init__(self, groups, cases, metadata):
+        self.data = self._create_plan(groups, cases, metadata)
+
+    def _create_plan(self, groups, cases, metadata):
+        plan_name = metadata[models.PLAN_KEY]
+        plan = None
+        if ((len(groups) == 1) and
+                (groups[0][models.NAME_KEY] == plan_name)):
+            # Only one group with same name as test plan
+            plan = groups[0]
+            if cases:
+                insert_len = len(cases)
+                plan_cases = plan[models.TEST_CASES_KEY]
+                cases.extend(plan_cases)
+                plan[models.TEST_CASES_KEY] = cases
+        elif groups or cases:
+            # Create top-level group with the test plan name
+            plan = dict(metadata)
+            plan[models.NAME_KEY] = plan_name
+            plan[models.SUB_GROUPS_KEY] = groups
+            plan[models.TEST_CASES_KEY] = cases
+        return plan
+
+
 class LavaResults(object):
     TEST_CASE_MAP = {
         models.NAME_KEY: "name",
@@ -664,11 +689,8 @@ def add_tests(job_data, job_meta, lab_name, db_options,
     :return The top-level test group document id as ObjectId object.
     """
     ret_code = 201
-    plan = None
     plan_doc_id = None
     errors = {}
-    ex = None
-    msg = None
 
     callback = None
     try:
@@ -693,27 +715,11 @@ def add_tests(job_data, job_meta, lab_name, db_options,
 
     test_results = LavaResults(callback.results,
                                callback.meta)
-    cases = []
-    plan_name = callback.meta[models.PLAN_KEY]
-    if ((len(test_results.groups) == 1) and
-            (test_results.groups[0][models.NAME_KEY] == plan_name)):
-        # Only one group with same name as test plan
-        plan = test_results.groups[0]
-        if cases:
-            insert_len = len(cases)
-            plan_cases = plan[models.TEST_CASES_KEY]
-            cases.extend(plan_cases)
-            plan[models.TEST_CASES_KEY] = cases
-    elif test_results.groups or cases:
-        # Create top-level group with the test plan name
-        plan = dict(callback.meta)
-        plan[models.NAME_KEY] = plan_name
-        plan[models.SUB_GROUPS_KEY] = test_results.groups
-        plan[models.TEST_CASES_KEY] = cases
+    plan = LavaPlan(test_results.groups, test_results.cases, callback.meta)
 
-    if plan:
+    if plan.data:
         ret_code, plan_doc_id, err = \
-            utils.kci_test.import_and_save_kci_tests(plan, db_options)
+            utils.kci_test.import_and_save_kci_tests(plan.data, db_options)
         utils.errors.update_errors(errors, err)
         handle_errors(errors=errors)
 
