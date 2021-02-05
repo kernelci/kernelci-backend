@@ -178,18 +178,6 @@ def _get_test_case(tests, names):
             return login
 
 
-def _add_login_case(meta, cases, login_tc):
-    # ToDo: consolidate with _add_test_results
-    test_case = {
-        models.VERSION_KEY: "1.1",
-        models.TIME_KEY: "0.0",
-        models.NAME_KEY: "login",
-        models.STATUS_KEY: login_tc["result"],
-    }
-    test_case.update({k: meta[k] for k in TEST_CASE_GROUP_KEYS})
-    cases.append(test_case)
-
-
 def _get_log_line_number(log, pattern):
     for line_number, line in enumerate(log):
         msg = line.get('msg', '')
@@ -559,10 +547,10 @@ class LavaResults(object):
     ]
 
     def __init__(self, results, metadata):
-        self.groups = self._populate_groups(results,
-                                            metadata)
+        self.groups, self.cases = self._populate_results(results,
+                                                         metadata)
 
-    def _populate_groups(self, results, metadata):
+    def _populate_results(self, results, metadata):
         groups = []
         cases = []
         job_tc = None
@@ -581,9 +569,20 @@ class LavaResults(object):
                 groups.append(group)
         if login_tc and login_tc.get('result') == 'pass' and len(groups) == 0:
             login_tc = job_tc
-        # if login_tc:
-        #     _add_login_case(meta, cases, login_tc)
-        return groups
+        if login_tc:
+            cases.append(self._create_login_case(metadata, login_tc))
+        return groups, cases
+
+    def _create_login_case(self, meta, login_tc):
+        # ToDo: consolidate with _add_test_results
+        test_case = {
+            models.VERSION_KEY: "1.1",
+            models.TIME_KEY: "0.0",
+            models.NAME_KEY: "login",
+            models.STATUS_KEY: login_tc["result"],
+        }
+        test_case.update({k: meta[k] for k in self.TEST_CASE_GROUP_KEYS})
+        return test_case
 
     def _add_test_results(self, group, results):
         """Add test results from test suite data to a group.
