@@ -119,107 +119,12 @@ def _get_definition_meta(meta, job_meta, meta_data_map):
                            " result.".format(ex))
 
 
-def add_log_fragments(groups, log, end_lines_map, start_log_line):
-    lines_map = _prepare_lines_map(end_lines_map, start_log_line)
-    for path, tc in _test_case_iter(groups):
-        try:
-            lines_range = lines_map[path]
-            tc[models.LOG_LINES_KEY] = _get_log_lines(log, *lines_range)
-        except KeyError:
-            utils.LOG.warn(
-                'No log lines specified for path: {} test_case {}'.format(
-                    path, tc.get('name')))
-
-
-def _test_case_iter(groups):
-    for group in groups:
-        stack = [group]
-        path = [group.get('name')]
-        while stack:
-            node = stack.pop()
-            if node is not group:
-                path.append(node.get('name'))
-            for test_case in node.get('test_cases', []):
-                path.append(test_case.get('name'))
-                yield tuple(path), test_case
-                path.pop()
-            if node is not group:
-                path.pop()
-            for sub_group in node.get('sub_groups', []):
-                stack.append(sub_group)
-
-
-def _prepare_lines_map(end_lines_map, start_log_line):
-    lines_map = OrderedDict(sorted(end_lines_map.items(),
-                                   key=lambda i: i[1]))
-    start_line = start_log_line
-    for path, end_line in lines_map.items():
-        lines_map[path] = (start_line, end_line)
-        start_line = end_line + 1
-    return lines_map
-
-
-def _get_log_lines(log, start_line, end_line):
-    lines = [
-        {
-            'dt': dparser.parse(line['dt']),
-            'msg': line['msg']
-        }
-        for line in log[start_line:end_line]
-    ]
-    return lines
-
-
 def _get_test_case(tests, names):
     tests_by_name = {t['name']: t for t in tests}
     for name in names:
         login = tests_by_name.get(name)
         if login:
             return login
-
-
-def _get_log_line_number(log, pattern):
-    for line_number, line in enumerate(log):
-        msg = line.get('msg', '')
-        if pattern.match(unicode(msg)) is not None:
-            return line_number
-
-
-def _adjust_log_line_numbers(results, log):
-    """ A workaround for a race condition effect visible in LAVA callbacks
-
-    This function changes log end line numbers in LAVA test results to match
-    the moment when the signal was sent instead of when it was received.
-    Function doesn't return value, but modifies results dictionary.
-    """
-    for ts, results_data in results.items():
-        if ts == 'lava':
-            continue
-        for result in results_data:
-            end_line_number = int(result['log_end_line'])
-            log_end_line = log[end_line_number]
-            test_case_rcvd = SIGNAL_RECEIVED_PATTERN.match(log_end_line['msg'])
-            test_case_id = test_case_rcvd.group(1) if \
-                test_case_rcvd is not None else None
-            if test_case_id:
-                result['log_end_line'] = _find_new_end_line(end_line_number,
-                                                            log,
-                                                            test_case_id)
-
-
-def _find_new_end_line(end_line_number, log, test_case_id):
-    signal_snd_template = r'<LAVA_SIGNAL_TESTCASE TEST_CASE_ID={}'
-    signal_snd_text = signal_snd_template.format(test_case_id)
-    signal_snd_pattern = re.compile(signal_snd_text)
-    for i, log_line in enumerate(reversed(log[:end_line_number]), 1):
-        if signal_snd_pattern.match(unicode(log_line['msg'])):
-            return end_line_number - i
-    return end_line_number
-
-
-def _filter_log_data(log, filters_funcs):
-    for filter_func in filters_funcs:
-        log[:] = filter(filter_func, log)
 
 
 def _prepare_line_num_translate(results_data, log):
@@ -430,8 +335,6 @@ class LavaCallback(object):
         log = yaml.load(log, Loader=yaml.CLoader)
         for i, log_line in enumerate(log, 1):
             log_line['msg'] = unicode(log_line['msg'])
-            log_line['org_num'] = i
-            log_line['line_num'] = i
         return log
 
     def add_rootfs_info(self, file_name='build_info.json'):
@@ -527,6 +430,104 @@ def store_test_log(metadata, log):
             utils.lava_log_parser.run(log, metadata, txt, html)
 
 
+class LogFragmentsMixin(object):
+    LOGIN_CASE_END_PATTERN = re.compile(r'end:.*login-action.*')
+    TEST_CASE_SIGNAL_PATTERN = re.compile(
+        r'\<LAVA_SIGNAL_TESTCASE TEST_CASE_ID.+>')
+    SIGNAL_RECEIVED_PATTERN = re.compile(r'Received signal: '
+                                         r'<TESTCASE> TEST_CASE_ID=(\w+)')
+
+    def _add_log_fragments(self):
+        lines_map = []
+        for path, tc in self._test_case_iter():
+            tc = tc
+            log_end_line = tc.get('log_end_line')
+            if log_end_line:
+                new_end_line = self._adjust_log_end_line(int(log_end_line))
+                lines_map.append((tc, int(new_end_line)))
+            else:
+                utils.LOG.warn('Log end line number not found for {}'
+                               .format('.'.join(path)))
+        start_line = self.start_log_line
+        for tc, end_line in sorted(lines_map, key=lambda x: x[1]):
+            tc[models.LOG_LINES_KEY] = self.log[start_line: end_line]
+            start_line = end_line + 1 \
+                if end_line < len(self.log) else end_line
+
+    @property
+    def start_log_line(self):
+        line_number = self._get_log_line_number(self.LOGIN_CASE_END_PATTERN)
+        return 0 if line_number is None else line_number
+
+    def _get_log_line_number(self, pattern):
+        for line_number, line in enumerate(self.log):
+            msg = line.get('msg', '')
+            if pattern.match(unicode(msg)) is not None:
+                return line_number
+
+    def _find_new_end_line(self, end_line_number, test_case_id):
+        signal_snd_template = r'<LAVA_SIGNAL_TESTCASE TEST_CASE_ID={}'
+        signal_snd_text = signal_snd_template.format(test_case_id)
+        signal_snd_pattern = re.compile(signal_snd_text)
+        for i, log_line in enumerate(reversed(self.log[:end_line_number]), 1):
+            if signal_snd_pattern.match(unicode(log_line['msg'])):
+                return end_line_number - i
+        return end_line_number
+
+    def _adjust_log_end_line(self, end_line_number):
+        log_end_line = self.log[end_line_number]
+        test_case_rcvd = \
+            self.SIGNAL_RECEIVED_PATTERN.match(log_end_line['msg'])
+        test_case_id = test_case_rcvd.group(1) if \
+            test_case_rcvd is not None else None
+        if test_case_id:
+            return self._find_new_end_line(end_line_number, test_case_id)
+        return end_line_number
+
+    @staticmethod
+    def _prepare_lines_map(end_lines_map, start_log_line):
+        lines_map = OrderedDict(sorted(end_lines_map.items(),
+                                       key=lambda i: i[1]))
+        start_line = start_log_line
+        for path, end_line in lines_map.items():
+            lines_map[path] = (start_line, end_line)
+            start_line = end_line + 1
+        return lines_map
+
+    def _test_case_iter(self):
+        for group in self.groups:
+            stack = [group]
+            path = [group.get('name')]
+            while stack:
+                node = stack.pop()
+                if node is not group:
+                    path.append(node.get('name'))
+                for test_case in node.get('test_cases', []):
+                    path.append(test_case.get('name'))
+                    yield tuple(path), test_case
+                    path.pop()
+                if node is not group:
+                    path.pop()
+                for sub_group in node.get('sub_groups', []):
+                    stack.append(sub_group)
+
+    def _get_log_lines(self, start_line, end_line):
+        lines = [
+            {
+                'dt': dparser.parse(line['dt']),
+                'msg': line['msg'],
+                'lvl': line['lvl']
+            }
+            for line in self.log[start_line:end_line]
+        ]
+        return lines
+
+    @staticmethod
+    def _filter_log_data(log, filters_funcs):
+        for filter_func in filters_funcs:
+            log[:] = filter(filter_func, log)
+
+
 class LavaPlan(object):
     def __init__(self, groups, cases, metadata):
         self.data = self._create_plan(groups, cases, metadata)
@@ -552,10 +553,11 @@ class LavaPlan(object):
         return plan
 
 
-class LavaResults(object):
+class LavaResults(LogFragmentsMixin):
     TEST_CASE_MAP = {
         models.NAME_KEY: "name",
         models.STATUS_KEY: "result",
+        "log_end_line": "log_end_line"
     }
 
     TEST_CASE_GROUP_KEYS = [
@@ -571,9 +573,19 @@ class LavaResults(object):
         models.MACH_KEY,
     ]
 
-    def __init__(self, results, metadata):
+    def __init__(self, results, metadata, log):
         self.groups, self.cases = self._populate_results(results,
                                                          metadata)
+        self.log = log
+        self._add_log_fragments()
+        self._filter_log_lines()
+
+    def _get_test_case(self, tests, names):
+        tests_by_name = {t['name']: t for t in tests}
+        for name in names:
+            login = tests_by_name.get(name)
+            if login:
+                return login
 
     def _populate_results(self, results, metadata):
         groups = []
@@ -582,10 +594,10 @@ class LavaResults(object):
         login_tc = None
         for suite_name, suite_results in results.iteritems():
             if suite_name == "lava":
-                login_tc = _get_test_case(suite_results,
-                                          ('login-action',
-                                           'auto-login-action'))
-                job_tc = _get_test_case(suite_results, ('job',))
+                login_tc = self._get_test_case(suite_results,
+                                               ('login-action',
+                                                'auto-login-action'))
+                job_tc = self._get_test_case(suite_results, ('job',))
             else:
                 suite_name = suite_name.partition("_")[2]
                 group = dict(metadata)
@@ -597,6 +609,12 @@ class LavaResults(object):
         if login_tc:
             cases.append(self._create_login_case(metadata, login_tc))
         return groups, cases
+
+    def _filter_log_lines(self):
+        for _, tc in self._test_case_iter():
+            log_lines = tc.get(models.LOG_LINES_KEY)
+            if log_lines:
+                self._filter_log_data(log_lines, LAVA_FILTERS)
 
     def _create_login_case(self, meta, login_tc):
         # ToDo: consolidate with _add_test_results
@@ -631,7 +649,6 @@ class LavaResults(object):
                 models.VERSION_KEY: "1.1",
                 models.TIME_KEY: "0.0",
             }
-            path = [group.get('name')]
             test_case.update({k: test[v]
                               for k, v in self.TEST_CASE_MAP.iteritems()})
             test_case.update({k: group[k]
@@ -648,11 +665,9 @@ class LavaResults(object):
                 test_case[models.ATTACHMENTS_KEY] = [reference]
             test_set_name = test_meta.get("set")
             if test_set_name:
-                path.append(test_set_name)
                 test_case_list = test_sets.setdefault(test_set_name, [])
             else:
                 test_case_list = test_cases
-            path.append(test_case[models.NAME_KEY])
             test_case_list.append(test_case)
 
         sub_groups = []
