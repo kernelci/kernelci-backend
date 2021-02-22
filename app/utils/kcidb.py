@@ -20,12 +20,59 @@
 import json
 import os
 import subprocess
+import threading
 import urlparse
 
 import models
 import utils
 import utils.db
 from utils.report.common import DEFAULT_STORAGE_URL as STORAGE_URL
+
+
+class KcidbSubmit(object):
+    def __init__(self, kcidb_options):
+        kcidb_path = kcidb_options.get("kcidb_path", "")
+        self.kcidb_submit_cmd = os.path.join(kcidb_path, "kcidb-submit")
+        self.project = kcidb_options["project"]
+        self.topic = kcidb_options["topic"]
+        self.credentials = kcidb_options["credentials"]
+        self.debug = kcidb_options.get("debug")
+        self._process = None
+        self._lock = threading.Lock()
+
+    @property
+    def process(self):
+        if not self._process:
+            self._process = self._spawn()
+        return self._process
+
+    def _spawn(self):
+        local_env = dict(os.environ)
+        local_env["GOOGLE_APPLICATION_CREDENTIALS"] = self.credentials
+        self._lock.acquire()
+        process = subprocess.Popen([self.kcidb_submit_cmd,
+                                    "-p", self.project,
+                                    "-t", self.topic],
+                                   stdin=subprocess.PIPE,
+                                   stdout=subprocess.PIPE,
+                                   env=local_env)
+        self._lock.release()
+        return process
+
+    def terminate(self):
+        if self._process:
+            self.process.communicate()
+        elif self.debug:
+            utils.LOG.info("No kcidb-submit process running")
+
+    def write(self, json_data):
+        self.process.stdin.write(json_data)
+        if not json_data.endswith('\n'):
+            self.process.stdin.write('\n')
+        self.process.stdin.flush()
+        if self.process.returncode:
+            utils.LOG.warn("Failed to push data to KCIDB")
+
 
 # Mapping between kcidb revision keys and build documents
 BUILD_REV_KEY_MAP = {
@@ -80,27 +127,16 @@ def _get_test_cases(group, db, hierarchy, ns):
     return tests
 
 
-def _submit(data, kcidb_options):
+def _submit(data, kcidb_options, kcidb_submit):
     json_data = json.dumps(data, indent=2)
     if kcidb_options.get("debug"):
         utils.LOG.info("Submitting with kcidb:")
         utils.LOG.info(json_data)
-    local_env = dict(os.environ)
-    local_env["GOOGLE_APPLICATION_CREDENTIALS"] = kcidb_options["credentials"]
-    kcidb_path = kcidb_options.get("kcidb_path", "")
-    kcidb_submit = os.path.join(kcidb_path, "kcidb-submit")
-    p = subprocess.Popen([kcidb_submit,
-                          "-p", kcidb_options["project"],
-                          "-t", kcidb_options["topic"]],
-                         stdin=subprocess.PIPE,
-                         stdout=subprocess.PIPE,
-                         env=local_env)
-    p.communicate(input=json_data)
-    if p.returncode:
-        utils.LOG.warn("Failed to push data  kcidb")
+    kcidb_submit.write(json_data)
 
 
-def push_build(build_id, first, kcidb_options, db_options={}, db=None):
+def push_build(build_id, first, kcidb_options, kcidb_submit,
+               db_options={}, db=None):
     if db is None:
         db = utils.db.get_db_connection(db_options)
     origin = kcidb_options.get("origin", "kernelci")
@@ -175,8 +211,7 @@ def push_build(build_id, first, kcidb_options, db_options={}, db=None):
         },
     }
     kcidb_data['builds'] = [kcidb_build]
-
-    _submit(kcidb_data, kcidb_options)
+    _submit(kcidb_data, kcidb_options, kcidb_submit)
 
 
 def _get_test_misc(group, test):
@@ -188,7 +223,8 @@ def _get_test_misc(group, test):
     return misc
 
 
-def push_tests(group_id, kcidb_options, db_options={}, db=None):
+def push_tests(group_id, kcidb_options, kcidb_submit,
+               db_options={}, db=None):
     status_translate = {
         'UNKNOWN': 'SKIP'
     }
@@ -262,4 +298,4 @@ def push_tests(group_id, kcidb_options, db_options={}, db=None):
             for test in test_cases
         ],
     }
-    _submit(kcidb_data, kcidb_options)
+    _submit(kcidb_data, kcidb_options, kcidb_submit)
