@@ -23,11 +23,13 @@
 from __future__ import absolute_import
 
 import ast
-import celery
 import celery.schedules
+import celery.signals
 import io
 import kombu.serialization
 import os
+import utils
+from utils.kcidb import KcidbSubmit
 
 import taskqueue.celeryconfig as celeryconfig
 import taskqueue.serializer as serializer
@@ -78,6 +80,28 @@ if os.path.exists(CELERY_CONFIG_FILE):
     app.conf.update(updates)
 
 app.conf.update(CELERYBEAT_SCHEDULE=CELERYBEAT_SCHEDULE)
+
+app.kcidb_pool = {}
+
+
+@celery.signals.worker_process_init.connect
+def worker_init_handler(*args, **kwargs):
+    pid = os.getpid()
+    kcidb_options = app.conf.get("kcidb_options")
+    utils.LOG.info("Creating KcidbSubmit object for PID: {}".format(pid))
+    app.kcidb_pool[pid] = KcidbSubmit(kcidb_options)
+
+
+@celery.signals.worker_process_shutdown.connect
+def worker_process_init_handler(*args, **kwargs):
+    pid = os.getpid()
+    kcidb_submit = app.kcidb_pool.get(pid)
+    if kcidb_submit:
+        utils.LOG.info('Terminating kcidb-submit for worker pid: {}'
+                       .format(pid))
+        kcidb_submit.terminate()
+    else:
+        utils.LOG.info('No kcidb-submit for worker pid: {}'.format(pid))
 
 
 if __name__ == "__main__":
