@@ -58,6 +58,7 @@ class TestBuildModel(unittest.TestCase):
         build_doc.modules = "modules-file"
         build_doc.dtb_dir = "dtb-dir"
         build_doc.dtb_dir_data = ["a-file"]
+        build_doc.kernel_build_logs = ["a.log"]
         build_doc.kernel_config = "kernel-config"
         build_doc.system_map = "system-map"
         build_doc.text_offset = "offset"
@@ -108,6 +109,7 @@ class TestBuildModel(unittest.TestCase):
             "version": "1.0",
             "dtb_dir": "dtb-dir",
             "dtb_dir_data": ["a-file"],
+            "kernel_build_logs": ["a.log"],
             "kernel_config": "kernel-config",
             "kernel_image": "kernel-image",
             "system_map": "system-map",

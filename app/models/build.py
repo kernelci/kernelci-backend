@@ -85,6 +85,7 @@ class BuildDocument(mbase.BaseDocument):
         self.git_url = None
         self.job_id = None
         self.kconfig_fragments = None
+        self.kernel_build_logs = []
         self.kernel_config = None
         self.kernel_config_size = None
         self.kernel_image = None
@@ -226,6 +227,7 @@ class BuildDocument(mbase.BaseDocument):
             models.JOB_ID_KEY: self.job_id,
             models.JOB_KEY: self.job,
             models.KCONFIG_FRAGMENTS_KEY: self.kconfig_fragments,
+            models.KERNEL_BUILD_LOGS_KEY: self.kernel_build_logs,
             models.KERNEL_CONFIG_KEY: self.kernel_config,
             models.KERNEL_CONFIG_SIZE_KEY: self.kernel_config_size,
             models.KERNEL_IMAGE_KEY: self.kernel_image,
