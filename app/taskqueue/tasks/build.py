@@ -51,7 +51,7 @@ def import_build(json_obj):
     # another record for _every_ build and limit the duplicates without
     # impacting performance.
     n_builds = db[models.BUILD_COLLECTION].count_documents(
-        {models.KERNEL_KEY: json_obj[models.KERNEL_KEY]})
+        {models.KERNEL_KEY: json_obj['bmeta'][models.KERNEL_KEY]})
     first = (n_builds == 0)
 
     # build_id and job_id are necessary since they are injected by Celery into

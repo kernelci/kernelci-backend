@@ -32,10 +32,10 @@ BASE_PATH = "/var/www/images/kernel-ci"
 LOG = utils.log.get_log()
 
 # Build log file names.
-BUILD_LOG_FILE = "build.log"
-BUILD_ERRORS_FILE = "build-errors.log"
-BUILD_WARNINGS_FILE = "build-warnings.log"
-BUILD_MISMATCHES_FILE = "build-mismatches.log"
+BUILD_LOG_FILE = "logs/kernel.log"
+BUILD_ERRORS_FILE = "logs/build-errors.log"
+BUILD_WARNINGS_FILE = "logs/build-warnings.log"
+BUILD_MISMATCHES_FILE = "logs/build-mismatches.log"
 
 # All the mongodb ID keys we use.
 ID_KEYS = [

@@ -48,6 +48,7 @@ class TestBuildLogParser(unittest.TestCase):
             build_doc = mbuild.BuildDocument(
                 "job", "kernel", "defconfig", "branch", "build_environment")
             build_dir = tempfile.mkdtemp()
+            os.mkdir(os.path.join(build_dir, 'logs'))
             log_file = os.path.join(
                 os.path.abspath(os.path.dirname(__file__)),
                 "assets", "build_log_0.log")
