@@ -29,6 +29,7 @@ import tornado
 import urls
 
 from handlers.tests.test_handler_base import TestHandlerBase
+from utils.build.tests import SAMPLE_META
 
 
 class TestBuildHandler(TestHandlerBase):
@@ -132,17 +133,7 @@ class TestBuildHandler(TestHandlerBase):
     def test_post_correct(self, mock_import):
         mock_import.apply_async = mock.MagicMock()
         headers = {"Authorization": "foo", "Content-Type": "application/json"}
-        body = json.dumps(
-            dict(
-                job="job",
-                kernel="kernel",
-                defconfig="defconfig",
-                arch="arch",
-                git_branch="branch",
-                build_environment="build_environment",
-                file_server_resource="path/to/build/data"
-            )
-        )
+        body = json.dumps(SAMPLE_META)
 
         response = self.fetch(
             "/build", method="POST", headers=headers, body=body)

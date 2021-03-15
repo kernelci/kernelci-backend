@@ -450,29 +450,6 @@ BUILD_VALID_KEYS = {
         TEXT_OFFSET_KEY,
         WARNINGS_KEY
     ],
-    "POST": {
-        MANDATORY_KEYS: [
-            ARCHITECTURE_KEY,
-            BUILD_ENVIRONMENT_KEY,
-            DEFCONFIG_KEY,
-            FILE_SERVER_RESOURCE_KEY,
-            GIT_BRANCH_KEY,
-            JOB_KEY,
-            KERNEL_KEY
-        ],
-        ACCEPTED_KEYS: [
-            ARCHITECTURE_KEY,
-            BUILD_ENVIRONMENT_KEY,
-            DEFCONFIG_FULL_KEY,
-            DEFCONFIG_KEY,
-            FILE_SERVER_RESOURCE_KEY,
-            GIT_BRANCH_KEY,
-            JOB_KEY,
-            KERNEL_KEY,
-            KERNEL_VERSION_KEY,
-            VERSION_KEY
-        ]
-    }
 }
 
 TOKEN_VALID_KEYS = {
