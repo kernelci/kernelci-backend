@@ -54,7 +54,7 @@ BUILD_SEARCH_SORT = [
 # Various build URLS.
 DEFCONFIG_ID_URL = (u"{build_url:s}/id/{build_id:s}/")
 LOG_URL = (
-    u"{storage_url:s}/{file_server_resource:s}/" + utils.BUILD_LOG_FILE)
+    u"{storage_url:s}/{file_server_resource:s}/" + utils.BUILD_LOGS_DIR)
 ERR_LOG_URL = (
     u"{storage_url:s}/{file_server_resource:s}/" + utils.BUILD_ERRORS_FILE)
 WARN_LOG_URL = (
