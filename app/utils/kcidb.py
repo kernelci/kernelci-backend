@@ -191,7 +191,7 @@ def push_build(build_id, first, kcidb_options, kcidb_submit,
             STORAGE_URL,
             '/'.join([
                 build[models.FILE_SERVER_RESOURCE_KEY],
-                utils.BUILD_LOG_FILE,
+                build[models.BUILD_LOG_KEY],
             ])
         ),
         'config_name': build[models.DEFCONFIG_FULL_KEY],

@@ -77,10 +77,9 @@ class TestBuildLogParser(unittest.TestCase):
             build_doc = mbuild.BuildDocument(
                 "job", "kernel", "defconfig", "branch", "build_environment")
             build_dir = tempfile.mkdtemp()
-            log_file = os.path.join(build_dir, utils.BUILD_LOG_FILE)
 
             status, e_l, w_l, m_l = lparser._parse_log(
-                build_doc, log_file, build_dir, errors)
+                build_doc, 'nope.log', build_dir, errors)
 
             self.assertEqual(500, status)
 

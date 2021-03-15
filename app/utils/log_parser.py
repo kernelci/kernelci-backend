@@ -569,17 +569,14 @@ def _parse_log(build_doc, log_file, build_dir, errors):
     return status, error_lines, warning_lines, mismatch_lines
 
 
-def parse_single_build_log(
-        build_id,
-        job_id,
-        db_options, base_path=utils.BASE_PATH, build_log=utils.BUILD_LOG_FILE):
+def parse_single_build_log(build_id, job_id, db_options,
+                           base_path=utils.BASE_PATH):
     """Parse the build log file of a single build instance.
 
     :param build_id: The ID of the saved build.
     :param job_id: The ID of the saved job.
     :param db_options: The database connection options.
     :param base_path: The base path on the file system where data is stored.
-    :param build_log: The name of the build log file.
     :return A 2-tuple: the status code, the errors data structure.
     """
     status = 200
@@ -594,15 +591,19 @@ def parse_single_build_log(
         if build_doc:
             file_server_resource = build_doc.file_server_resource
             build_dir = os.path.join(base_path, file_server_resource)
-            log_file = os.path.join(build_dir, build_log)
-            status, err_lines, warn_lines, mism_lines = _parse_log(
-                build_doc, log_file, build_dir, errors)
-
+            err, warn, mism = ([], [], [])
+            for build_log in build_doc.kernel_build_logs:
+                log_file = os.path.join(build_dir, build_log)
+                status, err_lines, warn_lines, mism_lines = _parse_log(
+                    build_doc, log_file, build_dir, errors)
+                if status != 200:
+                    break
+                err.extend(err_lines)
+                warn.extend(warn_lines)
+                mism.extend(mism_lines)
             if status == 200:
                 status = _save(
-                    build_doc,
-                    job_id,
-                    err_lines, warn_lines, mism_lines, errors, db_options)
+                    build_doc, job_id, err, warn, mism, errors, db_options)
     else:
         status = 500
         utils.LOG.warn("No build ID found, cannot continue parsing logs")
