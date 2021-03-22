@@ -257,7 +257,7 @@ class LavaCallback(object):
                     meta[meta_key] = v
         return meta
 
-    def _get_directory_path(self):
+    def _get_directory_path(self, meta):
         """Create the dir_path from LAVA metadata
 
         Update the metadata with the storage path of the artifacts.
@@ -267,22 +267,22 @@ class LavaCallback(object):
         :type meta: dictionary
         """
 
-        file_server_resource = self.meta.get(models.FILE_SERVER_RESOURCE_KEY)
+        file_server_resource = meta.get(models.FILE_SERVER_RESOURCE_KEY)
         if file_server_resource:
             directory_path = os.path.join(
                 self.base_path,
                 file_server_resource,
-                self.meta[models.LAB_NAME_KEY])
+                meta[models.LAB_NAME_KEY])
         else:
             directory_path = os.path.join(
                 self.base_path,
-                self.meta[models.JOB_KEY],
-                self.meta[models.GIT_BRANCH_KEY],
-                self.meta[models.KERNEL_KEY],
-                self.meta[models.ARCHITECTURE_KEY],
-                self.meta[models.DEFCONFIG_FULL_KEY],
-                self.meta[models.BUILD_ENVIRONMENT_KEY],
-                self.meta[models.LAB_NAME_KEY])
+                meta[models.JOB_KEY],
+                meta[models.GIT_BRANCH_KEY],
+                meta[models.KERNEL_KEY],
+                meta[models.ARCHITECTURE_KEY],
+                meta[models.DEFCONFIG_FULL_KEY],
+                meta[models.BUILD_ENVIRONMENT_KEY],
+                meta[models.LAB_NAME_KEY])
         return directory_path
 
     def _get_lava_meta(self):
@@ -323,8 +323,12 @@ class LavaCallback(object):
                 utils.LOG.warn("Metadata field {} missing in the job"
                                " result.".format(ex))
         meta.update(self._get_lava_meta())
-        meta[models.DIRECTORY_PATH] = self._get_directory_path()
-        self.add_rootfs_info()
+        meta[models.DIRECTORY_PATH] = self._get_directory_path(meta)
+        rootfs_url = meta.get(models.INITRD_KEY)
+        if rootfs_url and rootfs_url != "None":
+            rootfs_info = self._get_rootfs_info(rootfs_url)
+            if rootfs_info:
+                meta[models.INITRD_INFO_KEY] = rootfs_info
         return meta
 
     def _prepare_results(self, results):
@@ -337,7 +341,7 @@ class LavaCallback(object):
             log_line['msg'] = unicode(log_line['msg'])
         return log
 
-    def add_rootfs_info(self, file_name='build_info.json'):
+    def _get_rootfs_info(self, rootfs_url, file_name='build_info.json'):
         """Add rootfs info
 
         Parse the the JSON file with the information of the rootfs if it's
@@ -345,11 +349,7 @@ class LavaCallback(object):
         matches the local storage server, then read it directly from the file
         system.
         """
-
-        rootfs_url = self.meta.get(models.INITRD_KEY)
-        if not rootfs_url or rootfs_url == "None":
-            return
-
+        rootfs_info = None
         try:
             # compare to default URL without the scheme
             _default_url = urlparse(DEFAULT_STORAGE_URL).netloc
@@ -365,13 +365,12 @@ class LavaCallback(object):
                 file_url = "/".join([rootfs_top_url, file_name])
                 utils.LOG.info("Downloading rootfs info: {}".format(file_url))
                 rootfs_info_json = urllib2.urlopen(file_url)
-
             rootfs_info = json.load(rootfs_info_json)
-            self.meta[models.INITRD_INFO_KEY] = rootfs_info
         except IOError as e:
             utils.LOG.warn("IOError: {}".format(e))
         except ValueError as e:
             utils.LOG.warn("ValueError: {}".format(e))
+        return rootfs_info
 
 
 def store_artifacts(metadata, job_data, log):
