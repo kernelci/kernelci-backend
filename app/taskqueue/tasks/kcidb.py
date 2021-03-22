@@ -32,7 +32,7 @@ def push_build(args):
     if kcidb_options:
         try:
             utils.kcidb.push_build(build_id, first, kcidb_options,
-                                   kcidb_submit.process,
+                                   kcidb_submit,
                                    taskc.app.conf.db_options)
         except Exception, e:
             utils.LOG.exception(e)
