@@ -728,7 +728,8 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         handle_errors(ex, msg, errors)
 
     test_results = LavaResults(callback.results,
-                               callback.meta)
+                               callback.meta,
+                               callback.log)
     plan = LavaPlan(test_results.groups, test_results.cases, callback.meta)
 
     if plan.data:
