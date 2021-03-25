@@ -10,7 +10,7 @@ pymongo==3.9.0
 python-jenkins==0.4.11
 python-dateutil
 pytz
-pyyaml==5.1
+pyyaml==5.4
 redis==2.10.6
 scandir
 simplejson
