@@ -86,25 +86,28 @@ app.kcidb_pool = {}
 
 @celery.signals.worker_process_init.connect
 def worker_init_handler(*args, **kwargs):
-    pid = os.getpid()
     kcidb_options = app.conf.get("kcidb_options")
-    if kcidb_options.get("debug"):
-        utils.LOG.info("Creating KcidbSubmit object for PID: {}".format(pid))
-    app.kcidb_pool[pid] = KcidbSubmit(kcidb_options)
+    if kcidb_options:
+        pid = os.getpid()
+        if kcidb_options.get("debug"):
+            utils.LOG.info("Creating KcidbSubmit object for PID: {}"
+                           .format(pid))
+        app.kcidb_pool[pid] = KcidbSubmit(kcidb_options)
 
 
 @celery.signals.worker_process_shutdown.connect
 def worker_process_init_handler(*args, **kwargs):
-    pid = os.getpid()
-    kcidb_submit = app.kcidb_pool.get(pid)
     kcidb_options = app.conf.get("kcidb_options")
-    if kcidb_submit:
-        if kcidb_options.get("debug"):
-            utils.LOG.info('Terminating kcidb-submit for worker pid: {}'
-                           .format(pid))
-        kcidb_submit.terminate()
-    elif kcidb_options.get("debug"):
-        utils.LOG.info('No kcidb-submit for worker pid: {}'.format(pid))
+    if kcidb_options:
+        pid = os.getpid()
+        kcidb_submit = app.kcidb_pool.get(pid)
+        if kcidb_submit:
+            if kcidb_options.get("debug"):
+                utils.LOG.info('Terminating kcidb-submit for worker pid: {}'
+                               .format(pid))
+            kcidb_submit.terminate()
+        elif kcidb_options.get("debug"):
+            utils.LOG.info('No kcidb-submit for worker pid: {}'.format(pid))
 
 
 if __name__ == "__main__":
