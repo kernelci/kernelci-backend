@@ -27,9 +27,9 @@ import utils.kcidb
 def push_build(args):
     build_id, job_id, first = args
     kcidb_options = taskc.app.conf.get("kcidb_options")
-    pid = os.getpid()
-    kcidb_submit = taskc.app.kcidb_pool.get(pid)
     if kcidb_options:
+        pid = os.getpid()
+        kcidb_submit = taskc.app.kcidb_pool.get(pid)
         try:
             utils.kcidb.push_build(build_id, first, kcidb_options,
                                    kcidb_submit,
@@ -43,9 +43,9 @@ def push_build(args):
 @taskc.app.task(name="kcidb-tests")
 def push_tests(group_id):
     kcidb_options = taskc.app.conf.get("kcidb_options")
-    pid = os.getpid()
-    kcidb_submit = taskc.app.kcidb_pool[pid]
     if kcidb_options:
+        pid = os.getpid()
+        kcidb_submit = taskc.app.kcidb_pool[pid]
         try:
             utils.kcidb.push_tests(group_id, kcidb_options,
                                    kcidb_submit,
