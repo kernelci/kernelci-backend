@@ -27,7 +27,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 # The default mongodb database name.
-DB_NAME = "kernel-ci"
+DB_NAME = "chromeos-kernel-ci"
 
 DEFAULT_SCHEMA_VERSION = "1.0"
 
