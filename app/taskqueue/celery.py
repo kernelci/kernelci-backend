@@ -35,7 +35,8 @@ import taskqueue.celeryconfig as celeryconfig
 import taskqueue.serializer as serializer
 
 
-CELERY_CONFIG_FILE = "/etc/kernelci/kernelci-celery.cfg"
+CELERY_CONFIG_FILE = "/etc/kernelci/api.chromeos.kernelci.org/" \
+                     "kernelci-celery.cfg"
 TASKS_LIST = [
     "taskqueue.tasks.bisect",
     "taskqueue.tasks.build",
