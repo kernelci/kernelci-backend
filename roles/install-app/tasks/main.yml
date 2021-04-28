@@ -104,4 +104,4 @@
     - docs
 
 - include: selinux.yml
-  when: ansible_selinux is defined and ansible_selinux != False
+  when: ansible_selinux is defined and ansible_selinux.status == 'enabled'
