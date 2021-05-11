@@ -1,5 +1,5 @@
 [Unit]
-Description=Kernel CI Backend Service for {{ kci_app_name }}
+Description=Kernel CI Backend Service
 Requires={{ mongodb_service_name }}.service
 After={{ mongodb_service_name }}.service
 
@@ -11,12 +11,12 @@ ProtectSystem=full
 ProtectHome=true
 NoNewPrivileges=true
 PrivateTmp=true
-SyslogIdentifier=kernelci-{{ kci_app_name }}-backend
+SyslogIdentifier=kernelci-backend
 LimitNOFILE=65536
 RestartSec=5
 Restart=always
 WorkingDirectory={{ install_base }}/{{ hostname }}/app
-ExecStart={{ install_base }}/.venv/{{ hostname }}/bin/python -OO -R server.py --buffer-size=1073741824 --port={{ kci_app_port }}
+ExecStart={{ install_base }}/.venv/{{ hostname }}/bin/python -OO -R server.py --buffer-size=1073741824
 
 [Install]
 WantedBy=multi-user.target
