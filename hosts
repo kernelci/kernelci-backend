@@ -4,6 +4,9 @@ kernel-ci-backend
 [dev]
 api.staging.kernelci.org
 
+[chromeos]
+api.chromeos.kernelci.org
+
 [prod]
 api.kernelci.org
 

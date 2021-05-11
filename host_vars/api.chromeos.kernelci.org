@@ -1,0 +1,6 @@
+hostname: api.chromeos.kernelci.org
+role: production
+certname: api.chromeos.kernelci.org
+storage_certname: storage.chromeos.kernelci.org
+kci_storage_fqdn: storage.chromeos.kernelci.org
+kci_app_name: chromeos.kernelci.org
