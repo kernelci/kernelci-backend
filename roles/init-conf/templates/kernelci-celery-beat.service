@@ -1,7 +1,7 @@
 [Unit]
-Description=Kernel CI Backend Celery Beat for {{ kci_app_name }}
-Requires=kernelci-{{ kci_app_name }}-celery.service
-After=kernelci-{{ kci_app_name }}-celery.service
+Description=Kernel CI Backend Celery Beat
+Requires=kernelci-celery.service
+After=kernelci-celery.service
 
 [Service]
 Type=simple
@@ -11,18 +11,18 @@ ProtectSystem=full
 ProtectHome=true
 NoNewPrivileges=true
 PrivateTmp=true
-SyslogIdentifier=kernelci-{{ kci_app_name }}-celery-beat
+SyslogIdentifier=kernelci-celery-beat
 LimitNOFILE=65536
 RestartSec=5
 Restart=always
 RuntimeDirectory=celery
 RuntimeDirectoryMode=755
-PIDFile=/tmp/kernelci-{{ kci_app_name }}-celery-beat.pid
+PIDFile=/tmp/kernelci-celery-beat.pid
 WorkingDirectory={{ install_base }}/{{ hostname }}/app
 ExecStart={{ install_base }}/.venv/{{ hostname }}/bin/python -OO -R \
     {{ install_base }}/.venv/{{ hostname }}/bin/celery beat \
-    --loglevel=INFO --schedule=/var/run/celery/kernelci-{{ kci_app_name }}-beat.db \
-    --app=taskqueue --pidfile=/tmp/kernelci-{{ kci_app_name }}-celery-beat.pid
+    --loglevel=INFO --schedule=/var/run/celery/kernelci-beat.db \
+    --app=taskqueue --pidfile=/tmp/kernelci-celery-beat.pid
 
 [Install]
 WantedBy=multi-user.target

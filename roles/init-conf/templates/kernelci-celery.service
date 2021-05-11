@@ -1,8 +1,8 @@
 [Unit]
-Description=Kernel CI Backend Celery for {{ kci_app_name }}
+Description=Kernel CI Backend Celery
 Requires={{ redis_service_name }}.service
-Wants=kernelci-{{ kci_app_name }}-celery-beat.service
-Before=kernelci-{{ kci_app_name }}-celery-beat.service
+Wants=kernelci-celery-beat.service
+Before=kernelci-celery-beat.service
 
 [Service]
 Type=simple
@@ -24,12 +24,12 @@ WorkingDirectory={{ install_base }}/{{ hostname }}/app
 ExecStart={{ install_base }}/.venv/{{ hostname }}/bin/python -OO -R \
     {{ install_base }}/.venv/{{ hostname }}/bin/celery worker \
     -Ofair --without-gossip --autoscale=24,6 --loglevel=INFO \
-    --app=taskqueue --pidfile=/tmp/kernelci-{{ kci_app_name }}-celery.pid
+    --app=taskqueue --pidfile=/tmp/kernelci-celery.pid
 {% else %}
 ExecStart={{ install_base }}/.venv/{{ hostname }}/bin/python -OO -R \
     {{ install_base }}/.venv/{{ hostname }}/bin/celery worker \
     -Ofair --without-gossip --autoscale=10,2 --loglevel=INFO \
-    --app=taskqueue --pidfile=/tmp/kernelci-{{ kci_app_name }}-celery.pid
+    --app=taskqueue --pidfile=/tmp/kernelci-celery.pid
 {% endif %}
 
 [Install]
