@@ -29,7 +29,7 @@ import re
 import models
 import utils.log
 
-BASE_PATH = "/var/www/images/kernel-ci"
+BASE_PATH = "/data/storage.chromeos.kernelci.org"
 LOG = utils.log.get_log()
 
 # Build log file names.
