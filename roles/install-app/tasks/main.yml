@@ -77,8 +77,8 @@
     - install
     - app
 
-- name: Does /etc/kernelci exist?
-  file: path=/etc/kernelci
+- name: Does /etc/kernelci/{{ kci_app_name }} exist?
+  file: path=/etc/kernelci/{{ kci_app_name }}
         state=directory
         owner=root
         group=root
@@ -89,7 +89,7 @@
 
 - name: Install configuration file
   template: src=kernelci-backend.cfg
-            dest=/etc/kernelci/kernelci-backend.cfg
+            dest=/etc/kernelci/{{ kci_app_name }}/kernelci-backend.cfg
             owner=root
             group=root
             mode=0644
@@ -100,7 +100,7 @@
 
 - name: Install celery configuration file
   template: src=kernelci-celery.cfg
-            dest=/etc/kernelci/kernelci-celery.cfg
+            dest=/etc/kernelci/{{ kci_app_name }}/kernelci-celery.cfg
             owner=root
             group=root
             mode=0644
@@ -129,4 +129,4 @@
     - docs
 
 - include: selinux.yml
-  when: ansible_selinux is defined and ansible_selinux != False
+  when: ansible_selinux is defined and ansible_selinux.status == 'enabled'

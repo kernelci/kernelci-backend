@@ -64,15 +64,15 @@
     - upstart
 
 - name: Install celery systemd services
-  template: src={{ item }}.service
-            dest=/etc/systemd/system/{{ item }}.service
+  template: src={{ item.template }}.service
+            dest=/etc/systemd/system/{{ item.service_file }}.service
             owner=root
             group=root
             mode=0644
   when: ansible_distribution == "Debian" or ansible_distribution == "CentOS"
   with_items:
-    - kernelci-celery
-    - kernelci-celery-beat
+    - {template: kernelci-celery, service_file: "kernelci-{{ kci_app_name }}-celery"}
+    - {template: kernelci-celery-beat, service_file: "kernelci-{{ kci_app_name }}-celery-beat"}
   notify:
     - reload-systemd
   tags:
@@ -95,8 +95,8 @@
             creates=/etc/systemd/system/multi-user.target.wants/{{ item }}.service
   when: ansible_distribution == "Debian" or ansible_distribution == "CentOS"
   with_items:
-    - kernelci-celery
-    - kernelci-celery-beat
+    - kernelci-{{ kci_app_name }}-celery
+    - kernelci-{{ kci_app_name }}-celery-beat
   notify:
     - reload-systemd
   tags:
