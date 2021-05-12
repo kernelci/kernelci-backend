@@ -93,7 +93,7 @@
 
 - name: Install nginx upstream definitions
   template: src=backend-upstreams.conf
-            dest=/etc/nginx/conf.d/backend-upstreams.conf
+            dest=/etc/nginx/conf.d/backend-upstreams-{{ kci_app_name }}.conf
             mode=0644
             owner=root
             group=root
@@ -135,8 +135,8 @@
     - web-server
 
 - name: Copy backend proxy configuration
-  copy: src=backend-proxy.conf
-        dest=/etc/nginx/custom/backend-proxy.conf
+  template: src=backend-proxy.conf
+        dest=/etc/nginx/custom/backend-proxy-{{ kci_app_name }}.conf
         owner=root
         group=root
         mode=0644
