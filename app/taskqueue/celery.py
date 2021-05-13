@@ -79,6 +79,10 @@ if os.path.exists(CELERY_CONFIG_FILE):
 
     app.conf.update(updates)
 
+db_options = app.conf.db_options
+REDIS_URL = "redis://{}:{}/{}".format(db_options['redis_host'], db_options['redis_port'], db_options['redis_db'])
+app.conf.update(BROKER_URL=REDIS_URL)
+app.conf.update(CELERY_RESULT_BACKEND=REDIS_URL)
 app.conf.update(CELERYBEAT_SCHEDULE=CELERYBEAT_SCHEDULE)
 
 app.kcidb_pool = {}
