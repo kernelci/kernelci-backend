@@ -37,7 +37,7 @@ import utils.database.redisdb as redisdb
 import utils.db
 
 
-DEFAULT_CONFIG_FILE = "/etc/kernelci/api.chromeos.kernelci.org/" \
+DEFAULT_CONFIG_FILE = "/etc/kernelci/chromeos.kernelci.org/" \
                       "kernelci-backend.cfg"
 
 topt.define(
