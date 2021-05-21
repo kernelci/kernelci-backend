@@ -25,6 +25,7 @@ from __future__ import absolute_import
 import ast
 import celery.schedules
 import celery.signals
+from celery.bin import Option
 import io
 import kombu.serialization
 import os
@@ -35,7 +36,7 @@ import taskqueue.celeryconfig as celeryconfig
 import taskqueue.serializer as serializer
 
 
-CELERY_CONFIG_FILE = "/etc/kernelci/kernelci-celery.cfg"
+DEFAULT_CELERY_CONFIG_FILE = "/etc/kernelci/kernelci-celery.cfg"
 TASKS_LIST = [
     "taskqueue.tasks.bisect",
     "taskqueue.tasks.build",
@@ -62,6 +63,10 @@ app = celery.Celery(
     include=TASKS_LIST
 )
 
+app.user_options['preload'].add(
+    Option('-u', '--user-config', default=DEFAULT_CELERY_CONFIG_FILE,
+           help='User configuration file to use'),
+)
 app.config_from_object(celeryconfig)
 
 # Periodic tasks to be executed.
@@ -72,12 +77,19 @@ CELERYBEAT_SCHEDULE = {
     }
 }
 
-# Read from a config file from disk.
-if os.path.exists(CELERY_CONFIG_FILE):
-    with io.open(CELERY_CONFIG_FILE) as conf_file:
-        updates = ast.literal_eval(conf_file.read())
 
-    app.conf.update(updates)
+@celery.signals.user_preload_options.connect
+def on_preload_parsed(options, **kwargs):
+    # Read from a config file from disk.
+    user_config = options['user_config']
+    if os.path.isfile(user_config):
+        with io.open(user_config) as conf:
+            updates = ast.literal_eval(conf.read())
+        app.conf.update(updates)
+    else:
+        utils.LOG.warn('Celery configuration file not found: {}'
+                       .format(user_config))
+
 
 app.conf.update(CELERYBEAT_SCHEDULE=CELERYBEAT_SCHEDULE)
 
