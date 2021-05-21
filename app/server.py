@@ -36,13 +36,22 @@ import handlers.dbindexes as hdbindexes
 import urls
 import utils.database.redisdb as redisdb
 import utils.db
+import utils
 
-
+DEFAULT_BACKEND_SOCKET = "/tmp/kernelci-backend.socket"
 DEFAULT_CONFIG_FILE = "/etc/kernelci/kernelci-backend.cfg"
 DEFAULT_MONGODB_DBNAME = "kernel-ci"
 
 topt.define(
-    "master_key", default=str(uuid.uuid4()), type=str, help="The master key")
+    "config_file", type=str, default=DEFAULT_CONFIG_FILE,
+    help='kernelci-backend config file'
+)
+topt.define(
+    "socket", type=str, default=DEFAULT_BACKEND_SOCKET,
+    help='Unix socket path to be used by kernelci-backend'
+)
+topt.define(
+    "master_key", type=str, help="The master key")
 topt.define(
     "max_workers", default=5, type=int,
     help="The number of workers for the thread pool executor"
@@ -162,8 +171,15 @@ class KernelCiBackend(tornado.web.Application):
 
 
 if __name__ == "__main__":
-    if os.path.isfile(DEFAULT_CONFIG_FILE):
-        topt.options.parse_config_file(DEFAULT_CONFIG_FILE, final=False)
+    # This call of parse_command_line() is here to
+    # see if a config file path was passed as a CLI option
+    topt.options.parse_command_line(final=False)
+    if os.path.isfile(topt.options.config_file):
+        topt.options.parse_config_file(topt.options.config_file, final=False)
+    else:
+        utils.LOG.warn(
+            'KernelCI backend configuration file not found {}'
+                 .format(topt.options.config_file))
 
     topt.options.parse_command_line()
 
@@ -177,8 +193,7 @@ if __name__ == "__main__":
         application = KernelCiBackend()
 
         server = tornado.httpserver.HTTPServer(application, **HTTP_SETTINGS)
-        unix_socket = tornado.netutil.bind_unix_socket(
-            "/tmp/kernelci-backend.socket")
+        unix_socket = tornado.netutil.bind_unix_socket(topt.options.socket)
         server.add_socket(unix_socket)
     else:
         KernelCiBackend().listen(topt.options.port, **HTTP_SETTINGS)
