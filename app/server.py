@@ -24,12 +24,12 @@
 
 import concurrent.futures
 import os
+import sys
 import tornado
 import tornado.httpserver
 import tornado.netutil
 import tornado.options as topt
 import tornado.web
-import uuid
 
 import handlers.app as happ
 import handlers.dbindexes as hdbindexes
@@ -188,6 +188,10 @@ if __name__ == "__main__":
         "xheaders": True,
         "max_buffer_size": topt.options.buffer_size
     }
+
+    if not topt.options.master_key:
+        utils.LOG.error('master_key not specified')
+        sys.exit(1)
 
     if topt.options.unixsocket:
         application = KernelCiBackend()
