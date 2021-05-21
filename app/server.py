@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-# Copyright (C) Collabora Limited 2017
+# Copyright (C) Collabora Limited 2017, 2021
 # Author: Guillaume Tucker <guillaume.tucker@collabora.com>
+# Author: Michal Galka <michal.galka@collabora.com>
 #
 # Copyright (C) Linaro Limited 2014,2015,2016,2017
 # Author: Milo Casagrande <milo.casagrande@linaro.org>
@@ -38,6 +39,7 @@ import utils.db
 
 
 DEFAULT_CONFIG_FILE = "/etc/kernelci/kernelci-backend.cfg"
+DEFAULT_MONGODB_DBNAME = "kernel-ci"
 
 topt.define(
     "master_key", default=str(uuid.uuid4()), type=str, help="The master key")
@@ -57,6 +59,10 @@ topt.define(
 topt.define(
     "mongodb_host",
     default="localhost", type=str, help="The DB host to connect to")
+topt.define(
+    "mongodb_dbname", default=DEFAULT_MONGODB_DBNAME, type=str,
+    help="The DB name to use"
+)
 topt.define(
     "mongodb_port", default=27017, type=int, help="The DB port to connect to")
 topt.define(
@@ -121,6 +127,7 @@ class KernelCiBackend(tornado.web.Application):
             "mongodb_pool": topt.options.mongodb_pool,
             "mongodb_port": topt.options.mongodb_port,
             "mongodb_user": topt.options.mongodb_user,
+            "mongodb_dbname": topt.options.mongodb_dbname,
             "redis_db": topt.options.redis_db,
             "redis_host": topt.options.redis_host,
             "redis_password": topt.options.redis_password,
