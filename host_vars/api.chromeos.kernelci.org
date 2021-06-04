@@ -3,5 +3,5 @@ role: production
 certname: api.chromeos.kernelci.org
 storage_certname: storage.chromeos.kernelci.org
 kci_storage_fqdn: storage.chromeos.kernelci.org
-kci_app_name: chromeos.kernelci.org
+kci_app_name: api.chromeos.kernelci.org
 redis_db: 1
