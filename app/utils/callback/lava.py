@@ -710,7 +710,7 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         ret_code = 401
         msg = "Invalid test data from LAVA callback"
         utils.errors.add_error(errors, ret_code, msg)
-        handle_errors(ex, msg, errors)
+        utils.errors.handle_errors(ex, msg, errors)
 
     if callback is None:
         return None
@@ -721,7 +721,7 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         ret_code = 500
         msg = "Internal error"
         utils.errors.add_error(errors, ret_code, msg)
-        handle_errors(ex, msg, errors)
+        utils.errors.handle_errors(ex, msg, errors)
 
     test_results = LavaResults(callback.results, callback.meta, callback.log)
     plan = LavaPlan(test_results.groups, test_results.cases, callback.meta)
@@ -730,19 +730,10 @@ def add_tests(job_data, job_meta, lab_name, db_options,
         ret_code, plan_doc_id, err = \
             utils.kci_test.import_and_save_kci_tests(plan.data, db_options)
         utils.errors.update_errors(errors, err)
-        handle_errors(errors=errors)
+        utils.errors.handle_errors(errors=errors)
 
     if not plan_doc_id:
         utils.LOG.warn("No test results")
         return None
 
     return plan_doc_id
-
-
-def handle_errors(ex=None, msg=None, errors=None):
-    if ex is not None:
-        utils.LOG.exception(ex)
-    if msg is not None:
-        utils.LOG.error(msg)
-    if errors:
-        raise utils.errors.BackendError(errors)
