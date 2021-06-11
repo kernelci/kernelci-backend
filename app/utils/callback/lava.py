@@ -4,7 +4,7 @@
 # Author: Loys Ollivier <lollivier@baylibre.com>
 # Author: lollivier <lollivier@baylibre.com>
 #
-# Copyright (C) Collabora Limited 2017,2018,2019
+# Copyright (C) Collabora Limited 2017,2018,2019,2020,2021
 # Author: Guillaume Tucker <guillaume.tucker@collabora.com>
 # Author: Michal Galka <michal.galka@collabora.com>
 # Author: Ana Guerrero Lopez <ana.guerrero@collabora.com>
