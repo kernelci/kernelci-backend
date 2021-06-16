@@ -60,19 +60,18 @@ def get_db_client(db_options):
     return CLIENT
 
 
-def get_db_connection2(db_options, db_name=models.DB_NAME):
+def get_db_connection2(db_options):
     """Get a connection to a mongodb database.
 
     Get and in case authenticate to the mongodb database.
 
     :param db_options: The connection parameters.
     :type db_options: dict
-    :param db_name: The name of the database to connect to.
-    :type db_name: str
     :return A mongodb instance.
     """
     if not db_options or not isinstance(db_options, types.DictType):
         db_options = {}
+    db_name = db_options.get("mongodb_dbname", "")
 
     db = get_db_client(db_options)[db_name]
 
@@ -85,14 +84,11 @@ def get_db_connection2(db_options, db_name=models.DB_NAME):
     return db
 
 
-def get_db_connection(db_options, db_name=models.DB_NAME):
+def get_db_connection(db_options):
     """Retrieve a mongodb database connection.
 
     :params db_options: The mongodb database connection parameters.
     :type db_options: dict
-    :param db_name: The name of the database to connect to.
-    Defaults to "kernel-ci".
-    :type db_name: str
     :return A mongodb database instance.
     """
     if not db_options or not isinstance(db_options, types.DictType):
@@ -106,6 +102,7 @@ def get_db_connection(db_options, db_name=models.DB_NAME):
 
     db_user = db_options_get("mongodb_user", "")
     db_pwd = db_options_get("mongodb_password", "")
+    db_name = db_options_get("mongodb_dbname", "")
 
     connection = pymongo.MongoClient(
         host=db_host, maxPoolSize=db_pool, port=db_port, w="majority",
