@@ -557,6 +557,8 @@ class LavaResults(LogFragmentsMixin):
         models.MACH_KEY,
     ]
 
+    INVALID_CHARS_PATTERN = re.compile(r'[^a-zA-Z0-9_-]')
+
     def __init__(self, results, metadata, log):
         """Creates LavaResults class
 
@@ -594,7 +596,9 @@ class LavaResults(LogFragmentsMixin):
             else:
                 suite_name = suite_name.partition("_")[2]
                 group = dict(metadata)
-                group[models.NAME_KEY] = suite_name
+                group[models.NAME_KEY] = self.INVALID_CHARS_PATTERN \
+                    .sub('_',
+                         suite_name)
                 self._add_test_results(group, suite_results)
                 groups.append(group)
         if login_tc and login_tc.get('result') == 'pass' and len(groups) == 0:
@@ -644,6 +648,9 @@ class LavaResults(LogFragmentsMixin):
             }
             test_case.update({k: test[v]
                               for k, v in self.TEST_CASE_MAP.iteritems()})
+            test_case[models.NAME_KEY] = self.INVALID_CHARS_PATTERN \
+                .sub('_',
+                     test_case[models.NAME_KEY])
             test_case.update({k: group[k]
                               for k in self.TEST_CASE_GROUP_KEYS})
             measurement = test.get("measurement")
@@ -667,7 +674,8 @@ class LavaResults(LogFragmentsMixin):
         for test_set in test_sets.iteritems():
             test_set_name, test_set_cases = test_set
             sub_group = {
-                models.NAME_KEY: test_set_name,
+                models.NAME_KEY: self.INVALID_CHARS_PATTERN.sub(
+                    '_', test_set_name),
                 models.TEST_CASES_KEY: test_set_cases,
             }
             sub_groups.append(sub_group)
