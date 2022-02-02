@@ -45,6 +45,7 @@ HTML_HEAD = """\
   span.lavainfo {{color: #B3BEE8; }}
   span.warn {{ color: #FFA500; }}
   span.timestamp {{ color: #AAFFAA; }}
+  a.lineno {{ color: #CCCCCC; }}
   a:link {{text-decoration: none }}
   a:visited {{text-decoration: none }}
   a:active {{text-decoration: none }}
@@ -130,7 +131,10 @@ def run(log, meta, txt, html):
         dt, level, msg = (line.get(k) for k in ["dt", "lvl", "msg"])
         raw_ts = DT_RE.match(dt).groups()[1]
         timestamp = "<span class=\"timestamp\">{}  </span>".format(raw_ts)
-        sl = "<span id=L%d>" % lineno
+        sl = \
+            "<span id=L{lineno}>"\
+            "<a class=\"lineno\" href=\"#L{lineno}\">{lineno:5d}</a> "\
+            .format(lineno=lineno)
         el = "</span>\n"
 
         if isinstance(msg, list):
