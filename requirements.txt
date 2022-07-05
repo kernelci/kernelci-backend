@@ -6,7 +6,7 @@ hiredis==0.2.0
 jinja2
 jsonschema==2.6.0
 netaddr==0.7.18
-pycares==1.0.0
+pycares==4.2.0
 pymongo==3.9.0
 python-jenkins==0.4.11
 python-dateutil
