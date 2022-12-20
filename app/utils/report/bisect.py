@@ -151,6 +151,8 @@ def create_bisect_report(data, email_options, db_options,
         "defconfig": doc[models.DEFCONFIG_FULL_KEY],
         "compiler": compiler_str,
         "test_case_path": doc[models.TEST_CASE_PATH_KEY],
+        "test_case_id": regr[models.REGRESSIONS_KEY][-1][models.TEST_CASE_ID_KEY],
+        "base_url": rcommon.DEFAULT_BASE_URL,
         "show": log_data["show"],
         "log": log_data["log"],
     }
