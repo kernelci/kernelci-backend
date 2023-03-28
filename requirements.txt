@@ -12,7 +12,7 @@ python-jenkins==0.4.11
 python-dateutil
 pytz
 pyyaml==5.4
-redis==2.10.6
+redis==4.5.3
 scandir
 simplejson
 sphinx-bootstrap-theme
