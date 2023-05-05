@@ -9,6 +9,30 @@
     - install
     - app
 
+- name: Retrieve current userid
+  command: id -u
+  register: userid
+  tags:
+    - install
+    - app
+
+- name: Retrieve current groupid
+  command: id -g
+  register: groupid
+  tags:
+    - install
+    - app
+
+- name: Chown to current user to make git happy (CVE-2022-24765)
+  file: path={{ install_base }}/{{ hostname }}
+        state=directory
+        recurse=yes
+        owner={{ userid.stdout }}
+        group={{ groupid.stdout }}
+  tags:
+    - install
+    - app
+
 - name: Checkout kernel-ci-backend code
   git:  repo=https://github.com/kernelci/kernelci-backend.git
         dest={{ install_base }}/{{ hostname }}
