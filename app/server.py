@@ -171,7 +171,7 @@ if __name__ == "__main__":
 
         server = tornado.httpserver.HTTPServer(application, **HTTP_SETTINGS)
         unix_socket = tornado.netutil.bind_unix_socket(
-            "/tmp/kernelci-backend.socket")
+            "/tmp/chromeos-kernelci-backend.socket")
         server.add_socket(unix_socket)
     else:
         KernelCiBackend().listen(topt.options.port, **HTTP_SETTINGS)
