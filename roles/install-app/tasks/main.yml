@@ -58,6 +58,7 @@
 - name: Install pip requirements
   pip:  requirements={{ install_base }}/{{ hostname }}/requirements.txt
         virtualenv={{ install_base }}/.venv/{{ hostname }}
+        virtualenv_python=python2.7
         extra_args="--upgrade"
   notify:
     - restart-kernel-ci-backend
