@@ -1,4 +1,4 @@
-# Copyright (C) Collabora Limited 2019
+# Copyright (C) Collabora Limited 2019, 2023
 # Author: Guillaume Tucker <guillaume.tucker@collabora.com>
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -50,6 +50,17 @@ def _shrink_regressions(regressions_list):
     rlist = copy.copy(regressions_list)
     random.shuffle(rlist)
     return rlist[:3]
+
+
+def _filter_regressions_by_tree(regressions, trees):
+    filtered = {}
+    for plan, regs in regressions.iteritems():
+        filtered_regs = [
+            reg for reg in regs if reg['job'] in trees
+        ]
+        if filtered_regs:
+            filtered[plan] = filtered_regs
+    return filtered
 
 
 def _create_bisection(regr, db):
@@ -146,6 +157,9 @@ def trigger_bisections(job, branch, kernel, plan,
     """
     db = utils.db.get_db_connection(db_options)
     all_regressions = _find_regressions(job, branch, kernel, plan, db)
+    trees = jenkins_options.get('bisection-git-trees')
+    if trees:
+        all_regressions = _filter_regressions_by_tree(all_regressions, trees)
     shrunk_regressions = {
         key: _shrink_regressions(regr_list)
         for key, regr_list in all_regressions.iteritems()
