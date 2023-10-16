@@ -19,6 +19,9 @@ Summary:
   HTML log:   {{ log_url_html }}
   Result:     {{ found }}
 
+See this regression on the Kernel CI dashboard:
+{{ test_case_path }}: {{ base_url }}/test/case/id/{{ test_case_id }}
+
 Checks:
 {%- for check, result in checks|dictsort %}
   {{ "%-11s" | format(check + ":",) }} {{ result }}
